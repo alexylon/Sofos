@@ -95,16 +95,16 @@ export default function Chat() {
     }
 
     return (
-        <Box sx={{flexGrow: 1, p: 10, backgroundColor: '#fafafa'}}>
+        <Box sx={{flexGrow: 1, p: 10, paddingLeft: 35, paddingRight: 35, backgroundColor: '#fafafa'}}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2, minHeight: '100px'}}>
+                    <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2, minHeight: '20px'}}>
                         {completion()}
                     </Box>
                 </Grid>
                 <Grid item xs={12}>
                     <Box sx={{p: 1}}>
-                        {status === 'loading' && (<div>Generating response...</div>)}
+                        {status === 'loading' && (<p>Generating response...</p>)}
                     </Box>
                 </Grid>
                 <Grid item xs={12}>
@@ -112,7 +112,7 @@ export default function Chat() {
                         <TextField
                             fullWidth
                             id="user-input"
-                            label="Input"
+                            label="Send a message..."
                             multiline
                             rows={4}
                             value={input}
