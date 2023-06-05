@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export interface ChatRound {
     userMessage: string;
     botResponse?: string;
+    error?: string;
 }
 
 export interface ChatGptState {

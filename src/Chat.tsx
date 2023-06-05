@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import { Button, Grid, TextField } from '@mui/material';
 import { Configuration, OpenAIApi } from "openai";
 import axios from "axios";
+import { useAppSelector, useAppDispatch } from './app/hooks';
+import { addChatRound, ChatRound, setChatStatus } from "./features/chat/chatGptSlice";
 
 
 const configuration = new Configuration({
@@ -10,13 +12,14 @@ const configuration = new Configuration({
 });
 
 export default function Chat() {
-    const [botResponse, setBotResponse] = useState<any>("");
-    const [error, setError] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const status = useAppSelector(state => state.chatGpt.chatStatus);
+    const chatRounds = useAppSelector(state => state.chatGpt.messages);
+    const dispatch = useAppDispatch();
     const [input, setInput] = useState("");
 
     const onSubmit = () => {
+        dispatch(setChatStatus('loading'));
+
         async function getCompletion() {
             const openai = new OpenAIApi(configuration);
             return await openai.createChatCompletion({
@@ -28,13 +31,22 @@ export default function Chat() {
 
         getCompletion()
             .then(completion => {
-                setBotResponse(completion?.data?.choices[0]?.message?.content);
-                setLoading(false);
+                dispatch(setChatStatus('idle'));
+                dispatch(addChatRound({
+                    userMessage: input,
+                    botResponse: completion?.data?.choices[0]?.message?.content,
+                    error: "",
+                }))
+                setInput("");
             })
             .catch(function (e) {
-                setError(true);
-                setErrorMessage(e.message);
-                setLoading(false);
+                dispatch(setChatStatus('failed'));
+                dispatch(addChatRound({
+                    userMessage: input,
+                    botResponse: "",
+                    error: e.message,
+                }))
+                setInput("");
                 if (axios.isCancel(e)) {
                     console.log(`request cancelled:${e.message}`);
                 } else {
@@ -46,19 +58,38 @@ export default function Chat() {
     const completion = () => {
         return (
             <div style={{minHeight: "auto", height: "auto"}}>
-                {loading ? (
-                    <div>Loading...</div>
-                ) : error ? (
-                    <div>Error: {errorMessage}</div>
-                ) : (
-                    <div>
-                        {botResponse ? (
-                            <p>{botResponse}</p>
-                        ) : (
-                            <div>Loading...</div>
-                        )}
-                    </div>
-                )}
+                <div>
+                    {chatRounds && (chatRounds.map((chatRound: ChatRound) => {
+                            return (
+                                <>
+                                    <Grid item xs={12}>
+                                        <Box sx={{
+                                            border: '2px solid #ddd',
+                                            borderRadius: '4px',
+                                            p: 2,
+                                            minHeight: '20px',
+                                            backgroundColor: '#e0e0e0'
+                                        }}>
+                                            {chatRound.userMessage}
+                                        </Box>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Box sx={{
+                                            border: '2px solid #ddd',
+                                            borderRadius: '4px',
+                                            p: 2,
+                                            minHeight: '20px',
+                                            backgroundColor: 'lightblue'
+                                        }}>
+                                            {chatRound.botResponse}
+                                        </Box>
+                                    </Grid>
+                                    <br/>
+                                </>
+                            )
+                        })
+                    )}
+                </div>
             </div>
         )
     }
@@ -67,7 +98,17 @@ export default function Chat() {
         <Box sx={{flexGrow: 1, p: 10, backgroundColor: '#fafafa'}}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <Box sx={{border: '1px solid #ddd', borderRadius: '4px', p: 2}}>
+                    <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2, minHeight: '100px'}}>
+                        {completion()}
+                    </Box>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={{p: 1}}>
+                        {status === 'loading' && (<div>Generating response...</div>)}
+                    </Box>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2}}>
                         <TextField
                             fullWidth
                             id="user-input"
@@ -79,18 +120,20 @@ export default function Chat() {
                                 setInput(event.target.value);
                             }}
                             variant="outlined"
+                            disabled={status === 'loading'}
                         />
                     </Box>
                 </Grid>
                 <Grid item xs={12} md={2}>
-                    <Button variant="contained" color="primary" onClick={onSubmit} fullWidth>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={onSubmit}
+                        fullWidth
+                        disabled={status === 'loading'}
+                    >
                         Send
                     </Button>
-                </Grid>
-                <Grid item xs={12}>
-                    <Box sx={{border: '1px solid #ddd', borderRadius: '4px', p: 2, minHeight: '100px'}}>
-                        {completion()}
-                    </Box>
                 </Grid>
             </Grid>
         </Box>
