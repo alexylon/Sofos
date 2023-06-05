@@ -79,9 +79,12 @@ export default function Chat() {
                                             borderRadius: '4px',
                                             p: 2,
                                             minHeight: '20px',
-                                            backgroundColor: 'lightblue'
+                                            backgroundColor: status !== 'failed' ? 'lightblue' : '#FF7276'
                                         }}>
-                                            {chatRound.botResponse}
+                                            {status !== 'failed'
+                                                ? chatRound.botResponse
+                                                :
+                                                chatRound.error}
                                         </Box>
                                     </Grid>
                                     <br/>
