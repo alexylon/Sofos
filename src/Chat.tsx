@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Grid, Input, Slider, TextField } from '@mui/material';
 import { Configuration, OpenAIApi } from "openai";
 import axios from "axios";
 import { useAppSelector, useAppDispatch } from './app/hooks';
 import { addChatRound, ChatRound, setChatStatus } from "./features/chat/chatGptSlice";
+import ThermostatIcon from '@mui/icons-material/Thermostat';
 
 
 const configuration = new Configuration({
@@ -16,16 +17,20 @@ export default function Chat() {
     const chatRounds = useAppSelector(state => state.chatGpt.messages);
     const dispatch = useAppDispatch();
     const [input, setInput] = useState("");
+    const [temperatureValue, setTemperatureValue] = React.useState<number | string | Array<number | string>>(
+        0.7,
+    );
 
     const onSubmit = () => {
         dispatch(setChatStatus('loading'));
 
         async function getCompletion() {
+            console.log("Number(temperatureValue): ", Number(temperatureValue))
             const openai = new OpenAIApi(configuration);
             return await openai.createChatCompletion({
                 model: "gpt-3.5-turbo",
                 messages: [{"role": "user", "content": input}],
-                temperature: 0.2
+                temperature: Number(temperatureValue),
             });
         }
 
@@ -59,9 +64,9 @@ export default function Chat() {
         return (
             <div style={{minHeight: "auto", height: "auto"}}>
                 <div>
-                    {chatRounds && (chatRounds.map((chatRound: ChatRound) => {
+                    {chatRounds && (chatRounds.map((chatRound: ChatRound, index: number) => {
                             return (
-                                <>
+                                <div key={index}>
                                     <Grid item xs={12}>
                                         <Box sx={{
                                             border: '2px solid #ddd',
@@ -88,7 +93,7 @@ export default function Chat() {
                                         </Box>
                                     </Grid>
                                     <br/>
-                                </>
+                                </div>
                             )
                         })
                     )}
@@ -97,9 +102,81 @@ export default function Chat() {
         )
     }
 
+    const handleSliderChange = (event: Event, newValue: number | number[]) => {
+        setTemperatureValue(newValue);
+    };
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTemperatureValue(event.target.value === '' ? '' : Number(event.target.value));
+    };
+
+    const handleBlur = () => {
+        if (temperatureValue < 0) {
+            setTemperatureValue(0);
+        } else if (temperatureValue > 2) {
+            setTemperatureValue(2);
+        }
+    };
+
+    const marks = [
+        {
+            value: 0,
+            label: '0',
+        },
+        {
+            value: 2,
+            label: '2',
+        },
+    ];
+
+    const slider = () => {
+        return (
+            <>
+                <Box sx={{width: 350}}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item>
+                            <ThermostatIcon/>
+                        </Grid>
+                        <Grid item xs>
+                            <Slider
+                                value={typeof temperatureValue === 'number' ? temperatureValue : 0.7}
+                                onChange={handleSliderChange}
+                                step={0.1}
+                                min={0}
+                                max={2}
+                                marks={marks}
+                                aria-labelledby="input-slider"
+                            />
+                        </Grid>
+                        <Grid item>
+                            <Box sx={{p: 1, marginTop: -6}}>
+                                <Input
+                                    value={temperatureValue}
+                                    size="small"
+                                    onChange={handleInputChange}
+                                    onBlur={handleBlur}
+                                    inputProps={{
+                                        step: 0.1,
+                                        min: 0,
+                                        max: 2.0,
+                                        type: 'number',
+                                        'aria-labelledby': 'input-slider',
+                                    }}
+                                />
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </>
+        )
+    }
+
     return (
         <Box sx={{flexGrow: 1, p: 10, paddingLeft: 35, paddingRight: 35, backgroundColor: '#fafafa'}}>
             <Grid container spacing={2}>
+                <Grid item xs={12}>
+                    {slider()}
+                </Grid>
                 <Grid item xs={12}>
                     <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2, minHeight: '20px'}}>
                         {completion()}
