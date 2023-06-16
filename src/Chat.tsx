@@ -85,7 +85,7 @@ export default function Chat() {
                                             p: 3,
                                             marginBottom: -1,
                                             minHeight: '20px',
-                                            backgroundColor: status !== 'failed' ? '#EEEEEE' : '#FF7276'
+                                            backgroundColor: status !== 'failed' ? '#E1E1E1' : '#FF7276'
                                         }}>
                                             {status !== 'failed'
                                                 ?
@@ -176,7 +176,7 @@ export default function Chat() {
     }
 
     return (
-        <Box sx={{flexGrow: 1, p: 10, paddingLeft: 35, paddingRight: 35, backgroundColor: '#fafafa'}}>
+        <Box sx={{flexGrow: 1, p: 10, paddingLeft: 35, paddingRight: 35, backgroundColor: '#F0F0F0'}}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     {slider()}
@@ -205,6 +205,7 @@ export default function Chat() {
                             }}
                             variant="outlined"
                             disabled={status === 'loading'}
+                            sx={{borderRadius: '5px', backgroundColor: '#FAFAFA'}}
                         />
                     </Box>
                 </Grid>

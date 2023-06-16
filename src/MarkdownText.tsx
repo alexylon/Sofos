@@ -19,7 +19,7 @@ const MarkdownText = ({children}: any) => {
                             PreTag="div"
                         />
                     ) : (
-                        <code className={className} {...props} style={{fontWeight: 'bold', backgroundColor: '#DDDDDD', padding: '2px', borderRadius: '3px'}}>
+                        <code className={className} {...props} style={{fontWeight: 'bold', backgroundColor: '#D1D1D1', padding: '2px', borderRadius: '3px'}}>
                             {children}
                         </code>
                     )
