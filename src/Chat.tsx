@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Box from '@mui/material/Box';
-import { Button, Grid, Input, Slider, TextField } from '@mui/material';
-import { Configuration, OpenAIApi } from "openai";
+import {Button, Grid, Input, Slider, TextField} from '@mui/material';
+import {Configuration, OpenAIApi} from "openai";
 import axios from "axios";
-import { useAppSelector, useAppDispatch } from './app/hooks';
-import { addChatRound, ChatRound, setChatStatus } from "./features/chat/chatGptSlice";
+import {useAppSelector, useAppDispatch} from './app/hooks';
+import {addChatRound, ChatRound, setChatStatus} from "./features/chat/chatGptSlice";
 import ThermostatIcon from '@mui/icons-material/Thermostat';
+import MarkdownText from "./MarkdownText";
 
 
 const configuration = new Configuration({
@@ -69,25 +70,28 @@ export default function Chat() {
                                 <div key={index}>
                                     <Grid item xs={12}>
                                         <Box sx={{
-                                            border: '2px solid #ddd',
-                                            borderRadius: '4px',
-                                            p: 2,
+                                            borderRadius: '5px',
+                                            p: 3,
+                                            marginBottom: 1.5,
                                             minHeight: '20px',
-                                            backgroundColor: '#e0e0e0'
+                                            backgroundColor: '#85c1e2'
                                         }}>
                                             {chatRound.userMessage}
                                         </Box>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Box sx={{
-                                            border: '2px solid #ddd',
-                                            borderRadius: '4px',
-                                            p: 2,
+                                            borderRadius: '5px',
+                                            p: 3,
+                                            marginBottom: -1,
                                             minHeight: '20px',
-                                            backgroundColor: status !== 'failed' ? 'lightblue' : '#FF7276'
+                                            backgroundColor: status !== 'failed' ? '#EEEEEE' : '#FF7276'
                                         }}>
                                             {status !== 'failed'
-                                                ? chatRound.botResponse
+                                                ?
+                                                <MarkdownText>
+                                                    {chatRound.botResponse}
+                                                </MarkdownText>
                                                 :
                                                 chatRound.error}
                                         </Box>
@@ -178,7 +182,7 @@ export default function Chat() {
                     {slider()}
                 </Grid>
                 <Grid item xs={12}>
-                    <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2, minHeight: '20px'}}>
+                    <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 2, minHeight: '20px'}}>
                         {completion()}
                     </Box>
                 </Grid>
@@ -188,7 +192,7 @@ export default function Chat() {
                     </Box>
                 </Grid>
                 <Grid item xs={12}>
-                    <Box sx={{border: '2px solid #ddd', borderRadius: '4px', p: 2}}>
+                    <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 2}}>
                         <TextField
                             fullWidth
                             id="user-input"
