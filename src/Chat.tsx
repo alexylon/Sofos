@@ -176,7 +176,7 @@ export default function Chat() {
     }
 
     return (
-        <Box sx={{flexGrow: 1, p: 10, paddingLeft: 35, paddingRight: 35, backgroundColor: '#F0F0F0'}}>
+        <Box sx={{flexGrow: 1, p: 10, maxWidth: 800, marginLeft: "auto", marginRight: "auto", backgroundColor: '#F0F0F0'}}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     {slider()}
