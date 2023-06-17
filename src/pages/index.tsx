@@ -1,5 +1,7 @@
 import React from 'react';
+import './index.css';
 import Chat from "./Chat";
+import { wrapper } from "@/store/store";
 
 function App() {
     return (
@@ -9,4 +11,4 @@ function App() {
     );
 }
 
-export default App;
+export default wrapper.withRedux(App);

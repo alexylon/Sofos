@@ -1,41 +1,28 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
-import {Button, Grid, Input, Slider, TextField} from '@mui/material';
-import {Configuration, OpenAIApi} from "openai";
+import { Button, Grid, Input, Slider, TextField } from '@mui/material';
 import axios from "axios";
-import {useAppSelector, useAppDispatch} from './app/hooks';
-import {addChatRound, ChatRound, setChatStatus} from "./features/chat/chatGptSlice";
+import { useAppSelector, useAppDispatch } from '@/store/hooks';
+import { addChatRound, ChatRound, setChatStatus } from "@/features/chat/chatGptSlice";
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import MarkdownText from "./MarkdownText";
+import getCompletion from "@/pages/api/getData";
 
-
-const configuration = new Configuration({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY,
-});
 
 export default function Chat() {
+    console.log("apiKey: ", process.env.OPENAI_API_KEY)
     const status = useAppSelector(state => state.chatGpt.chatStatus);
     const chatRounds = useAppSelector(state => state.chatGpt.messages);
     const dispatch = useAppDispatch();
     const [input, setInput] = useState("");
-    const [temperatureValue, setTemperatureValue] = React.useState<number | string | Array<number | string>>(
+    const [temperatureValue, setTemperatureValue] = useState<number | number[]>(
         0.7,
     );
 
     const onSubmit = () => {
         dispatch(setChatStatus('loading'));
 
-        async function getCompletion() {
-            console.log("Number(temperatureValue): ", Number(temperatureValue))
-            const openai = new OpenAIApi(configuration);
-            return await openai.createChatCompletion({
-                model: "gpt-3.5-turbo",
-                messages: [{"role": "user", "content": input}],
-                temperature: Number(temperatureValue),
-            });
-        }
-
-        getCompletion()
+        getCompletion(input, temperatureValue)
             .then(completion => {
                 dispatch(setChatStatus('idle'));
                 dispatch(addChatRound({
@@ -74,7 +61,7 @@ export default function Chat() {
                                             p: 3,
                                             marginBottom: 1.5,
                                             minHeight: '20px',
-                                            backgroundColor: '#85c1e2'
+                                            backgroundColor: '#a9d3ea'
                                         }}>
                                             {chatRound.userMessage}
                                         </Box>
@@ -85,7 +72,7 @@ export default function Chat() {
                                             p: 3,
                                             marginBottom: -1,
                                             minHeight: '20px',
-                                            backgroundColor: status !== 'failed' ? '#E1E1E1' : '#FF7276'
+                                            backgroundColor: status !== 'failed' ? '#d5d5d5' : '#ff8083'
                                         }}>
                                             {status !== 'failed'
                                                 ?
@@ -111,16 +98,18 @@ export default function Chat() {
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTemperatureValue(event.target.value === '' ? '' : Number(event.target.value));
+        setTemperatureValue(event.target.value === '' ? 0 : Number(event.target.value));
     };
 
     const handleBlur = () => {
-        if (temperatureValue < 0) {
-            setTemperatureValue(0);
-        } else if (temperatureValue > 2) {
-            setTemperatureValue(2);
+        if (!Array.isArray(temperatureValue)) {
+            if (temperatureValue < 0) {
+                setTemperatureValue(0);
+            } else if (temperatureValue > 2) {
+                setTemperatureValue(2);
+            }
         }
-    };
+    }
 
     const marks = [
         {
@@ -143,7 +132,7 @@ export default function Chat() {
                         </Grid>
                         <Grid item xs>
                             <Slider
-                                value={typeof temperatureValue === 'number' ? temperatureValue : 0.7}
+                                value={temperatureValue}
                                 onChange={handleSliderChange}
                                 step={0.1}
                                 min={0}
@@ -176,7 +165,14 @@ export default function Chat() {
     }
 
     return (
-        <Box sx={{flexGrow: 1, p: 10, maxWidth: 800, marginLeft: "auto", marginRight: "auto", backgroundColor: '#F0F0F0'}}>
+        <Box sx={{
+            flexGrow: 1,
+            p: 10,
+            maxWidth: 800,
+            marginLeft: "auto",
+            marginRight: "auto",
+            backgroundColor: '#F0F0F0'
+        }}>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     {slider()}
