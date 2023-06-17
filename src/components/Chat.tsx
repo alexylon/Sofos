@@ -10,7 +10,6 @@ import getCompletion from "@/pages/api/getData";
 
 
 export default function Chat() {
-    console.log("apiKey: ", process.env.OPENAI_API_KEY)
     const status = useAppSelector(state => state.chatGpt.chatStatus);
     const chatRounds = useAppSelector(state => state.chatGpt.messages);
     const dispatch = useAppDispatch();
