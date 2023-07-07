@@ -20,4 +20,4 @@ function App({...rest}) {
     );
 }
 
-export default wrapper.withRedux(App);
+export default App;
