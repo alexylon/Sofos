@@ -1,0 +1,13 @@
+{
+  "tauri": {
+    "windows": [
+      {
+        "title": "Ferrocrypt",
+        "fullscreen": false,
+        "resizable": true,
+        "height": 900,
+        "width": 600
+      }
+    ]
+  }
+}

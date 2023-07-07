@@ -5,13 +5,18 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Chat from "../components/Chat";
-import { wrapper } from "@/store/store";
+import {Provider} from "react-redux";
+import {wrapper} from "@/store/store";
 
-function App() {
+function App({...rest}) {
+    const {store, props} = wrapper.useWrappedStore(rest);
+
     return (
-        <div className="App">
-            <Chat/>
-        </div>
+        <Provider store={store}>
+            <div className="App">
+                <Chat/>
+            </div>
+        </Provider>
     );
 }
 

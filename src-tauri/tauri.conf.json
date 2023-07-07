@@ -55,10 +55,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
         "resizable": true,
         "title": "Sofos",
-        "width": 800
+        "height": 900,
+        "width": 600
       }
     ]
   }
