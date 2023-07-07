@@ -1,5 +1,5 @@
 {
-  "name": "openai-app",
+  "name": "sofos",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,6 +15,8 @@
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.3",
     "@reduxjs/toolkit": "^1.9.5",
+    "@tauri-apps/api": "^1.4.0",
+    "@tauri-apps/cli": "^1.4.0",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",
     "@types/react-dom": "18.2.5",
