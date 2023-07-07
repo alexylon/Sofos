@@ -8,6 +8,7 @@ import getCompletion from "@/pages/api/getData";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 import Completion from "@/components/Completion";
 import TemperatureSlider from "@/components/TemperatureSlider";
+import {TextareaAutosize} from "@mui/base";
 
 
 export default function Chat() {
@@ -87,7 +88,14 @@ export default function Chat() {
                                 id="user-input"
                                 label="Send a message..."
                                 multiline
-                                rows={4}
+                                InputProps={{
+                                    inputComponent: TextareaAutosize,
+                                    inputProps: {
+                                        minRows: 1,
+                                        maxRows: 10,
+                                        style: { resize: 'none' },
+                                    },
+                                }}
                                 value={input}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                     setInput(event.target.value);

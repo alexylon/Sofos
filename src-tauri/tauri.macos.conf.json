@@ -5,8 +5,8 @@
         "title": "Sofos",
         "fullscreen": false,
         "resizable": true,
-        "height": 900,
-        "width": 800
+        "width": 700,
+        "height": 900
       }
     ]
   }
