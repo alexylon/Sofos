@@ -1,34 +1,30 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Sofos
 
-## Getting Started
+Sofos is a cross-platform desktop application for ChatGPT, implemented with React (TypeScript and Next.js) and Rust (Tauri)
 
-First, run the development server:
+## BUILD the GUI app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+After installing [Rust](https://www.rust-lang.org/learn/get-started),
+and [Node.js](https://nodejs.org/) just run the following commands in the `ferrocrypt-gui` directory:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install the `create-tauri-app` utility:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```cargo install create-tauri-app```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Install the Tauri CLI:
 
-## Learn More
+```cargo install tauri-cli```
 
-To learn more about Next.js, take a look at the following resources:
+Install node modules:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```npm install```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Build the app to a binary executable file:
 
-## Deploy on Vercel
+```cargo tauri build```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The binary executable file of the GUI app will be generated in `ferrocrypt-gui/src-tauri/target/release/bundle/`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+You can start a live dev session with ```cargo tauri dev```
+
+<br/>
