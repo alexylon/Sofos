@@ -2,11 +2,11 @@
   "tauri": {
     "windows": [
       {
-        "title": "Ferrocrypt",
+        "title": "Sofos",
         "fullscreen": false,
         "resizable": true,
         "height": 900,
-        "width": 600
+        "width": 800
       }
     ]
   }

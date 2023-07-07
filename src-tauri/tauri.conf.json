@@ -28,7 +28,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.sofos.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -58,7 +58,7 @@
         "resizable": true,
         "title": "Sofos",
         "height": 900,
-        "width": 600
+        "width": 800
       }
     ]
   }

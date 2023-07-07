@@ -5,7 +5,7 @@ Sofos is a cross-platform desktop application for ChatGPT, implemented with Reac
 ## BUILD the GUI app
 
 After installing [Rust](https://www.rust-lang.org/learn/get-started),
-and [Node.js](https://nodejs.org/) just run the following commands in the `ferrocrypt-gui` directory:
+and [Node.js](https://nodejs.org/) just run the following commands in the `root` directory:
 
 Install the `create-tauri-app` utility:
 
@@ -23,8 +23,19 @@ Build the app to a binary executable file:
 
 ```cargo tauri build```
 
-The binary executable file of the GUI app will be generated in `ferrocrypt-gui/src-tauri/target/release/bundle/`
+The portable binary executable file of the desktop app will be generated in `src-tauri/target/release/`
+The installation file of the desktop app will be generated in `src-tauri/target/release/bundle/`
 
 You can start a live dev session with ```cargo tauri dev```
 
 <br/>
+
+## RUN the React/Next.js App in a browser
+
+Just run the following commands in the `root` directory:
+
+```npm install```
+
+```npm run dev```
+
+Then navigate to http://localhost:3000 in your browser
