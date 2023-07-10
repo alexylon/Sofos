@@ -1,8 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 
 
-const AutoScrollingWindow = ({chatRoundsCount, children}: any) => {
+const AutoScrollingWindow = ({children, messages}: any) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const propertyValues = Object.values(messages);
 
     const scrollToLastMessage = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -10,10 +11,10 @@ const AutoScrollingWindow = ({chatRoundsCount, children}: any) => {
 
     useEffect(() => {
         scrollToLastMessage();
-    }, [chatRoundsCount]);
+    }, [propertyValues]);
 
     return (
-        <div style={{ overflowY: 'auto', position: 'relative' }}>
+        <div style={{ position: 'relative' }}>
             {children}
             <div ref={messagesEndRef}/>
         </div>

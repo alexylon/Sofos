@@ -45,7 +45,7 @@ export default function TemperatureSlider({handleTemperatureInputChange, setTemp
                             step={0.1}
                             min={0}
                             max={2}
-                            marks={marks}
+                            // marks={marks}
                             aria-labelledby="input-slider"
                         />
                     </Grid>

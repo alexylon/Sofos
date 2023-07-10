@@ -2,12 +2,9 @@
 
 const nextConfig = {
     reactStrictMode: true,
-    transpilePackages: ['react', '@mui/material', 'openai', 'axios', 'react-markdown', 'react-syntax-highlighter'],
-    env:{
-        OPENAI_API_KEY : process.env.OPENAI_API_KEY,
-    },
     trailingSlash: true,
-    output: 'export',
+    // distDir: 'out',
+    // output: 'export',
 }
 
 module.exports = nextConfig
