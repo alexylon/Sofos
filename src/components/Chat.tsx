@@ -10,7 +10,7 @@ import {useChat} from 'ai/react'
 
 
 export default function Chat() {
-    const {messages, input, handleInputChange, handleSubmit} = useChat()
+    const {input, isLoading, handleInputChange, handleSubmit, messages, stop} = useChat();
     // const [temperatureValue, setTemperatureValue] = useState<number | number[]>(
     //     0.7,
     // );
@@ -78,7 +78,7 @@ export default function Chat() {
                         />
                     </Box>
                 </Grid>
-                <Grid item xs={12} md={2}>
+                <Grid item xs={12} md={6}>
                     <Button
                         variant="contained"
                         color="primary"
@@ -87,6 +87,16 @@ export default function Chat() {
                         disabled={false}
                     >
                         Send
+                    </Button>
+                </Grid>
+                <Grid item xs={12} md={6} style={{display: "flex", justifyContent: "flex-end"}}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={stop as () => void}
+                        disabled={!isLoading}
+                    >
+                        Abort
                     </Button>
                 </Grid>
             </Grid>
