@@ -10,7 +10,7 @@ import {useChat} from 'ai/react'
 
 
 export default function Chat() {
-    const {input, isLoading, handleInputChange, handleSubmit, messages, stop} = useChat();
+    const {input, isLoading, handleInputChange, handleSubmit, messages, reload, stop} = useChat();
     // const [temperatureValue, setTemperatureValue] = useState<number | number[]>(
     //     0.7,
     // );
@@ -50,7 +50,7 @@ export default function Chat() {
                         flex: 1, // This will allow it to expand and shrink
                         mb: 0, // Adding margin at the bottom
                     }}>
-                        <Completion messages={messages}/>
+                        <Completion messages={messages} reload={reload}/>
                     </Box>
                 </Grid>
             </Grid>

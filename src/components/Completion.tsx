@@ -1,16 +1,16 @@
 import React from "react";
-import {Grid} from "@mui/material";
+import {Button, Grid} from "@mui/material";
 import Box from "@mui/material/Box";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 
 
-export default function Completion({messages}: any) {
+export default function Completion({messages, reload}: any) {
 
     return (
         <AutoScrollingWindow style={{flexGrow: 1}} messages={messages}>
             <div style={{minHeight: "auto", height: "auto"}}>
-                {messages.map((m: any) => (
+                {messages.map((m: any, i: number) => (
                     <div key={m.id}>
                         {m.role === 'user'
                             ?
@@ -35,6 +35,14 @@ export default function Completion({messages}: any) {
                                     <MarkdownText>
                                         {m.content}
                                     </MarkdownText>
+                                    {i === messages.length - 1 && m.role !== 'assistant' && (
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={reload}>
+                                            Reload
+                                        </Button>
+                                    )}
                                 </Box>
                             </Grid>
                         }
