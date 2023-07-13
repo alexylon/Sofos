@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react';
-import {AppBar, Avatar, Box, Toolbar, Typography, Button, IconButton} from '@mui/material';
+import {AppBar, Avatar, Box, Toolbar, Typography, Button, IconButton, Grid} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import {signIn, signOut, useSession} from "next-auth/react"
 
@@ -12,6 +12,7 @@ export default function HeaderAppBar() {
     return (
         <>
             {!session && (
+                <Grid container spacing={2} sx={{position: 'fixed', top: 15}}>
                 <Box sx={{flexGrow: 1}}>
                     <AppBar position="static">
                         <Toolbar variant="dense">
@@ -41,8 +42,10 @@ export default function HeaderAppBar() {
                         </Toolbar>
                     </AppBar>
                 </Box>
+                </Grid>
             )}
             {session?.user && (
+                <Grid container spacing={2} sx={{position: 'fixed', top: 15}}>
                 <Box sx={{flexGrow: 1}}>
                     <AppBar position="static">
                         <Toolbar variant="dense">
@@ -77,6 +80,7 @@ export default function HeaderAppBar() {
                         </Toolbar>
                     </AppBar>
                 </Box>
+                </Grid>
             )}
             <div>{!session && loading ? "loading..." : ""}</div>
         </>
