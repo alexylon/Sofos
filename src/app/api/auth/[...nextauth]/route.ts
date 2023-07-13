@@ -1,6 +1,7 @@
 import NextAuth, {NextAuthOptions} from "next-auth"
 import GithubProvider from "next-auth/providers/github"
-export const authOptions: NextAuthOptions = {
+
+const authOptions: NextAuthOptions = {
     // Configure one or more authentication providers
     session: {
         strategy: "jwt",
