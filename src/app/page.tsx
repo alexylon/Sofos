@@ -5,7 +5,6 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Chat from "../components/Chat";
-import Login from "@/components/Login";
 
 
 export default function App() {

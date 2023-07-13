@@ -1,5 +1,3 @@
-'use client'
-
 import './globals.css'
 import {Inter} from 'next/font/google'
 import React from "react";
@@ -13,11 +11,7 @@ export const metadata = {
     description: 'ChatGPT Client',
 }
 
-export default function RootLayout({
-                                       children,
-                                   }: {
-    children: React.ReactNode
-}) {
+export default function RootLayout({children,}: { children: React.ReactNode }) {
     return (
         <html lang="en">
         <body className={inter.className}>
