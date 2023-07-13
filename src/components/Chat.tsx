@@ -90,7 +90,7 @@ export default function Chat() {
             py: 1,
             mt: 1
         }}>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={{position: 'fixed', top: 65, maxWidth: '732px', pr: 2}}>
                 <Grid item xs={12} className="messageContainer">
                     <Box sx={{
                         border: '2px solid #ddd',
