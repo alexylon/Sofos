@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
 import {Button, Grid, TextField} from '@mui/material';
 import Completion from "@/components/Completion";
@@ -9,6 +9,8 @@ import {useChat} from 'ai/react'
 
 
 export default function Chat() {
+    const [nodeHeight, setNodeHeight] = useState(0);
+
     const {
         input,
         isLoading,
@@ -49,6 +51,20 @@ export default function Chat() {
         });
     };
 
+    const textFieldRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (textFieldRef.current) {
+            const inputElement = textFieldRef.current.querySelector('textarea');
+            if (inputElement) {
+                setTimeout(() => {
+                    const { height } = window.getComputedStyle(inputElement);
+                    setNodeHeight(parseFloat(height));
+                }, 0);
+            }
+        }
+    }, [input]);
+
     return (
         <Box sx={{
             height: '96vh',
@@ -68,7 +84,7 @@ export default function Chat() {
                         border: '2px solid #ddd',
                         borderRadius: '5px',
                         p: 1,
-                        maxHeight: 'calc(90vh - 100px)', // Here, adjust the 100px value based on the height of sendMessageContainer and any desired margins
+                        maxHeight: `calc(94vh - ${Math.max(150, 127 + nodeHeight)}px)`,
                         overflowY: 'auto',
                         flex: 1, // This will allow it to expand and shrink
                         mb: 0, // Adding margin at the bottom
@@ -77,10 +93,11 @@ export default function Chat() {
                     </Box>
                 </Grid>
             </Grid>
-            <Grid container spacing={2} className="sendMessageContainer">
+            <Grid container spacing={2} className="sendMessageContainer" sx={{position: 'fixed', bottom: 40, width: '715px'}}>
                 <Grid item xs={12}>
                     <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
                         <TextField
+                            ref={textFieldRef}
                             fullWidth
                             id="user-input"
                             label={"Send a message..."}
