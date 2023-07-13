@@ -2,15 +2,16 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import Box from '@mui/material/Box';
-import {Button, Grid, TextField} from '@mui/material';
+import {Button, Grid, IconButton, InputAdornment, TextField} from '@mui/material';
 import Completion from "@/components/Completion";
 import {TextareaAutosize} from "@mui/base";
 import {useChat} from 'ai/react'
+import {useSession} from "next-auth/react"
+import SendIcon from '@mui/icons-material/Send';
 
 
 export default function Chat() {
     const [nodeHeight, setNodeHeight] = useState(0);
-
     const {
         input,
         isLoading,
@@ -21,6 +22,8 @@ export default function Chat() {
         setInput,
         stop
     } = useChat();
+
+    const {data: session} = useSession();
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
@@ -58,16 +61,24 @@ export default function Chat() {
             const inputElement = textFieldRef.current.querySelector('textarea');
             if (inputElement) {
                 setTimeout(() => {
-                    const { height } = window.getComputedStyle(inputElement);
+                    const {height} = window.getComputedStyle(inputElement);
                     setNodeHeight(parseFloat(height));
                 }, 0);
             }
         }
     }, [input]);
 
+    if (!session) {
+        return (
+            <>
+
+            </>
+        )
+    }
+
     return (
         <Box sx={{
-            height: '96vh',
+            height: '91vh',
             maxWidth: 700,
             marginLeft: "auto",
             marginRight: "auto",
@@ -84,7 +95,7 @@ export default function Chat() {
                         border: '2px solid #ddd',
                         borderRadius: '5px',
                         p: 1,
-                        maxHeight: `calc(94vh - ${Math.max(150, 127 + nodeHeight)}px)`,
+                        maxHeight: `calc(92vh - ${Math.max(160, 137 + nodeHeight)}px)`,
                         overflowY: 'auto',
                         flex: 1, // This will allow it to expand and shrink
                         mb: 0, // Adding margin at the bottom
@@ -93,7 +104,12 @@ export default function Chat() {
                     </Box>
                 </Grid>
             </Grid>
-            <Grid container spacing={2} className="sendMessageContainer" sx={{position: 'fixed', bottom: 40, width: '715px'}}>
+            <Grid
+                container
+                spacing={2}
+                className="sendMessageContainer"
+                sx={{position: 'fixed', bottom: 30, width: '715px'}}
+            >
                 <Grid item xs={12}>
                     <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
                         <TextField
@@ -109,6 +125,13 @@ export default function Chat() {
                                     maxRows: 10,
                                     style: {resize: 'none'},
                                 },
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton edge="end" color="primary" onClick={handleSubmit as () => void}>
+                                            <SendIcon/>
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
                             }}
                             value={input}
                             onChange={handleInputChange}
@@ -118,45 +141,44 @@ export default function Chat() {
                         />
                     </Box>
                 </Grid>
-                <Grid item xs={12} md={4}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSubmit as () => void}
-                        fullWidth
-                        disabled={false}
-                    >
-                        Send
-                    </Button>
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <input
-                        type="file"
-                        id="file-input"
-                        style={{display: 'none'}}
-                        onChange={handleFileChange}
-                    />
-                    <label htmlFor="file-input">
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        mt: 1,
+                        ml: 2
+                    }}
+                >
+                    <Grid item xs={12} md={4}>
+                        <input
+                            type="file"
+                            id="file-input"
+                            style={{display: 'none'}}
+                            onChange={handleFileChange}
+                        />
+                        <label htmlFor="file-input">
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                component="span"
+                                style={{minWidth: "120px"}}
+                            >
+                                Select File
+                            </Button>
+                        </label>
+                    </Grid>
+                    <Grid item xs={12} md={4} sx={{ml: "50px"}}>
                         <Button
-                            variant="outlined"
+                            variant="contained"
                             color="primary"
-                            component="span"
-                            style={{minWidth: "120px"}}>
-                            Select File
+                            onClick={stop as () => void}
+                            disabled={!isLoading}
+                            style={{minWidth: "120px"}}
+                        >
+                            Abort
                         </Button>
-                    </label>
-                </Grid>
-                <Grid item xs={12} md={4} style={{display: "flex", justifyContent: "flex-end"}}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={stop as () => void}
-                        disabled={!isLoading}
-                        style={{minWidth: "120px"}}
-                    >
-                        Abort
-                    </Button>
-                </Grid>
+                    </Grid>
+                </Box>
             </Grid>
         </Box>
     );

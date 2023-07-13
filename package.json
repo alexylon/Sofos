@@ -19,6 +19,7 @@
     "@tauri-apps/cli": "^1.4.0",
     "ai": "^2.1.15",
     "next": "13.4.9",
+    "next-auth": "^4.22.1",
     "next-redux-wrapper": "^8.1.0",
     "openai": "^3.3.0",
     "openai-edge": "^1.2.0",

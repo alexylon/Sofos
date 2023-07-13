@@ -5,14 +5,14 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import Chat from "../components/Chat";
+import Login from "@/components/Login";
 
-function App() {
+
+export default function App() {
 
     return (
-        <div>
+        <>
             <Chat/>
-        </div>
+        </>
     );
 }
-
-export default App;
