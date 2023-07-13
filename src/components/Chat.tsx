@@ -108,7 +108,7 @@ export default function Chat() {
                 container
                 spacing={2}
                 className="sendMessageContainer"
-                sx={{position: 'fixed', bottom: 30, width: '715px'}}
+                sx={{position: 'fixed', bottom: 30, maxWidth: '725px', pr: 1}}
             >
                 <Grid item xs={12}>
                     <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
