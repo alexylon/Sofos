@@ -78,7 +78,7 @@ export default function Chat() {
 
     return (
         <Box sx={{
-            height: '91vh',
+            height: '90vh',
             maxWidth: 700,
             marginLeft: "auto",
             marginRight: "auto",
@@ -88,6 +88,7 @@ export default function Chat() {
             justifyContent: 'space-between',
             overflow: 'hidden',
             py: 1,
+            mt: 1
         }}>
             <Grid container spacing={2}>
                 <Grid item xs={12} className="messageContainer">
@@ -95,10 +96,10 @@ export default function Chat() {
                         border: '2px solid #ddd',
                         borderRadius: '5px',
                         p: 1,
-                        maxHeight: `calc(92vh - ${Math.max(160, 137 + nodeHeight)}px)`,
+                        height: `calc(90vh - ${Math.max(150, 127 + nodeHeight)}px)`,
                         overflowY: 'auto',
                         flex: 1, // This will allow it to expand and shrink
-                        mb: 0, // Adding margin at the bottom
+                        mb: 1, // Adding margin at the bottom
                     }}>
                         <Completion messages={messages} reload={reload}/>
                     </Box>
@@ -108,7 +109,7 @@ export default function Chat() {
                 container
                 spacing={2}
                 className="sendMessageContainer"
-                sx={{position: 'fixed', bottom: 30, maxWidth: '725px', pr: 1}}
+                sx={{position: 'fixed', bottom: 30, maxWidth: '732px', pr: 2}}
             >
                 <Grid item xs={12}>
                     <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
