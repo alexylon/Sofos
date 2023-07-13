@@ -62,7 +62,11 @@ export default function HeaderAppBar() {
                             <Typography component="div" sx={{flexGrow: 1}}>
                                 {session.user.email ?? session.user.name}
                             </Typography>
-                            <Avatar alt="Remy Sharp" src={session?.user?.image} sx={{width: "30px", height: "30px"}}/>
+                            <Avatar
+                                alt="avatar"
+                                src={session.user.image ? session.user.image : undefined}
+                                sx={{width: "30px", height: "30px"}}
+                            />
                             <Button
                                 color="inherit"
                                 onClick={(e) => {
