@@ -1,32 +1,7 @@
 # Sofos
 
-Sofos is a cross-platform desktop application for ChatGPT, implemented with React (TypeScript and Next.js) and Rust (Tauri)
+Sofos is yet another web ChatGPT app, implemented with React (TypeScript) and Next.js
 
-## BUILD the GUI app
-
-After installing [Rust](https://www.rust-lang.org/learn/get-started),
-and [Node.js](https://nodejs.org/) just run the following commands in the `root` directory:
-
-Install the `create-tauri-app` utility:
-
-```cargo install create-tauri-app```
-
-Install the Tauri CLI:
-
-```cargo install tauri-cli```
-
-Install node modules:
-
-```npm install```
-
-Build the app to a binary executable file:
-
-```cargo tauri build```
-
-The portable binary executable file of the desktop app will be generated in `src-tauri/target/release/`
-The installation file of the desktop app will be generated in `src-tauri/target/release/bundle/`
-
-You can start a live dev session with ```cargo tauri dev```
 
 <br/>
 
