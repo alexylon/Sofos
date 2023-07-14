@@ -77,14 +77,18 @@ export default function Chat() {
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
     const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
+    const isNormalHeight = useMediaQuery({ query: '(max-height: 1200px)' })
+    const isMedianHeight = useMediaQuery({ query: '(max-height: 900px)' })
 
     useEffect(() => {
-        if (isDesktopOrLaptop) {
-            setWindowHeight(93);
+        if (isRetina) {
+            setWindowHeight(84);
+        } else if (isMedianHeight) {
+            setWindowHeight(88);
         } else {
-            setWindowHeight(86);
+            setWindowHeight(93);
         }
-    }, [isDesktopOrLaptop, isBigScreen, isTabletOrMobile, isPortrait, isRetina]);
+    }, [isDesktopOrLaptop, isBigScreen, isTabletOrMobile, isPortrait, isRetina, isNormalHeight, isMedianHeight]);
 
 
     if (!session) {
