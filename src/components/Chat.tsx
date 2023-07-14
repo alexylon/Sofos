@@ -13,7 +13,7 @@ import { useMediaQuery } from 'react-responsive'
 
 export default function Chat() {
     const [nodeHeight, setNodeHeight] = useState(0);
-    const [windowHeight, setWindowHeight] = useState(93);
+    const [windowHeight, setWindowHeight] = useState(94);
     const {
         input,
         isLoading,
@@ -78,15 +78,15 @@ export default function Chat() {
     const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
     const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
     const isNormalHeight = useMediaQuery({ query: '(max-height: 1200px)' })
-    const isMedianHeight = useMediaQuery({ query: '(max-height: 900px)' })
+    const isMedianHeight = useMediaQuery({ query: '(max-height: 850px)' })
 
     useEffect(() => {
         if (isRetina) {
-            setWindowHeight(82);
+            setWindowHeight(83);
         } else if (isMedianHeight) {
-            setWindowHeight(88);
+            setWindowHeight(90);
         } else {
-            setWindowHeight(93);
+            setWindowHeight(94);
         }
     }, [isDesktopOrLaptop, isBigScreen, isTabletOrMobile, isPortrait, isRetina, isNormalHeight, isMedianHeight]);
 
@@ -112,7 +112,7 @@ export default function Chat() {
             py: 1,
             mt: 1
         }}>
-            <Grid container spacing={2} sx={{position: 'fixed', top: 65, maxWidth: '732px', pr: 2}}>
+            <Grid container spacing={2} sx={{position: 'fixed', top: 55, maxWidth: '732px', pr: 2}}>
                 <Grid item xs={12} className="messageContainer">
                     <Box sx={{
                         border: '2px solid #ddd',
