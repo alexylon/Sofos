@@ -8,10 +8,12 @@ import {TextareaAutosize} from "@mui/base";
 import {useChat} from 'ai/react'
 import {useSession} from "next-auth/react"
 import SendIcon from '@mui/icons-material/Send';
+import { useMediaQuery } from 'react-responsive'
 
 
 export default function Chat() {
     const [nodeHeight, setNodeHeight] = useState(0);
+    const [windowHeight, setWindowHeight] = useState(93);
     const {
         input,
         isLoading,
@@ -68,6 +70,23 @@ export default function Chat() {
         }
     }, [input]);
 
+    const isDesktopOrLaptop = useMediaQuery({
+        query: '(min-width: 1224px)'
+    })
+    const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
+    const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
+    const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
+
+    useEffect(() => {
+        if (isDesktopOrLaptop) {
+            setWindowHeight(93);
+        } else {
+            setWindowHeight(86);
+        }
+    }, [isDesktopOrLaptop, isBigScreen, isTabletOrMobile, isPortrait, isRetina]);
+
+
     if (!session) {
         return (
             <>
@@ -78,7 +97,6 @@ export default function Chat() {
 
     return (
         <Box sx={{
-            height: '90vh',
             maxWidth: 700,
             marginLeft: "auto",
             marginRight: "auto",
@@ -96,7 +114,7 @@ export default function Chat() {
                         border: '2px solid #ddd',
                         borderRadius: '5px',
                         p: 1,
-                        height: `calc(90vh - ${Math.max(150, 127 + nodeHeight)}px)`,
+                        height: `calc(${windowHeight}vh - ${Math.max(150, 127 + nodeHeight)}px)`,
                         overflowY: 'auto',
                         flex: 1, // This will allow it to expand and shrink
                         mb: 1, // Adding margin at the bottom
@@ -109,7 +127,7 @@ export default function Chat() {
                 container
                 spacing={2}
                 className="sendMessageContainer"
-                sx={{position: 'fixed', bottom: 30, maxWidth: '732px', pr: 2}}
+                sx={{position: 'fixed', bottom: 10, maxWidth: '732px', pr: 2}}
             >
                 <Grid item xs={12}>
                     <Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
