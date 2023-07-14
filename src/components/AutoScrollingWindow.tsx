@@ -11,7 +11,7 @@ const AutoScrollingWindow = ({children, messages}: any) => {
 
     useEffect(() => {
         scrollToLastMessage();
-    }, [propertyValues]);
+    }, [messages]);
 
     return (
         <div style={{ position: 'relative' }}>
