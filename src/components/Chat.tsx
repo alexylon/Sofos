@@ -197,6 +197,7 @@ export default function Chat() {
                             color="primary"
                             onClick={isLoading ? stop as () => void : reload as () => void}
                             style={{minWidth: "120px"}}
+                            disabled={messages.length < 1}
                         >
                             {isLoading ? "Abort" : "Regenerate"}
                         </Button>
