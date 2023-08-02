@@ -1,12 +1,12 @@
 'use client'
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
-import {Button, Grid, IconButton, InputAdornment, TextField} from '@mui/material';
+import { Button, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
 import Completion from "@/components/Completion";
-import {TextareaAutosize} from "@mui/base";
-import {useChat} from 'ai/react'
-import {useSession} from "next-auth/react"
+import { TextareaAutosize } from "@mui/base";
+import { useChat } from 'ai/react'
+import { useSession } from "next-auth/react"
 import SendIcon from '@mui/icons-material/Send';
 import { useMediaQuery } from 'react-responsive'
 
@@ -73,12 +73,12 @@ export default function Chat() {
     const isDesktopOrLaptop = useMediaQuery({
         query: '(min-width: 1224px)'
     })
-    const isBigScreen = useMediaQuery({ query: '(min-width: 1824px)' })
-    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-    const isPortrait = useMediaQuery({ query: '(orientation: portrait)' })
-    const isRetina = useMediaQuery({ query: '(min-resolution: 2dppx)' })
-    const isNormalHeight = useMediaQuery({ query: '(max-height: 1200px)' })
-    const isMedianHeight = useMediaQuery({ query: '(max-height: 850px)' })
+    const isBigScreen = useMediaQuery({query: '(min-width: 1824px)'})
+    const isTabletOrMobile = useMediaQuery({query: '(max-width: 1224px)'})
+    const isPortrait = useMediaQuery({query: '(orientation: portrait)'})
+    const isRetina = useMediaQuery({query: '(min-resolution: 2dppx)'})
+    const isNormalHeight = useMediaQuery({query: '(max-height: 1200px)'})
+    const isMedianHeight = useMediaQuery({query: '(max-height: 850px)'})
 
     useEffect(() => {
         if (isRetina) {
@@ -120,10 +120,10 @@ export default function Chat() {
                         p: 1,
                         height: `calc(${windowHeight}vh - ${Math.max(150, 127 + nodeHeight)}px)`,
                         overflowY: 'auto',
-                        flex: 1, // This will allow it to expand and shrink
-                        mb: 1, // Adding margin at the bottom
+                        flex: 1,
+                        mb: 1,
                     }}>
-                        <Completion messages={messages} reload={reload}/>
+                        <Completion messages={messages}/>
                     </Box>
                 </Grid>
             </Grid>
@@ -164,7 +164,8 @@ export default function Chat() {
                         />
                     </Box>
                 </Grid>
-                <Box
+                <Grid
+                    container
                     sx={{
                         display: 'flex',
                         flexDirection: 'row',
@@ -172,7 +173,7 @@ export default function Chat() {
                         ml: 2
                     }}
                 >
-                    <Grid item xs={12} md={4}>
+                    <Grid item xs={6} md={6}>
                         <input
                             type="file"
                             id="file-input"
@@ -190,18 +191,17 @@ export default function Chat() {
                             </Button>
                         </label>
                     </Grid>
-                    <Grid item xs={12} md={4} sx={{ml: "50px"}}>
+                    <Grid item xs={6} md={6} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={stop as () => void}
-                            disabled={!isLoading}
+                            onClick={isLoading ? stop as () => void : reload as () => void}
                             style={{minWidth: "120px"}}
                         >
-                            Abort
+                            {isLoading ? "Abort" : "Regenerate"}
                         </Button>
                     </Grid>
-                </Box>
+                </Grid>
             </Grid>
         </Box>
     );

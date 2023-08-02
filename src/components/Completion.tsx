@@ -1,11 +1,11 @@
 import React from "react";
-import {Button, Grid} from "@mui/material";
+import { Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 
 
-export default function Completion({messages, reload}: any) {
+export default function Completion({messages}: any) {
 
     return (
         <AutoScrollingWindow style={{flexGrow: 1}} messages={messages}>
@@ -35,14 +35,6 @@ export default function Completion({messages, reload}: any) {
                                     <MarkdownText>
                                         {m.content}
                                     </MarkdownText>
-                                    {i === messages.length - 1 && m.role !== 'assistant' && (
-                                        <Button
-                                            variant="contained"
-                                            color="primary"
-                                            onClick={reload}>
-                                            Reload
-                                        </Button>
-                                    )}
                                 </Box>
                             </Grid>
                         }
