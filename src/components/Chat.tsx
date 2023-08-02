@@ -147,6 +147,17 @@ export default function Chat() {
                                     minRows: 1,
                                     maxRows: 10,
                                     style: {resize: 'none'},
+                                    onKeyDown: (event) => {
+                                        if (event.key === 'Enter' && !event.shiftKey) {
+                                            // Prevent default action
+                                            event.preventDefault();
+
+                                            // Create synthetic FormEvent for TypeScript compatibility
+                                            const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
+
+                                            handleSubmit(formEvent);
+                                        }
+                                    },
                                 },
                                 endAdornment: (
                                     <InputAdornment position="end">
