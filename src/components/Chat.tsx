@@ -152,6 +152,10 @@ export default function Chat() {
                                             // Prevent default action
                                             event.preventDefault();
 
+                                            if (!input?.trim()) {
+                                                return;
+                                            }
+
                                             // Create synthetic FormEvent for TypeScript compatibility
                                             const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
 
@@ -161,7 +165,15 @@ export default function Chat() {
                                 },
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        <IconButton edge="end" color="primary" onClick={handleSubmit as () => void}>
+                                        <IconButton
+                                            edge="end"
+                                            color="primary"
+                                            onClick={(event: any) => {
+                                                if (!!input?.trim()) {
+                                                    handleSubmit(event);
+                                                }
+                                            }}
+                                        >
                                             <SendIcon/>
                                         </IconButton>
                                     </InputAdornment>
