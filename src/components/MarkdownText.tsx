@@ -40,7 +40,7 @@ const MarkdownText = ({children}: any) => {
                                 customStyle={{borderRadius: '0 0 5px 5px'}}
                                 language={(match && match[1]) || ''}
                                 PreTag="div"
-                                showLineNumbers
+                                showLineNumbers={false}
                                 codeTagProps={{
                                     style: {
                                         fontSize: '0.9rem',
