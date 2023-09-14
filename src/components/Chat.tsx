@@ -164,7 +164,7 @@ export default function Chat() {
                                         }
                                     },
                                 },
-                                endAdornment: isLoading && (
+                                endAdornment: !isLoading && (
                                     <InputAdornment position="end">
                                         <IconButton
                                             edge="end"
