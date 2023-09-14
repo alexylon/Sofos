@@ -139,7 +139,7 @@ export default function Chat() {
                             ref={textFieldRef}
                             fullWidth
                             id="user-input"
-                            label={"Send a message..."}
+                            label={!isLoading ? "Send a message..." : ""}
                             multiline
                             disabled={isLoading}
                             InputProps={{
@@ -183,7 +183,6 @@ export default function Chat() {
                             value={input}
                             onChange={handleInputChange}
                             variant="outlined"
-                            disabled={false}
                             sx={{borderRadius: '5px', backgroundColor: '#FAFAFA'}}
                         />
                     </Box>
