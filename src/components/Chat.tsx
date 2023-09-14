@@ -164,7 +164,7 @@ export default function Chat() {
                                         }
                                     },
                                 },
-                                endAdornment: (
+                                endAdornment: isLoading && (
                                     <InputAdornment position="end">
                                         <IconButton
                                             edge="end"
@@ -183,7 +183,11 @@ export default function Chat() {
                             value={input}
                             onChange={handleInputChange}
                             variant="outlined"
-                            sx={{borderRadius: '5px', backgroundColor: '#FAFAFA'}}
+                            sx={
+                                isLoading 
+                                ? {borderRadius: '5px', backgroundColor: '#F0F0F0'}
+                                : {borderRadius: '5px', backgroundColor: '#FAFAFA'}
+                            }
                         />
                     </Box>
                 </Grid>
