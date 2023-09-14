@@ -141,6 +141,7 @@ export default function Chat() {
                             id="user-input"
                             label={"Send a message..."}
                             multiline
+                            disabled={isLoading}
                             InputProps={{
                                 inputComponent: TextareaAutosize,
                                 inputProps: {
