@@ -13,7 +13,7 @@ import { useMediaQuery } from 'react-responsive'
 
 export default function Chat() {
     const [nodeHeight, setNodeHeight] = useState(0);
-    const [windowHeight, setWindowHeight] = useState(94);
+    const [windowHeight, setWindowHeight] = useState(80);
     const {
         input,
         isLoading,
