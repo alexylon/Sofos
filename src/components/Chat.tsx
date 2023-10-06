@@ -191,6 +191,7 @@ export default function Chat() {
                         />
                     </Box>
                 </Grid>
+                {false &&
                 <Grid
                     container
                     sx={{
@@ -230,6 +231,7 @@ export default function Chat() {
                         </Button>
                     </Grid>
                 </Grid>
+                }
             </Grid>
         </Box>
     );
