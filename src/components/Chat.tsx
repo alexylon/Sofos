@@ -82,7 +82,7 @@ export default function Chat() {
 
     useEffect(() => {
         if (isRetina) {
-            setWindowHeight(83);
+            setWindowHeight(70);
         } else if (isMedianHeight) {
             setWindowHeight(90);
         } else {
