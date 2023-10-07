@@ -13,7 +13,7 @@ import { useMediaQuery } from 'react-responsive'
 
 export default function Chat() {
     const [nodeHeight, setNodeHeight] = useState(0);
-    const [windowHeight, setWindowHeight] = useState(80);
+    const [windowHeight, setWindowHeight] = useState(94);
     const {
         input,
         isLoading,
@@ -82,7 +82,7 @@ export default function Chat() {
 
     useEffect(() => {
         if (isRetina) {
-            setWindowHeight(55);
+            setWindowHeight(83);
         } else if (isMedianHeight) {
             setWindowHeight(90);
         } else {
