@@ -19,7 +19,8 @@ export async function POST(req: Request) {
 		model: 'gpt-4-turbo-preview',
 		stream: true,
 		messages,
-		temperature: 0.2
+		temperature: 0.2,
+		top_p: 0.1,
 	})
 	// Convert the response into a friendly text-stream
 	const stream = OpenAIStream(response)
