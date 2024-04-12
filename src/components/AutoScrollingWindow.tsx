@@ -1,24 +1,23 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 
 
 const AutoScrollingWindow = ({children, messages}: any) => {
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    const propertyValues = Object.values(messages);
+	const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToLastMessage = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    };
+	const scrollToLastMessage = () => {
+		messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
+	};
 
-    useEffect(() => {
-        scrollToLastMessage();
-    }, [messages]);
+	useEffect(() => {
+		scrollToLastMessage();
+	}, [messages]);
 
-    return (
-        <div style={{ position: 'relative' }}>
-            {children}
-            <div ref={messagesEndRef}/>
-        </div>
-    );
+	return (
+		<div style={{position: 'relative'}}>
+			{children}
+			<div ref={messagesEndRef} />
+		</div>
+	);
 };
 
 export default AutoScrollingWindow;
