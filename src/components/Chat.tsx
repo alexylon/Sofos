@@ -74,7 +74,7 @@ export default function Chat() {
 			overflow: 'hidden',
 			mt: '5px',
 			pt: 5,
-			pb: 5,
+			pb: 3,
 			height: {
 				xs: 'calc(83vh - 40px)', // On extra-small devices
 				sm: 'calc(93vh - 40px)', // On small devices and up
@@ -114,7 +114,7 @@ export default function Chat() {
 				<Box
 					sx={{
 					position: 'absolute',
-					bottom: 56,
+					bottom: 40,
 					left: 0,
 					right: 0,
 				}}>
