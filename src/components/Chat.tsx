@@ -72,9 +72,13 @@ export default function Chat() {
 			flexDirection: 'column',
 			justifyContent: 'space-between',
 			overflow: 'hidden',
+			mt: '5px',
 			pt: 5,
 			pb: 5,
-			height: 'calc(93vh - 40px)',
+			height: {
+				xs: 'calc(83vh - 40px)', // On extra-small devices
+				sm: 'calc(93vh - 40px)', // On small devices and up
+			},
 			position: 'relative',
 		}}>
 			<Grid
@@ -84,7 +88,13 @@ export default function Chat() {
 			>
 				<Grid
 					item xs={12}
-					sx={{height: 'calc(93vh - 123px)', overflow: 'auto'}}
+					sx={{
+						height: {
+							xs: 'calc(83vh - 123px)', // On extra-small devices
+							sm: 'calc(93vh - 123px)', // On small devices and up
+						},
+						overflow: 'auto',
+				}}
 				>
 					<Box sx={{
 						p: 1,
