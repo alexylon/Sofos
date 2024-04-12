@@ -76,7 +76,7 @@ const MarkdownText = ({children}: any) => {
 			}}
 		>
 			{children}
-		</MemoizedReactMarkdownp>
+		</MemoizedReactMarkdown>
 	);
 };
 
