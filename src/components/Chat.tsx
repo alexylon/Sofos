@@ -62,29 +62,34 @@ export default function Chat() {
 	}
 
 	return (
-		<Box sx={{
+		<Box
+			className="chatContainer"
+			sx={{
 			maxWidth: 730,
 			marginLeft: "auto",
 			marginRight: "auto",
-			backgroundColor: '#F0F0F0',
 			display: 'flex',
 			flexDirection: 'column',
 			justifyContent: 'space-between',
 			overflow: 'hidden',
-			py: 3,
-			mt: 6,
-			gap: '5px',
-			height: 'calc(92vh - 50px)',
+			pt: 5,
+			pb: 5,
+			height: 'calc(93vh - 40px)',
+			position: 'relative',
 		}}>
-			<Grid container spacing={2} sx={{flexGrow: 1, overflow: 'auto'}}>
-				<Grid item xs={12} className="messageContainer" sx={{display: 'flex'}}>
+			<Grid
+				className="messageContainer"
+				container
+				sx={{border: '2px solid #ddd', borderRadius: '5px'}}
+			>
+				<Grid
+					item xs={12}
+					sx={{height: 'calc(93vh - 123px)', overflow: 'auto'}}
+				>
 					<Box sx={{
-						mt: -2,
-						border: '2px solid #ddd',
-						borderRadius: '5px',
 						p: 1,
-						overflowY: 'auto',
 						flex: 1,
+						overflow: 'auto',
 					}}>
 						<Completion messages={messages} />
 					</Box>
@@ -94,71 +99,82 @@ export default function Chat() {
 				container
 				spacing={2}
 				className="sendMessageContainer"
-				sx={{maxWidth: '732px', mb: -3}}
+				sx={{mb: -3}}
 			>
-				<Grid item xs={12}>
-					<Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
-						<TextField
-							fullWidth
-							id="user-input"
-							label={!isLoading ? "Send a message..." : ""}
-							multiline
-							disabled={isLoading}
-							InputProps={{
-								inputComponent: TextareaAutosize,
-								inputProps: {
-									minRows: 1,
-									maxRows: 10,
-									style: {resize: 'none'},
-									onKeyDown: (event) => {
-										if (event.key === 'Enter' && !event.shiftKey) {
-											// Prevent default action
-											event.preventDefault();
+				<Box
+					sx={{
+					position: 'absolute',
+					bottom: 56,
+					left: 0,
+					right: 0,
+				}}>
+					<Grid item xs={12}>
+						<Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
+							<TextField
+								fullWidth
+								id="user-input"
+								label={!isLoading ? "Send a message..." : ""}
+								multiline
+								disabled={isLoading}
+								size="small"
+								InputProps={{
+									inputComponent: TextareaAutosize,
+									inputProps: {
+										minRows: 1,
+										maxRows: 10,
+										style: {resize: 'none'},
+										onKeyDown: (event) => {
+											if (event.key === 'Enter' && !event.shiftKey) {
+												// Prevent default action
+												event.preventDefault();
 
-											if (!input?.trim()) {
-												return;
-											}
-
-											// Create synthetic FormEvent for TypeScript compatibility
-											const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
-
-											handleSubmit(formEvent);
-										}
-									},
-								},
-								endAdornment: !isLoading && (
-									<InputAdornment position="end">
-										<IconButton
-											edge="end"
-											color="primary"
-											onClick={(event: any) => {
-												if (!!input?.trim()) {
-													handleSubmit(event);
+												if (!input?.trim()) {
+													return;
 												}
-											}}
-										>
-											<SendIcon />
-										</IconButton>
-									</InputAdornment>
-								),
-							}}
-							value={input}
-							onChange={handleInputChange}
-							variant="outlined"
-							sx={
-								isLoading
-									? {borderRadius: '5px', backgroundColor: '#F0F0F0'}
-									: {borderRadius: '5px', backgroundColor: '#FAFAFA'}
-							}
-						/>
-					</Box>
-				</Grid>
+
+												// Create synthetic FormEvent for TypeScript compatibility
+												const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
+
+												handleSubmit(formEvent);
+											}
+										},
+									},
+									endAdornment: !isLoading && (
+										<InputAdornment position="end">
+											<IconButton
+												edge="end"
+												color="primary"
+												onClick={(event: any) => {
+													if (!!input?.trim()) {
+														handleSubmit(event);
+													}
+												}}
+											>
+												<SendIcon />
+											</IconButton>
+										</InputAdornment>
+									),
+								}}
+								value={input}
+								onChange={handleInputChange}
+								variant="outlined"
+								sx={
+									isLoading
+										? {borderRadius: '5px', backgroundColor: '#F0F0F0'}
+										: {borderRadius: '5px', backgroundColor: '#FAFAFA'}
+								}
+							/>
+						</Box>
+					</Grid>
+				</Box>
 				<Grid
 					container
+					className="actionButtons"
 					sx={{
 						display: 'flex',
 						flexDirection: 'row',
 						mt: 1,
+						// mb: -1,
 						ml: 2
 					}}
 				>

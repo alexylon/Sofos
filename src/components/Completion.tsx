@@ -28,14 +28,14 @@ export default function Completion({messages}: any) {
                             <Grid item xs={12}>
                                 <Box sx={{
                                     borderRadius: '5px',
-                                    p: 1,
+									p: 1,
                                     marginBottom: 1,
-                                    backgroundColor: '#d5d5d5',
-                                }}>
-                                    <MarkdownText>
-                                        {m.content}
-                                    </MarkdownText>
-                                </Box>
+									backgroundColor: '#d5d5d5',
+								}}>
+									<MarkdownText>
+										{m.content}
+									</MarkdownText>
+								</Box>
                             </Grid>
                         }
                     </div>
