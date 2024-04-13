@@ -91,8 +91,8 @@ export default function Chat() {
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(86vh - 85px)', // On extra-small devices
-							sm: 'calc(94vh - 85px)', // On small devices and up
+							xs: 'calc(86vh - 72px)', // On extra-small devices
+							sm: 'calc(94vh - 72px)', // On small devices and up
 						},
 						overflow: 'auto',
 					}}
@@ -109,11 +109,21 @@ export default function Chat() {
 			<Grid item xs={6} md={6}>
 				<Box sx={{display: 'flex', justifyContent: 'center'}}>
 					<Button
-						variant="contained"
+						variant="outlined"
 						color="primary"
 						size="small"
 						onClick={isLoading ? stop as () => void : reload as () => void}
-						style={{width: "180px", height: "30px", bottom: 32}}
+						sx={{
+							width: "180px",
+							height: "30px",
+							bottom: 37,
+							backgroundColor: '#fafafa',
+							borderColor: '#bfbfbf',
+							':hover': {
+								backgroundColor: '#fafafa',
+								borderColor: '#000000',
+							},
+						}}
 						disabled={messages.length < 1}
 					>
 						{isLoading ? "Abort" : "Regenerate"}
