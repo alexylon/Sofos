@@ -80,7 +80,6 @@ export default function Chat() {
 					sm: 'calc(94vh - 60px)', // On small devices and up
 				},
 				position: 'relative',
-				border: '2px solid #ddd', borderRadius: '5px',
 			}}>
 			<Grid
 				className="messageContainer"
