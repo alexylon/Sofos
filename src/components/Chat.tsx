@@ -65,36 +65,37 @@ export default function Chat() {
 		<Box
 			className="chatContainer"
 			sx={{
-			maxWidth: 730,
-			marginLeft: "auto",
-			marginRight: "auto",
-			display: 'flex',
-			flexDirection: 'column',
-			justifyContent: 'space-between',
-			overflow: 'hidden',
-			mt: '5px',
-			pt: 5,
-			pb: 3,
-			height: {
-				xs: 'calc(83vh - 40px)', // On extra-small devices
-				sm: 'calc(93vh - 40px)', // On small devices and up
-			},
-			position: 'relative',
-		}}>
+				maxWidth: 730,
+				marginLeft: "auto",
+				marginRight: "auto",
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'space-between',
+				overflow: 'hidden',
+				mt: '45px',
+				pt: 1,
+				pb: 3,
+				height: {
+					xs: 'calc(86vh - 60px)', // On extra-small devices
+					sm: 'calc(94vh - 60px)', // On small devices and up
+				},
+				position: 'relative',
+				border: '2px solid #ddd', borderRadius: '5px',
+			}}>
 			<Grid
 				className="messageContainer"
 				container
-				sx={{border: '2px solid #ddd', borderRadius: '5px'}}
+				// sx={{border: '2px solid #ddd', borderRadius: '5px'}}
 			>
 				<Grid
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(83vh - 123px)', // On extra-small devices
-							sm: 'calc(93vh - 123px)', // On small devices and up
+							xs: 'calc(86vh - 85px)', // On extra-small devices
+							sm: 'calc(94vh - 85px)', // On small devices and up
 						},
 						overflow: 'auto',
-				}}
+					}}
 				>
 					<Box sx={{
 						p: 1,
@@ -105,21 +106,34 @@ export default function Chat() {
 					</Box>
 				</Grid>
 			</Grid>
+			<Grid item xs={6} md={6}>
+				<Box sx={{display: 'flex', justifyContent: 'center'}}>
+					<Button
+						variant="contained"
+						color="primary"
+						size="small"
+						onClick={isLoading ? stop as () => void : reload as () => void}
+						style={{width: "220px", height: "24px", bottom: 38}}
+						disabled={messages.length < 1}
+					>
+						{isLoading ? "Abort" : "Regenerate"}
+					</Button>
+				</Box>
+			</Grid>
 			<Grid
+				className="sendMessageContainer"
 				container
 				spacing={2}
-				className="sendMessageContainer"
-				sx={{mb: -3}}
 			>
 				<Box
 					sx={{
-					position: 'absolute',
-					bottom: 40,
-					left: 0,
-					right: 0,
-				}}>
+						position: 'absolute',
+						bottom: 1,
+						left: 0,
+						right: 0,
+					}}>
 					<Grid item xs={12}>
-						<Box sx={{border: '2px solid #ddd', borderRadius: '5px', p: 1}}>
+						<Box sx={{p: 1}}>
 							<TextField
 								fullWidth
 								id="user-input"
@@ -177,47 +191,6 @@ export default function Chat() {
 						</Box>
 					</Grid>
 				</Box>
-				<Grid
-					container
-					className="actionButtons"
-					sx={{
-						display: 'flex',
-						flexDirection: 'row',
-						mt: 1,
-						// mb: -1,
-						ml: 2
-					}}
-				>
-					<Grid item xs={6} md={6}>
-						<input
-							type="file"
-							id="file-input"
-							style={{display: 'none'}}
-							onChange={handleFileChange}
-						/>
-						<label htmlFor="file-input">
-							<Button
-								variant="outlined"
-								color="primary"
-								component="span"
-								style={{minWidth: "120px"}}
-							>
-								Select File
-							</Button>
-						</label>
-					</Grid>
-					<Grid item xs={6} md={6} style={{display: 'flex', justifyContent: 'flex-end'}}>
-						<Button
-							variant="contained"
-							color="primary"
-							onClick={isLoading ? stop as () => void : reload as () => void}
-							style={{minWidth: "120px"}}
-							disabled={messages.length < 1}
-						>
-							{isLoading ? "Abort" : "Regenerate"}
-						</Button>
-					</Grid>
-				</Grid>
 			</Grid>
 		</Box>
 	);
