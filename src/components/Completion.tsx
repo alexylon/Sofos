@@ -17,6 +17,7 @@ export default function Completion({messages}: any) {
 							<Grid item xs={12}>
 								<Box sx={{
 									borderRadius: '5px',
+									mt: 1,
 									p: 1,
 									marginBottom: 1,
 									backgroundColor: '#a9d3ea'
@@ -29,7 +30,8 @@ export default function Completion({messages}: any) {
 								<Box sx={{
 									borderRadius: '5px',
 									p: 1,
-									marginBottom: 1,
+									mt: 1,
+									mb: 1,
 									backgroundColor: '#d5d5d5',
 								}}>
 									<MarkdownText>

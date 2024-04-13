@@ -72,9 +72,9 @@ export default function Chat() {
 				flexDirection: 'column',
 				justifyContent: 'space-between',
 				overflow: 'hidden',
-				mt: '45px',
+				mt: '40px',
 				pt: 1,
-				pb: 3,
+				pb: 4,
 				height: {
 					xs: 'calc(86vh - 60px)', // On extra-small devices
 					sm: 'calc(94vh - 60px)', // On small devices and up
@@ -89,8 +89,8 @@ export default function Chat() {
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(86vh - 68px)', // On extra-small devices
-							sm: 'calc(94vh - 68px)', // On small devices and up
+							xs: 'calc(86vh - 60px)', // On extra-small devices
+							sm: 'calc(94vh - 60px)', // On small devices and up
 						},
 						overflow: 'auto',
 					}}
@@ -106,12 +106,13 @@ export default function Chat() {
 			</Grid>
 			<Grid className="actionButton" item xs={6} md={6}>
 				<Box sx={{display: 'flex', justifyContent: 'center'}}>
-					<Button
-						variant="outlined"
-						color="primary"
-						size="small"
-						onClick={isLoading ? stop as () => void : reload as () => void}
-						sx={{
+					{messages.length > 0 &&
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        onClick={isLoading ? stop as () => void : reload as () => void}
+                        sx={{
 							width: "180px",
 							height: "30px",
 							position: 'absolute',
@@ -123,10 +124,11 @@ export default function Chat() {
 								borderColor: '#000000',
 							},
 						}}
-						disabled={messages.length < 1}
-					>
-						{isLoading ? "Abort" : "Regenerate"}
-					</Button>
+                        disabled={messages.length < 1}
+                      >
+						  {isLoading ? "Abort" : "Regenerate"}
+                      </Button>
+					}
 				</Box>
 			</Grid>
 			<Grid
