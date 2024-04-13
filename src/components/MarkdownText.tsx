@@ -14,7 +14,7 @@ const MemoizedReactMarkdown: FC<Options> = memo(
 
 const MarkdownText = ({children}: any) => {
 	return (
-		<ReactMarkdown
+		<MemoizedReactMarkdown
 			components={{
 				code({node, inline, className, children, ...props}) {
 					const match = /language-(\w+)/.exec(className || '');
@@ -76,7 +76,7 @@ const MarkdownText = ({children}: any) => {
 			}}
 		>
 			{children}
-		</ReactMarkdown>
+		</MemoizedReactMarkdown>
 	);
 };
 
