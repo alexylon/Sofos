@@ -113,7 +113,7 @@ export default function Chat() {
 						color="primary"
 						size="small"
 						onClick={isLoading ? stop as () => void : reload as () => void}
-						style={{width: "180px", height: "30px", bottom: 40}}
+						style={{width: "180px", height: "30px", bottom: 32}}
 						disabled={messages.length < 1}
 					>
 						{isLoading ? "Abort" : "Regenerate"}
@@ -128,7 +128,7 @@ export default function Chat() {
 				<Box
 					sx={{
 						position: 'absolute',
-						bottom: 1,
+						bottom: -10,
 						left: 0,
 						right: 0,
 					}}>
