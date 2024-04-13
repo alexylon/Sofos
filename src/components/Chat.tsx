@@ -91,8 +91,8 @@ export default function Chat() {
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(86vh - 72px)', // On extra-small devices
-							sm: 'calc(94vh - 72px)', // On small devices and up
+							xs: 'calc(86vh - 68px)', // On extra-small devices
+							sm: 'calc(94vh - 68px)', // On small devices and up
 						},
 						overflow: 'auto',
 					}}
@@ -138,7 +138,7 @@ export default function Chat() {
 				<Box
 					sx={{
 						position: 'absolute',
-						bottom: -10,
+						bottom: -15,
 						left: 0,
 						right: 0,
 					}}>
