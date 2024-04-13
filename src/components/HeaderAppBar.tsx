@@ -12,7 +12,7 @@ export default function HeaderAppBar() {
 
 	return (
 		<>
-			<Grid container spacing={2} sx={{position: 'fixed', top: 15}}>
+			<Grid container spacing={2} sx={{position: 'fixed', top: 15, zIndex: 10}}>
 				<Box sx={{flexGrow: 1}}>
 					<AppBar position="static">
 						<Toolbar variant="dense">

@@ -85,7 +85,6 @@ export default function Chat() {
 			<Grid
 				className="messageContainer"
 				container
-				// sx={{border: '2px solid #ddd', borderRadius: '5px'}}
 			>
 				<Grid
 					item xs={12}
@@ -116,6 +115,7 @@ export default function Chat() {
 						sx={{
 							width: "180px",
 							height: "30px",
+							position: 'absolute',
 							bottom: 37,
 							backgroundColor: '#fafafa',
 							borderColor: '#bfbfbf',
