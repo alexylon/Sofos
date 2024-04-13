@@ -63,7 +63,7 @@ const MarkdownText = ({children}: any) => {
 								className={className}
 								{...props}
 								style={{
-									fontWeight: 'bold',
+									fontWeight: 'normal',
 									backgroundColor: '#c5c5c5',
 									padding: '2px',
 									borderRadius: '3px'
