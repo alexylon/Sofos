@@ -105,7 +105,7 @@ export default function Chat() {
 					</Box>
 				</Grid>
 			</Grid>
-			<Grid item xs={6} md={6}>
+			<Grid className="actionButton" item xs={6} md={6}>
 				<Box sx={{display: 'flex', justifyContent: 'center'}}>
 					<Button
 						variant="outlined"
@@ -147,10 +147,14 @@ export default function Chat() {
 							<TextField
 								fullWidth
 								id="user-input"
-								label={!isLoading ? "Send a message..." : ""}
+								label={!isLoading && !input ? "Send a message..." : ""}
 								multiline
 								disabled={isLoading}
 								size="small"
+								value={input}
+								onChange={handleInputChange}
+								variant="outlined"
+								InputLabelProps={{shrink: false}}
 								InputProps={{
 									inputComponent: TextareaAutosize,
 									inputProps: {
@@ -189,9 +193,6 @@ export default function Chat() {
 										</InputAdornment>
 									),
 								}}
-								value={input}
-								onChange={handleInputChange}
-								variant="outlined"
 								sx={
 									isLoading
 										? {borderRadius: '5px', backgroundColor: '#F0F0F0'}
