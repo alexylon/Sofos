@@ -34,7 +34,7 @@ const MarkdownText = ({children}: any) => {
 										elevation={0}
 									>
 										<Toolbar variant="dense">
-											<Box sx={{display: 'flex', ml: -1}}>
+											<Box sx={{display: 'flex'}}>
 												{(match && match[1]) || ''}
 											</Box>
 											<Box sx={{flexGrow: 10}} />
