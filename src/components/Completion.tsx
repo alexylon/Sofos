@@ -29,6 +29,7 @@ export default function Completion({messages}: any) {
 									<Box sx={{
 										display: 'flex',
 										justifyContent: 'flex-end',
+										mr: -1,
 									}}
 									>
 										<CopyToClipboardButton value={m.content} color="#000000" />
@@ -57,6 +58,7 @@ export default function Completion({messages}: any) {
 									<Box sx={{
 										display: 'flex',
 										justifyContent: 'flex-end',
+										mr: -1,
 									}}
 									>
 										<CopyToClipboardButton value={m.content} color="#000000" />

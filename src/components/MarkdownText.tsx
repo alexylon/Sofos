@@ -34,12 +34,16 @@ const MarkdownText = ({children}: any) => {
 										elevation={0}
 									>
 										<Toolbar variant="dense">
-											{(match && match[1]) || ''}
-											<Box sx={{flexGrow: 1}} />
-											<CopyToClipboardButton
-												value={String(children).replace(/\n$/, '')}
-												color="white"
-											/>
+											<Box sx={{display: 'flex', ml: -1}}>
+												{(match && match[1]) || ''}
+											</Box>
+											<Box sx={{flexGrow: 10}} />
+											<Box sx={{display: 'flex', mr: -1}}>
+												<CopyToClipboardButton
+													value={String(children).replace(/\n$/, '')}
+													color="white"
+												/>
+											</Box>
 										</Toolbar>
 									</AppBar>
 								</Box>
