@@ -65,7 +65,10 @@ const MarkdownText = ({children}: any) => {
 								style={{
 									fontWeight: 'normal',
 									backgroundColor: '#c5c5c5',
-									padding: '2px',
+									paddingTop: '1px',
+									paddingBottom: '1px',
+									paddingLeft: '2px',
+									paddingRight: '2px',
 									borderRadius: '3px'
 								}}
 							>

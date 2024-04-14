@@ -18,8 +18,11 @@ export default function Completion({messages}: any) {
 								<Box sx={{
 									borderRadius: '5px',
 									mt: 1,
-									p: 1,
-									marginBottom: 1,
+									pt: 1,
+									pb: 1,
+									pl: 2,
+									pr: 2,
+									mb: 1,
 									backgroundColor: '#a9d3ea'
 								}}>
 									{m.content}
@@ -29,7 +32,10 @@ export default function Completion({messages}: any) {
 							<Grid item xs={12}>
 								<Box sx={{
 									borderRadius: '5px',
-									p: 1,
+									pt: 1,
+									pb: 1,
+									pl: 2,
+									pr: 2,
 									mt: 1,
 									mb: 1,
 									backgroundColor: '#d5d5d5',
