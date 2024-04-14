@@ -6,9 +6,10 @@ import DoneIcon from '@mui/icons-material/Done';
 interface CopyButtonProps {
 	value: string;
 	timeout?: number;
+	color: string;
 }
 
-export function CopyToClipboardButton({value, timeout = 2000, ...rest}: CopyButtonProps) {
+export function CopyToClipboardButton({value, color, timeout = 2000, ...rest}: CopyButtonProps) {
 	const [isCopied, setIsCopied] = React.useState(false);
 
 	const onCopy = () => {
@@ -30,8 +31,8 @@ export function CopyToClipboardButton({value, timeout = 2000, ...rest}: CopyButt
 
 	return (
 		<IconButton aria-label="delete" onClick={onCopy} {...rest}>
-			<span>{isCopied ? <DoneIcon sx={{color: 'white', fontSize: '20px'}} /> :
-				<ContentCopyIcon sx={{color: 'white', fontSize: '20px'}} />}</span>
+			<span>{isCopied ? <DoneIcon sx={{color: color, fontSize: '20px'}} /> :
+				<ContentCopyIcon sx={{color: color, fontSize: '20px'}} />}</span>
 		</IconButton>
 	);
 }

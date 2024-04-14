@@ -3,6 +3,7 @@ import { Grid } from "@mui/material";
 import Box from "@mui/material/Box";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
+import { CopyToClipboardButton } from '@/components/CopyToClipboardButton';
 
 
 export default function Completion({messages}: any) {
@@ -18,21 +19,34 @@ export default function Completion({messages}: any) {
 								<Box sx={{
 									borderRadius: '5px',
 									mt: 1,
-									pt: 1,
 									pb: 1,
 									pl: 2,
 									pr: 2,
 									mb: 1,
 									backgroundColor: '#a9d3ea'
-								}}>
-									{m.content}
+								}}
+								>
+									<Box sx={{
+										display: 'flex',
+										justifyContent: 'flex-end',
+									}}
+									>
+										<CopyToClipboardButton value={m.content} color="#000000" />
+									</Box>
+									<Box sx={{
+										mt: -4,
+									}}
+									>
+										<MarkdownText>
+											{m.content}
+										</MarkdownText>
+									</Box>
 								</Box>
 							</Grid>
 							:
 							<Grid item xs={12}>
 								<Box sx={{
 									borderRadius: '5px',
-									pt: 1,
 									pb: 1,
 									pl: 2,
 									pr: 2,
@@ -40,9 +54,21 @@ export default function Completion({messages}: any) {
 									mb: 1,
 									backgroundColor: '#d5d5d5',
 								}}>
-									<MarkdownText>
-										{m.content}
-									</MarkdownText>
+									<Box sx={{
+										display: 'flex',
+										justifyContent: 'flex-end',
+									}}
+									>
+										<CopyToClipboardButton value={m.content} color="#000000" />
+									</Box>
+									<Box sx={{
+										mt: -3,
+									}}
+									>
+										<MarkdownText>
+											{m.content}
+										</MarkdownText>
+									</Box>
 								</Box>
 							</Grid>
 						}
