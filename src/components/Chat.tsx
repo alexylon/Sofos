@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Box from '@mui/material/Box';
-import { Button, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
+import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import Completion from "@/components/Completion";
 import { TextareaAutosize } from "@mui/base";
 import { useChat } from 'ai/react'
@@ -73,8 +73,7 @@ export default function Chat() {
 				justifyContent: 'space-between',
 				overflow: 'hidden',
 				mt: '40px',
-				pt: 1,
-				pb: 4,
+				pb: 6,
 				height: {
 					xs: 'calc(86vh - 60px)', // On extra-small devices
 					sm: 'calc(94vh - 60px)', // On small devices and up
@@ -85,7 +84,7 @@ export default function Chat() {
 				className="messageContainer"
 				container
 				sx={{
-					width: '100%', // Ensure the container takes full width
+					width: '100%',
 				}}
 			>
 				<Grid
@@ -104,13 +103,30 @@ export default function Chat() {
 						msOverflowStyle: 'none', // Hide scrollbar for IE 10+
 					}}
 				>
-					<Box sx={{
-						p: 1,
-						flex: 1,
-						overflow: 'auto',
-					}}>
-						<Completion messages={messages} />
-					</Box>
+					{messages.length
+						?
+						<Box sx={{
+							p: 1,
+							flex: 1,
+							overflow: 'auto',
+						}}>
+							<Completion messages={messages} />
+						</Box>
+						:
+						<Box sx={{
+							mt: 15,
+						}}>
+							<Typography
+								variant="h2"
+								component="h2"
+								color="#D1D5DB"
+								align="center"
+								fontWeight="bold"
+							>
+								Sofos
+							</Typography>
+						</Box>
+					}
 				</Grid>
 			</Grid>
 			<Grid className="actionButton" item xs={6} md={6}>
@@ -125,7 +141,7 @@ export default function Chat() {
 							width: "180px",
 							height: "30px",
 							position: 'absolute',
-							bottom: 37,
+							bottom: 52,
 							backgroundColor: '#fafafa',
 							borderColor: '#bfbfbf',
 							':hover': {
@@ -148,7 +164,7 @@ export default function Chat() {
 				<Box
 					sx={{
 						position: 'absolute',
-						bottom: -15,
+						bottom: 0,
 						left: 0,
 						right: 0,
 					}}>
