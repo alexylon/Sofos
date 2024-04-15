@@ -84,6 +84,9 @@ export default function Chat() {
 			<Grid
 				className="messageContainer"
 				container
+				sx={{
+					width: '100%', // Ensure the container takes full width
+				}}
 			>
 				<Grid
 					item xs={12}
@@ -93,6 +96,12 @@ export default function Chat() {
 							sm: 'calc(94vh - 60px)', // On small devices and up
 						},
 						overflow: 'auto',
+						width: '100%',
+						'&::-webkit-scrollbar': {
+							display: 'none', // Hide scrollbar for WebKit browsers
+						},
+						scrollbarWidth: 'none', // Hide scrollbar for Firefox
+						msOverflowStyle: 'none', // Hide scrollbar for IE 10+
 					}}
 				>
 					<Box sx={{
@@ -134,7 +143,7 @@ export default function Chat() {
 			<Grid
 				className="sendMessageContainer"
 				container
-				spacing={2}
+				sx={{width: '100%'}}
 			>
 				<Box
 					sx={{
