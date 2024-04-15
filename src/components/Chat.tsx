@@ -75,7 +75,7 @@ export default function Chat() {
 				mt: '40px',
 				pb: 6,
 				height: {
-					xs: 'calc(86vh - 60px)', // On extra-small devices
+					xs: 'calc(85vh - 60px)', // On extra-small devices
 					sm: 'calc(94vh - 60px)', // On small devices and up
 				},
 				position: 'relative',
@@ -91,7 +91,7 @@ export default function Chat() {
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(86vh - 60px)', // On extra-small devices
+							xs: 'calc(85vh - 60px)', // On extra-small devices
 							sm: 'calc(94vh - 60px)', // On small devices and up
 						},
 						overflow: 'auto',
