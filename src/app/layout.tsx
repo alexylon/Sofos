@@ -8,7 +8,7 @@ import { Box } from "@mui/material";
 const inter = Inter({subsets: ['latin']})
 
 export const metadata = {
-	title: 'Sofos',
+	title: 'sofos',
 	description: 'GPT Client',
 }
 

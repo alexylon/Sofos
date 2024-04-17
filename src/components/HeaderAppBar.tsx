@@ -20,7 +20,7 @@ export default function HeaderAppBar() {
 								<MenuIcon />
 							</IconButton>
 							<Typography variant="h6" component="div" sx={{flexGrow: 1}}>
-								Sofos
+								sofos
 							</Typography>
 							<Typography component="div" sx={{flexGrow: 1}}>
 								{user ? user.email ?? user.name : "Not signed in"}

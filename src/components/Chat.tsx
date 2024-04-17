@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import Completion from "@/components/Completion";
@@ -21,8 +21,31 @@ export default function Chat() {
 		setInput,
 		stop
 	} = useChat();
-
+	const scrollableGridRef = useRef(null);
 	const {data: session} = useSession();
+
+	// Capture all scroll events across the entire viewport
+	useEffect(() => {
+		const handleScroll = (event: WheelEvent) => {
+			const grid = scrollableGridRef.current as HTMLDivElement | null;
+
+			// Check if the scrollableGridRef is currently in the viewport
+			if (grid) {
+				const bounding = grid.getBoundingClientRect();
+
+				// Check if the vertical position of the mouse is within the grid's boundaries
+				if (event.clientY >= bounding.top && event.clientY <= bounding.bottom) {
+					grid.scrollTop += event.deltaY;
+				}
+			}
+		};
+
+		window.addEventListener('wheel', handleScroll, { passive: false });
+
+		return () => {
+			window.removeEventListener('wheel', handleScroll);
+		};
+	}, []);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files.length > 0) {
@@ -65,7 +88,7 @@ export default function Chat() {
 		<Box
 			className="chatContainer"
 			sx={{
-				maxWidth: 730,
+				maxWidth: 900,
 				marginLeft: "auto",
 				marginRight: "auto",
 				display: 'flex',
@@ -75,7 +98,7 @@ export default function Chat() {
 				mt: '40px',
 				pb: 6,
 				height: {
-					xs: 'calc(85vh - 60px)', // On extra-small devices
+					xs: 'calc(85vh - 62px)', // On extra-small devices
 					sm: 'calc(94vh - 60px)', // On small devices and up
 				},
 				position: 'relative',
@@ -88,10 +111,11 @@ export default function Chat() {
 				}}
 			>
 				<Grid
+					ref={scrollableGridRef}
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(85vh - 60px)', // On extra-small devices
+							xs: 'calc(85vh - 62px)', // On extra-small devices
 							sm: 'calc(94vh - 60px)', // On small devices and up
 						},
 						overflow: 'auto',
@@ -122,8 +146,11 @@ export default function Chat() {
 								color="#D1D5DB"
 								align="center"
 								fontWeight="bold"
+								sx={{
+									userSelect: 'none',
+								}}
 							>
-								Sofos
+								sofos
 							</Typography>
 						</Box>
 					}
