@@ -178,7 +178,25 @@ export default function Chat() {
 						}}
                         disabled={messages.length < 1}
                       >
-						  {isLoading ? "Abort" : "Regenerate"}
+						  {isLoading
+							  ?
+							  <Typography
+								  color="red"
+								  sx={{
+									  userSelect: 'none',
+								  }}
+							  >
+								  Abort
+							  </Typography>
+							  :
+							  <Typography
+								  sx={{
+									  userSelect: 'none',
+								  }}
+							  >
+							  Regenerate
+							  </Typography>
+						  }
                       </Button>
 					}
 				</Box>
