@@ -138,7 +138,7 @@ export default function Chat() {
 						</Box>
 						:
 						<Box sx={{
-							mt: 15,
+							mt: 25,
 						}}>
 							<Typography
 								variant="h2"
