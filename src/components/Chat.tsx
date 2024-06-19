@@ -49,7 +49,7 @@ export default function Chat() {
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files.length > 0) {
-			readFileContent(event.target.files[0]).then(content => {
+			readFileContent(event.target?.files[0]).then(content => {
 				setInput(input + " " + content);
 				// Resetting the value allows to select the same file again
 				event.target.value = '';

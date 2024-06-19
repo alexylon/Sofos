@@ -4,14 +4,19 @@ import Box from "@mui/material/Box";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton';
+import { Message } from 'ai';
 
 
-export default function Completion({messages}: any) {
+interface CompletionProps {
+	messages?: Message[]
+}
+
+export default function Completion({ messages }: CompletionProps) {
 
 	return (
-		<AutoScrollingWindow style={{flexGrow: 1}} messages={messages}>
-			<div style={{minHeight: "auto", height: "auto"}}>
-				{messages.map((m: any) => (
+		<AutoScrollingWindow style={{ flexGrow: 1 }} messages={messages}>
+			<div style={{ minHeight: "auto", height: "auto" }}>
+				{messages?.map((m: any) => (
 					<div key={m.id}>
 						{m.role === 'user'
 							?

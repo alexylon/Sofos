@@ -1,11 +1,17 @@
 import React, { useEffect, useRef } from 'react';
+import { Message } from 'ai';
 
 
-const AutoScrollingWindow = ({children, messages}: any) => {
-	const messagesEndRef = useRef<HTMLDivElement>(null);
+interface AutoScrollingWindowProps {
+	messages?: Message[],
+	style?: { flexGrow: number }
+}
+
+const AutoScrollingWindow = ({ children, messages, style }: AutoScrollingWindowProps) => {
+	const messagesEndRef = useRef<HTMLDivElement>(null as HTMLDivElement);
 
 	const scrollToLastMessage = () => {
-		messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
 	};
 
 	useEffect(() => {
@@ -13,7 +19,7 @@ const AutoScrollingWindow = ({children, messages}: any) => {
 	}, [messages]);
 
 	return (
-		<div style={{position: 'relative'}}>
+		<div style={{ position: 'relative' }}>
 			{children}
 			<div ref={messagesEndRef} />
 		</div>

@@ -25,7 +25,7 @@ export function CopyToClipboardButton({value, color, timeout = 2000, ...rest}: C
 			setIsCopied(true);
 			setTimeout(() => {
 				setIsCopied(false);
-			}, timeout);
+			}, timeout ? timeout : 0);
 		});
 	};
 
