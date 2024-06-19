@@ -9,10 +9,12 @@ interface AutoScrollingWindowProps {
 }
 
 const AutoScrollingWindow = ({ children, messages }: AutoScrollingWindowProps) => {
-	const messagesEndRef = useRef<HTMLDivElement>(null as HTMLDivElement);
+	const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
 	const scrollToLastMessage = () => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+		if (messagesEndRef.current) {
+			(messagesEndRef.current as HTMLDivElement).scrollIntoView({ behavior: "smooth" } as ScrollIntoViewOptions);
+		}
 	};
 
 	useEffect(() => {
