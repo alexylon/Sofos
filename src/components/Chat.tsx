@@ -88,7 +88,7 @@ export default function Chat() {
 		<Box
 			className="chatContainer"
 			sx={{
-				maxWidth: 900,
+				maxWidth: 1200,
 				marginLeft: "auto",
 				marginRight: "auto",
 				display: 'flex',
@@ -96,7 +96,7 @@ export default function Chat() {
 				justifyContent: 'space-between',
 				overflow: 'hidden',
 				mt: '40px',
-				pb: 6,
+				pb: 5,
 				height: {
 					xs: 'calc(85vh - 62px)', // On extra-small devices
 					sm: 'calc(94vh - 60px)', // On small devices and up
@@ -115,8 +115,8 @@ export default function Chat() {
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(85vh - 62px)', // On extra-small devices
-							sm: 'calc(94vh - 60px)', // On small devices and up
+							xs: 'calc(83vh - 62px)', // On extra-small devices
+							sm: 'calc(92vh - 60px)', // On small devices and up
 						},
 						overflow: 'auto',
 						width: '100%',
@@ -168,7 +168,7 @@ export default function Chat() {
 							width: "180px",
 							height: "30px",
 							position: 'absolute',
-							bottom: 52,
+							bottom: 57,
 							backgroundColor: '#fafafa',
 							borderColor: '#bfbfbf',
 							':hover': {
