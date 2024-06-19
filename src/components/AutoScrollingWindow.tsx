@@ -5,9 +5,10 @@ import { Message } from 'ai';
 interface AutoScrollingWindowProps {
 	messages?: Message[],
 	style?: { flexGrow: number }
+	children: React.ReactNode
 }
 
-const AutoScrollingWindow = ({ children, messages, style }: AutoScrollingWindowProps) => {
+const AutoScrollingWindow = ({ children, messages }: AutoScrollingWindowProps) => {
 	const messagesEndRef = useRef<HTMLDivElement>(null as HTMLDivElement);
 
 	const scrollToLastMessage = () => {
