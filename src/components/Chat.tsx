@@ -167,7 +167,7 @@ export default function Chat() {
                         size="small"
                         startIcon={
                             isLoading 
-                                ? <CancelIcon sx={{color: "red"}}/> 
+                                ? <CancelIcon sx={{color: "red", mt: "-3px"}}/> 
                                 : <ReplayIcon color="primary"/>
                             }
                         onClick={isLoading ? stop as () => void : reload as () => void}
