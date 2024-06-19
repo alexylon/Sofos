@@ -194,7 +194,7 @@ export default function Chat() {
 									  userSelect: 'none',
 								  }}
 							  >
-							  Regenerate
+								  Regenerate
 							  </Typography>
 						  }
                       </Button>
@@ -246,6 +246,9 @@ export default function Chat() {
 
 												handleSubmit(formEvent);
 											}
+										},
+										onWheel: (event) => {
+											event.stopPropagation();
 										},
 									},
 									endAdornment: !isLoading && (
