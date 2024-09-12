@@ -8,6 +8,8 @@ import { TextareaAutosize } from "@mui/base";
 import { useChat } from 'ai/react'
 import { useSession } from "next-auth/react"
 import SendIcon from '@mui/icons-material/Send';
+import ReplayIcon from '@mui/icons-material/Replay';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 
 export default function Chat() {
@@ -163,6 +165,11 @@ export default function Chat() {
                         variant="outlined"
                         color="primary"
                         size="small"
+                        startIcon={
+                            isLoading 
+                                ? <CancelIcon sx={{color: "red", mt: 0}}/> 
+                                : <ReplayIcon color="primary"/>
+                            }
                         onClick={isLoading ? stop as () => void : reload as () => void}
                         sx={{
 							width: "180px",
