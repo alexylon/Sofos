@@ -250,6 +250,7 @@ export default function Chat() {
 												  sx={{
 													  height: 50,
 													  width: 50,
+													  overflow: 'hidden',
 													  borderRadius: '5px',
 													  mr: 1,
 												  }}
