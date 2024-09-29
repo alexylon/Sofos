@@ -14,7 +14,7 @@ const authOptions: NextAuthOptions = {
 		// ...add more providers here
 	],
 	theme: {
-		colorScheme: "light",
+		colorScheme: "dark",
 	},
 	callbacks: {
 		async jwt({token}) {

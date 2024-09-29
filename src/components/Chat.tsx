@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
 import Completion from "@/components/Completion";
@@ -10,6 +10,10 @@ import { useSession } from "next-auth/react"
 import SendIcon from '@mui/icons-material/Send';
 import ReplayIcon from '@mui/icons-material/Replay';
 import CancelIcon from '@mui/icons-material/Cancel';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
+import { styled } from '@mui/material/styles';
+import Image from "next/image";
 
 
 export default function Chat() {
@@ -23,8 +27,10 @@ export default function Chat() {
 		setInput,
 		stop
 	} = useChat();
+	const [model, setModel] = useState<string>('gpt-4o');
+	const [imageUrl, setImageUrl] = useState<string | null>(null);
 	const scrollableGridRef = useRef(null);
-	const {data: session} = useSession();
+	const { data: session } = useSession();
 
 	// Capture all scroll events across the entire viewport
 	useEffect(() => {
@@ -49,16 +55,55 @@ export default function Chat() {
 		};
 	}, []);
 
+	if (!session) {
+		return null;
+	}
+
+	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		if (imageUrl) {
+			handleSubmit(e, {
+				data: {
+					model: model,
+					imageUrl: imageUrl,
+				},
+				experimental_attachments: [{ url: imageUrl, contentType: 'image' }],
+			});
+
+			setImageUrl(null);
+			return;
+		}
+		handleSubmit(e, {
+			data: {
+				model: model,
+			},
+		});
+	};
+
+	const onRemovePreviewImage = () => setImageUrl(null);
+
+	const handleUploadImageFile = async (file: File) => {
+		const base64 = await new Promise<string>((resolve, reject) => {
+			const reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = () => resolve(reader.result as string);
+			reader.onerror = (error) => reject(error);
+		});
+		setImageUrl(base64);
+	};
+
+	const handleUploadFile = async (file: File) => {
+		try {
+			if (file.type.startsWith("image/")) {
+				return await handleUploadImageFile(file);
+			}
+		} catch (error: any) {
+			console.error(error.message);
+		}
+	};
+
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files.length > 0) {
-			readFileContent(event.target?.files[0]).then(content => {
-				setInput(input + " " + content);
-				// Resetting the value allows to select the same file again
-				event.target.value = '';
-			}).catch(error => {
-				// handle error
-				console.error(error);
-			});
+			handleUploadFile(event.target.files[0]).then();
 		}
 	};
 
@@ -78,13 +123,21 @@ export default function Chat() {
 		});
 	};
 
-	if (!session) {
-		return (
-			<>
+	const VisuallyHiddenInput = styled('input')({
+		clip: 'rect(0 0 0 0)',
+		clipPath: 'inset(50%)',
+		height: 1,
+		overflow: 'hidden',
+		position: 'absolute',
+		bottom: 0,
+		left: 0,
+		whiteSpace: 'nowrap',
+		width: 1,
+	});
 
-			</>
-		)
-	}
+	const handleButtonClick = () => {
+		document.getElementById('file-input')?.click();
+	};
 
 	return (
 		<Box
@@ -159,23 +212,23 @@ export default function Chat() {
 				</Grid>
 			</Grid>
 			<Grid className="actionButton" item xs={6} md={6}>
-				<Box sx={{display: 'flex', justifyContent: 'center'}}>
+				<Box sx={{ display: 'flex', justifyContent: 'center' }}>
 					{messages.length > 0 &&
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        size="small"
-                        startIcon={
-                            isLoading 
-                                ? <CancelIcon sx={{color: "red", mt: 0}}/> 
-                                : <ReplayIcon color="primary"/>
-                            }
-                        onClick={isLoading ? stop as () => void : reload as () => void}
-                        sx={{
+											<Button
+												variant="outlined"
+												color="primary"
+												size="small"
+												startIcon={
+							isLoading
+								? <CancelIcon sx={{ color: "red", mt: 0 }} />
+								: <ReplayIcon color="primary" />
+						}
+												onClick={isLoading ? stop as () => void : reload as () => void}
+												sx={{
 							width: "180px",
 							height: "30px",
 							position: 'absolute',
-							bottom: 57,
+							bottom: 77,
 							backgroundColor: '#fafafa',
 							borderColor: '#bfbfbf',
 							':hover': {
@@ -183,8 +236,8 @@ export default function Chat() {
 								borderColor: '#000000',
 							},
 						}}
-                        disabled={messages.length < 1}
-                      >
+												disabled={messages.length < 1}
+											>
 						  {isLoading
 							  ?
 							  <Typography
@@ -204,14 +257,14 @@ export default function Chat() {
 								  Regenerate
 							  </Typography>
 						  }
-                      </Button>
+											</Button>
 					}
 				</Box>
 			</Grid>
 			<Grid
 				className="sendMessageContainer"
 				container
-				sx={{width: '100%'}}
+				sx={{ width: '100%' }}
 			>
 				<Box
 					sx={{
@@ -221,7 +274,7 @@ export default function Chat() {
 						right: 0,
 					}}>
 					<Grid item xs={12}>
-						<Box sx={{p: 1}}>
+						<Box sx={{ p: 1 }}>
 							<TextField
 								fullWidth
 								id="user-input"
@@ -232,13 +285,21 @@ export default function Chat() {
 								value={input}
 								onChange={handleInputChange}
 								variant="outlined"
-								InputLabelProps={{shrink: false}}
+								InputLabelProps={{
+									shrink: false,
+									sx: {
+										marginLeft: imageUrl ? '90px' : '30px',
+										display: 'flex',
+										alignItems: 'center',
+										height: '70%',
+									},
+								}}
 								InputProps={{
 									inputComponent: TextareaAutosize,
 									inputProps: {
 										minRows: 1,
 										maxRows: 10,
-										style: {resize: 'none'},
+										style: { resize: 'none' },
 										onKeyDown: (event) => {
 											if (event.key === 'Enter' && !event.shiftKey) {
 												// Prevent default action
@@ -251,13 +312,43 @@ export default function Chat() {
 												// Create synthetic FormEvent for TypeScript compatibility
 												const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
 
-												handleSubmit(formEvent);
+												onSubmit(formEvent);
 											}
 										},
 										onWheel: (event) => {
 											event.stopPropagation();
 										},
 									},
+									startAdornment: (
+										<>
+											{!imageUrl && (
+												<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
+													<AddPhotoAlternateOutlinedIcon />
+													<VisuallyHiddenInput
+														id="file-input"
+														type="file"
+														accept=".jpg,.jpeg,.webp,.png"
+														onChange={handleFileChange}
+														multiple={false}
+													/>
+												</IconButton>
+											)
+											}
+											{imageUrl && (
+												<>
+													<Image
+														src={imageUrl}
+														alt="Uploaded image"
+														width={50}
+														height={50}
+													/>
+													<IconButton sx={{ mt: '-30px' }} onClick={onRemovePreviewImage}>
+														<ClearOutlinedIcon />
+													</IconButton>
+												</>
+											)}
+										</>
+									),
 									endAdornment: !isLoading && (
 										<InputAdornment position="end">
 											<IconButton
@@ -265,7 +356,7 @@ export default function Chat() {
 												color="primary"
 												onClick={(event: any) => {
 													if (!!input?.trim()) {
-														handleSubmit(event);
+														onSubmit(event);
 													}
 												}}
 											>
@@ -276,8 +367,8 @@ export default function Chat() {
 								}}
 								sx={
 									isLoading
-										? {borderRadius: '5px', backgroundColor: '#F0F0F0'}
-										: {borderRadius: '5px', backgroundColor: '#FAFAFA'}
+										? { borderRadius: '5px', backgroundColor: '#F0F0F0' }
+										: { borderRadius: '5px', backgroundColor: '#FAFAFA' }
 								}
 							/>
 						</Box>

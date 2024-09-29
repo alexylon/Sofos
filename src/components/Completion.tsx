@@ -43,9 +43,21 @@ export default function Completion({ messages }: CompletionProps) {
 										mt: -4,
 									}}
 									>
-										<MarkdownText>
-											{m.content}
-										</MarkdownText>
+										<>
+											<MarkdownText>
+												{m.content}
+											</MarkdownText>
+											{m.experimental_attachments && m.experimental_attachments.length > 0 && m.experimental_attachments[0]?.url &&
+												<Box
+												component="img"
+												sx={{
+												maxHeight: 100,
+											}}
+											alt="Uploaded image"
+											src={m.experimental_attachments[0].url}
+										/>
+											}
+										</>
 									</Box>
 								</Box>
 							</Grid>
