@@ -127,7 +127,7 @@ export default function Chat() {
 					sx={{
 						height: files
 							? {
-								xs: 'calc(81vh - 112px)', // On extra-small devices
+								xs: 'calc(81vh - 118px)', // On extra-small devices
 								sm: 'calc(90vh - 110px)', // On small devices and up
 							}
 							: {
