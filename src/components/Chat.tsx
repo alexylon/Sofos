@@ -170,8 +170,8 @@ export default function Chat() {
 					item xs={12}
 					sx={{
 						height: {
-							xs: 'calc(82vh - 62px)', // On extra-small devices
-							sm: 'calc(91vh - 60px)', // On small devices and up
+							xs: 'calc(81vh - 62px)', // On extra-small devices
+							sm: 'calc(90vh - 60px)', // On small devices and up
 						},
 						overflow: 'auto',
 						width: '100%',
