@@ -51,7 +51,8 @@ export default function Completion({ messages }: CompletionProps) {
 												<Box
 												component="img"
 												sx={{
-												maxHeight: 100,
+												maxHeight: 200,
+												borderRadius: '5px',
 											}}
 											alt="Uploaded image"
 											src={m.experimental_attachments[0].url}
