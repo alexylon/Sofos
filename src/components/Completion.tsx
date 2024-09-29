@@ -47,17 +47,23 @@ export default function Completion({ messages }: CompletionProps) {
 											<MarkdownText>
 												{m.content}
 											</MarkdownText>
-											{m.experimental_attachments && m.experimental_attachments.length > 0 && m.experimental_attachments[0]?.url &&
-												<Box
-												component="img"
-												sx={{
-												maxHeight: 200,
-												borderRadius: '5px',
-											}}
-											alt="Uploaded image"
-											src={m.experimental_attachments[0].url}
-										/>
-											}
+											{m?.experimental_attachments
+												?.filter((attachment: any) =>
+													attachment?.contentType?.startsWith('image/'),
+												)
+												.map((attachment: any, index: number) => (
+													<Box
+														key={`${m.id}-${index}`}
+														component="img"
+														sx={{
+															maxHeight: 200,
+															borderRadius: '5px',
+															mr: 2,
+														}}
+														alt={attachment.name ?? `attachment-${index}`}
+														src={attachment.url}
+													/>
+												))}
 										</>
 									</Box>
 								</Box>

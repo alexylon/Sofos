@@ -13,7 +13,6 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import { styled } from '@mui/material/styles';
-import Image from "next/image";
 
 
 export default function Chat() {
@@ -28,7 +27,7 @@ export default function Chat() {
 		stop
 	} = useChat();
 	const [model, setModel] = useState<string>('gpt-4o');
-	const [imageUrl, setImageUrl] = useState<string | null>(null);
+	const [files, setFiles] = useState<FileList | undefined>(undefined);
 	const scrollableGridRef = useRef(null);
 	const { data: session } = useSession();
 
@@ -60,67 +59,24 @@ export default function Chat() {
 	}
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		if (imageUrl) {
-			handleSubmit(e, {
-				data: {
-					model: model,
-					imageUrl: imageUrl,
-				},
-				experimental_attachments: [{ url: imageUrl, contentType: 'image' }],
-			});
-
-			setImageUrl(null);
-			return;
-		}
 		handleSubmit(e, {
 			data: {
 				model: model,
 			},
+			experimental_attachments: files,
 		});
+
+		setFiles(undefined);
 	};
 
-	const onRemovePreviewImage = () => setImageUrl(null);
+	const onRemovePreviewImage = () => {
+		setFiles(undefined);
+	}
 
-	const handleUploadImageFile = async (file: File) => {
-		const base64 = await new Promise<string>((resolve, reject) => {
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onload = () => resolve(reader.result as string);
-			reader.onerror = (error) => reject(error);
-		});
-		setImageUrl(base64);
-	};
-
-	const handleUploadFile = async (file: File) => {
-		try {
-			if (file.type.startsWith("image/")) {
-				return await handleUploadImageFile(file);
-			}
-		} catch (error: any) {
-			console.error(error.message);
-		}
-	};
-
-	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFilesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files && event.target.files.length > 0) {
-			handleUploadFile(event.target.files[0]).then();
+			setFiles(event.target.files);
 		}
-	};
-
-	const readFileContent = (file: File): Promise<string> => {
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-
-			reader.onload = (event) => {
-				resolve(event?.target?.result as string);
-			};
-
-			reader.onerror = (event) => {
-				reject(new Error("Error reading file: " + event?.target?.error));
-			};
-
-			reader.readAsText(file);
-		});
 	};
 
 	const VisuallyHiddenInput = styled('input')({
@@ -169,10 +125,15 @@ export default function Chat() {
 					ref={scrollableGridRef}
 					item xs={12}
 					sx={{
-						height: {
-							xs: 'calc(81vh - 62px)', // On extra-small devices
-							sm: 'calc(90vh - 60px)', // On small devices and up
-						},
+						height: files
+							? {
+								xs: 'calc(81vh - 112px)', // On extra-small devices
+								sm: 'calc(90vh - 110px)', // On small devices and up
+							}
+							: {
+								xs: 'calc(81vh - 62px)', // On extra-small devices
+								sm: 'calc(90vh - 60px)', // On small devices and up
+							},
 						overflow: 'auto',
 						width: '100%',
 						'&::-webkit-scrollbar': {
@@ -211,8 +172,9 @@ export default function Chat() {
 					}
 				</Grid>
 			</Grid>
-			<Grid className="actionButton" item xs={6} md={6}>
-				<Box sx={{ display: 'flex', justifyContent: 'center' }}>
+			{!files &&
+							<Grid className="actionButton" item xs={6} md={6}>
+								<Box sx={{ display: 'flex', justifyContent: 'center' }}>
 					{messages.length > 0 &&
 											<Button
 												variant="outlined"
@@ -259,8 +221,9 @@ export default function Chat() {
 						  }
 											</Button>
 					}
-				</Box>
-			</Grid>
+								</Box>
+							</Grid>
+			}
 			<Grid
 				className="sendMessageContainer"
 				container
@@ -275,6 +238,32 @@ export default function Chat() {
 					}}>
 					<Grid item xs={12}>
 						<Box sx={{ p: 1 }}>
+							{files &&
+															<>
+								  {
+									  Array.from(files).map((file: File, index: number) => {
+										  const fileURL = URL.createObjectURL(file);
+										  return (
+											  <Box
+												  key={`${file.name}-${index}`}
+												  component="img"
+												  sx={{
+													  height: 50,
+													  width: 50,
+													  borderRadius: '5px',
+													  mr: 1,
+												  }}
+												  alt={file.name ?? `attachment-${index}`}
+												  src={fileURL}
+											  />
+										  );
+									  })
+								  }
+																<IconButton sx={{ mt: '-75px' }} onClick={onRemovePreviewImage}>
+																	<ClearOutlinedIcon />
+																</IconButton>
+															</>
+							}
 							<TextField
 								fullWidth
 								id="user-input"
@@ -288,7 +277,7 @@ export default function Chat() {
 								InputLabelProps={{
 									shrink: false,
 									sx: {
-										marginLeft: imageUrl ? '90px' : '30px',
+										marginLeft: '30px',
 										display: 'flex',
 										alignItems: 'center',
 										height: '70%',
@@ -320,34 +309,16 @@ export default function Chat() {
 										},
 									},
 									startAdornment: (
-										<>
-											{!imageUrl && (
-												<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
-													<AddPhotoAlternateOutlinedIcon />
-													<VisuallyHiddenInput
-														id="file-input"
-														type="file"
-														accept=".jpg,.jpeg,.webp,.png"
-														onChange={handleFileChange}
-														multiple={false}
-													/>
-												</IconButton>
-											)
-											}
-											{imageUrl && (
-												<>
-													<Image
-														src={imageUrl}
-														alt="Uploaded image"
-														width={50}
-														height={50}
-													/>
-													<IconButton sx={{ mt: '-30px' }} onClick={onRemovePreviewImage}>
-														<ClearOutlinedIcon />
-													</IconButton>
-												</>
-											)}
-										</>
+										<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
+											<AddPhotoAlternateOutlinedIcon />
+											<VisuallyHiddenInput
+												id="file-input"
+												type="file"
+												accept=".jpg,.jpeg,.webp,.png"
+												onChange={handleFilesChange}
+												multiple
+											/>
+										</IconButton>
 									),
 									endAdornment: !isLoading && (
 										<InputAdornment position="end">
@@ -376,5 +347,6 @@ export default function Chat() {
 				</Box>
 			</Grid>
 		</Box>
-	);
+	)
+		;
 }

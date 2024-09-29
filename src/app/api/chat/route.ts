@@ -2,8 +2,8 @@ import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { convertToCoreMessages, streamText } from 'ai';
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+// Allow streaming responses up to 60 seconds
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
 	// Extract the `messages` from the body of the request
@@ -29,9 +29,9 @@ export async function POST(req: Request) {
 
 	const result = await streamText({
 		model: model,
-		messages: updatedMessages,
+		messages: convertToCoreMessages(messages),
 		temperature: 0.2,
-		topP: 0.2,
+		topP: 0.3,
 		async onFinish({ text, toolCalls, toolResults, usage, finishReason }) {
 			// implement your own logic here, e.g. for storing messages
 			// or recording token usage
