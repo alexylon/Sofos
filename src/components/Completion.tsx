@@ -57,6 +57,10 @@ export default function Completion({ messages }: CompletionProps) {
 														component="img"
 														sx={{
 															maxHeight: 200,
+															maxWidth: {
+																xs: 350, // On extra-small devices
+																sm: 1280, // On small devices and up
+															},
 															borderRadius: '5px',
 															mr: 2,
 														}}
