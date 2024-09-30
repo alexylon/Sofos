@@ -18,7 +18,7 @@ export default function RootLayout({children,}: { children: React.ReactNode }) {
 		<body className={inter.className}>
 		<NextAuthProvider>
 			<Box className="layoutContainer" sx={{overflow: 'hidden', maxHeight: '97vh'}}>
-				<HeaderAppBar />
+				{/*<HeaderAppBar />*/}
 				{children}
 			</Box>
 		</NextAuthProvider>
