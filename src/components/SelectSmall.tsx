@@ -2,8 +2,15 @@ import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { Model, SamplingParameter } from '@/types/types';
 
-export default function SelectSmall({ options, handleChange, value }: any) {
+interface SelectSmallProps {
+	options: Model[] | SamplingParameter[],
+	handleChange: any,
+	value: string | number,
+}
+
+export default function SelectSmall({ options, handleChange, value }: SelectSmallProps) {
 
 	return (
 		<FormControl sx={{ m: 1 }} size="small">

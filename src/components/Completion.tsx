@@ -1,24 +1,25 @@
 import React from "react";
-import { Grid } from "@mui/material";
-import Box from "@mui/material/Box";
+import { Grid, Box, Chip } from "@mui/material";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton';
-import { Message } from 'ai';
+import { Attachment, Message } from 'ai';
+import { Model } from '@/types/types';
 
 
 interface CompletionProps {
-	messages?: Message[]
+	messages?: Message[],
+	models: Model[],
 }
 
-export default function Completion({ messages }: CompletionProps) {
+export default function Completion({ messages, models }: CompletionProps) {
 
 	return (
 		<AutoScrollingWindow style={{ flexGrow: 1 }} messages={messages}>
 			<div style={{ minHeight: "auto", height: "auto" }}>
-				{messages?.map((m: any) => (
-					<div key={m.id}>
-						{m.role === 'user'
+				{messages?.map((message: Message) => (
+					<div key={message.id}>
+						{message.role === 'user'
 							?
 							<Grid item xs={12}>
 								<Box sx={{
@@ -37,7 +38,7 @@ export default function Completion({ messages }: CompletionProps) {
 										mr: -1,
 									}}
 									>
-										<CopyToClipboardButton value={m.content} color="#000000" />
+										<CopyToClipboardButton value={message.content} color="#000000" />
 									</Box>
 									<Box sx={{
 										mt: -4,
@@ -45,15 +46,15 @@ export default function Completion({ messages }: CompletionProps) {
 									>
 										<>
 											<MarkdownText>
-												{m.content}
+												{message.content}
 											</MarkdownText>
-											{m?.experimental_attachments
-												?.filter((attachment: any) =>
+											{message?.experimental_attachments
+												?.filter((attachment:  Attachment | undefined) =>
 													attachment?.contentType?.startsWith('image/'),
 												)
 												.map((attachment: any, index: number) => (
 													<Box
-														key={`${m.id}-${index}`}
+														key={`${message.id}-${index}`}
 														component="img"
 														sx={{
 															maxHeight: 200,
@@ -83,20 +84,30 @@ export default function Completion({ messages }: CompletionProps) {
 									mb: 1,
 									backgroundColor: '#d5d5d5',
 								}}>
-									<Box sx={{
-										display: 'flex',
-										justifyContent: 'flex-end',
-										mr: -1,
-									}}
-									>
-										<CopyToClipboardButton value={m.content} color="#000000" />
+									<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+										<Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: '10px' }}>
+											<Chip
+												label={
+													message.annotations && message.annotations?.length > 0
+														// @ts-ignore
+														? models.find((model: string) => model.value === message.annotations[0].model)?.label
+														: ''
+												}
+												variant="outlined"
+												size="small"
+												sx={{ fontSize: '0.70rem' }}
+											/>
+										</Box>
+										<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1 }}>
+											<CopyToClipboardButton value={message.content} color="#000000" />
+										</Box>
 									</Box>
 									<Box sx={{
-										mt: -3,
+										mt: -2,
 									}}
 									>
 										<MarkdownText>
-											{m.content}
+											{message.content}
 										</MarkdownText>
 									</Box>
 								</Box>

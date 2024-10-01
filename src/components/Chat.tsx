@@ -2,26 +2,20 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
-import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
-import Completion from "@/components/Completion";
-import { TextareaAutosize } from "@mui/base";
 import { useChat } from 'ai/react'
 import { useSession } from "next-auth/react"
-import SendIcon from '@mui/icons-material/Send';
-import ReplayIcon from '@mui/icons-material/Replay';
-import CancelIcon from '@mui/icons-material/Cancel';
-import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { styled } from '@mui/material/styles';
-import ImageBox from '@/components/ImageBox';
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { Model, SamplingParameter } from '@/types/types';
+import MessagesContainer from '@/components/MessagesContainer';
+import ActionButton from '@/components/ActionButton';
+import SendMessageContainer from '@/components/SendMessageContainer';
 
 
 const MAX_IMAGES = 5;
 
-const models = [
+const models: Model[] = [
 	{
 		value: 'gpt-4o',
 		label: 'GPT-4o',
@@ -36,6 +30,21 @@ const models = [
 	},
 ];
 
+const samplingParameters: SamplingParameter[] = [
+	{
+		value: 0.2,
+		label: 'Focused',
+	},
+	{
+		value: 0.5,
+		label: 'Balanced',
+	},
+	{
+		value: 0.7,
+		label: 'Creative',
+	},
+];
+
 export default function Chat() {
 	const {
 		input,
@@ -44,10 +53,10 @@ export default function Chat() {
 		handleSubmit,
 		messages,
 		reload,
-		setInput,
-		stop
+		stop,
 	} = useChat();
-	const [model, setModel] = useState<string>('gpt-4o');
+	const [model, setModel] = useState<string>(models[0].value);
+	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
 	const [images, setImages] = useState<File[]>([]);
 	const scrollableGridRef = useRef(null);
 	const { data: session } = useSession();
@@ -86,6 +95,7 @@ export default function Chat() {
 		handleSubmit(e, {
 			data: {
 				model: model,
+				samplingParameter: samplingParameter,
 			},
 			experimental_attachments: fileList.length > 0 ? fileList : undefined,
 		});
@@ -122,18 +132,6 @@ export default function Chat() {
 		}
 	};
 
-	const VisuallyHiddenInput = styled('input')({
-		clip: 'rect(0 0 0 0)',
-		clipPath: 'inset(50%)',
-		height: 1,
-		overflow: 'hidden',
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		whiteSpace: 'nowrap',
-		width: 1,
-	});
-
 	const handleButtonClick = () => {
 		document.getElementById('file-input')?.click();
 	};
@@ -142,15 +140,26 @@ export default function Chat() {
 		setModel(event.target.value);
 	};
 
+	const handleSamplingParameterChange = (event: SelectChangeEvent) => {
+		setSamplingParameter(Number(event.target.value));
+	};
+
 	const hasImages = images.length > 0;
 
 	return (
 		<>
-			<HeaderAppBar options={models} handleChange={handleModelChange} value={model} />
+			<HeaderAppBar
+				models={models}
+				handleModelChange={handleModelChange}
+				model={model}
+				samplingParameters={samplingParameters}
+				handleSamplingParameterChange={handleSamplingParameterChange}
+				samplingParameter={samplingParameter}
+			/>
 			{user &&
-							<Box
-								className="chatContainer"
-								sx={{
+              <Box
+                className="chatContainer"
+                sx={{
 					maxWidth: 1200,
 					marginLeft: "auto",
 					marginRight: "auto",
@@ -166,242 +175,20 @@ export default function Chat() {
 					},
 					position: 'relative',
 				}}>
-								<Grid
-									className="messageContainer"
-									container
-									sx={{
-					  width: '100%',
-				  }}
-								>
-									<Grid
-										ref={scrollableGridRef}
-										item xs={12}
-										sx={{
-						height: hasImages
-							? {
-								xs: 'calc(81vh - 118px)', // On extra-small devices
-								sm: 'calc(90vh - 110px)', // On small devices and up
-							}
-							: {
-								xs: 'calc(81vh - 62px)', // On extra-small devices
-								sm: 'calc(90vh - 60px)', // On small devices and up
-							},
-						overflow: 'auto',
-						width: '100%',
-						'&::-webkit-scrollbar': {
-							display: 'none', // Hide scrollbar for WebKit browsers
-						},
-						scrollbarWidth: 'none', // Hide scrollbar for Firefox
-						msOverflowStyle: 'none', // Hide scrollbar for IE 10+
-					}}
-									>
-					  {messages.length
-						  ?
-						  <Box sx={{
-							  p: 1,
-							  flex: 1,
-							  overflow: 'auto',
-						  }}>
-							  <Completion messages={messages} />
-						  </Box>
-						  :
-						  <Box sx={{
-							  mt: 25,
-						  }}>
-							  <Typography
-								  variant="h2"
-								  component="h2"
-								  color="#D1D5DB"
-								  align="center"
-								  fontWeight="bold"
-								  sx={{
-									  userSelect: 'none',
-								  }}
-							  >
-								  sofos
-							  </Typography>
-						  </Box>
-					  }
-									</Grid>
-								</Grid>
-				  {!hasImages &&
-										<Grid className="actionButton" item xs={6} md={6}>
-											<Box sx={{ display: 'flex', justifyContent: 'center' }}>
-						  {messages.length > 0 &&
-														<Button
-															variant="outlined"
-															color="primary"
-															size="small"
-															startIcon={
-								  isLoading
-									  ? <CancelIcon sx={{ color: "red", mt: 0 }} />
-									  : <ReplayIcon color="primary" />
-							  }
-															onClick={isLoading ? stop as () => void : reload as () => void}
-															sx={{
-								  width: "180px",
-								  height: "30px",
-								  position: 'absolute',
-								  bottom: 77,
-								  backgroundColor: '#fafafa',
-								  borderColor: '#bfbfbf',
-								  ':hover': {
-									  backgroundColor: '#fafafa',
-									  borderColor: '#000000',
-								  },
-							  }}
-															disabled={messages.length < 1}
-														>
-								{isLoading
-									?
-									<Typography
-										color="red"
-										sx={{
-											userSelect: 'none',
-										}}
-									>
-										Abort
-									</Typography>
-									:
-									<Typography
-										sx={{
-											userSelect: 'none',
-										}}
-									>
-										Regenerate
-									</Typography>
-								}
-														</Button>
-						  }
-											</Box>
-										</Grid>
-				  }
-								<Grid
-									className="sendMessageContainer"
-									container
-									sx={{ width: '100%' }}
-								>
-									<Box
-										sx={{
-						position: 'absolute',
-						bottom: 0,
-						left: 0,
-						right: 0,
-					}}>
-										<Grid item xs={12}>
-											<Box sx={{ p: 1 }}>
-						  {hasImages &&
-														<Box sx={{ display: 'flex', flexDirection: 'row', mb: -2 }}>
-								{
-									images.map((file: File, index: number) => {
-										const fileURL = URL.createObjectURL(file);
-										return (
-											<div key={index}>
-												<ImageBox index={index} file={file} fileURL={fileURL} />
-												<IconButton
-													sx={{
-														transform: 'translate(+210%, -250%)',
-														backgroundColor: 'rgba(255, 255, 255, 0.5)',
-														borderRadius: '50%',
-														boxShadow: 1,
-														height: '20px',
-														width: '20px',
-														ml: -2,
-													}}
-													size='small'
-													onClick={() => handleRemoveImage(index)}
-												>
-													<ClearOutlinedIcon />
-												</IconButton>
-											</div>
-										);
-									})
-								}
-														</Box>
-						  }
-												<TextField
-													fullWidth
-													id="user-input"
-													label={!isLoading && !input ? "Send a message..." : ""}
-													multiline
-													disabled={isLoading}
-													size="small"
-													value={input}
-													onChange={handleInputChange}
-													variant="outlined"
-													InputLabelProps={{
-							  shrink: false,
-							  sx: {
-								  marginLeft: '30px',
-								  display: 'flex',
-								  alignItems: 'center',
-								  height: '70%',
-							  },
-						  }}
-													InputProps={{
-							  inputComponent: TextareaAutosize,
-							  inputProps: {
-								  minRows: 1,
-								  maxRows: 10,
-								  style: { resize: 'none' },
-								  onKeyDown: (event) => {
-									  if (event.key === 'Enter' && !event.shiftKey) {
-										  // Prevent default action
-										  event.preventDefault();
-
-										  if (!input?.trim()) {
-											  return;
-										  }
-
-										  // Create synthetic FormEvent for TypeScript compatibility
-										  const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
-
-										  onSubmit(formEvent);
-									  }
-								  },
-								  onWheel: (event) => {
-									  event.stopPropagation();
-								  },
-							  },
-							  startAdornment: (
-								  <IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
-									  <AddPhotoAlternateOutlinedIcon />
-									  <VisuallyHiddenInput
-										  id="file-input"
-										  type="file"
-										  accept="image/jpeg,image/jpg,image/png"
-										  onChange={handleFilesChange}
-										  multiple
-									  />
-								  </IconButton>
-							  ),
-							  endAdornment: !isLoading && (
-								  <InputAdornment position="end">
-									  <IconButton
-										  edge="end"
-										  color="primary"
-										  onClick={(event: any) => {
-											  if (!!input?.trim()) {
-												  onSubmit(event);
-											  }
-										  }}
-									  >
-										  <SendIcon />
-									  </IconButton>
-								  </InputAdornment>
-							  ),
-						  }}
-													sx={
-							  isLoading
-								  ? { borderRadius: '5px', backgroundColor: '#F0F0F0' }
-								  : { borderRadius: '5px', backgroundColor: '#FAFAFA' }
-						  }
-												/>
-											</Box>
-										</Grid>
-									</Box>
-								</Grid>
-							</Box>
+                <MessagesContainer hasImages={hasImages} messages={messages} models={models} />
+                <ActionButton hasImages={hasImages} messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+                <SendMessageContainer
+                  hasImages={hasImages}
+                  images={images}
+                  isLoading={isLoading}
+                  handleRemoveImage={handleRemoveImage}
+                  input={input}
+                  handleInputChange={handleInputChange}
+                  onSubmit={onSubmit}
+                  handleButtonClick={handleButtonClick}
+                  handleFilesChange={handleFilesChange}
+                />
+              </Box>
 			}
 		</>
 	)
