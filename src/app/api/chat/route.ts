@@ -8,8 +8,6 @@ export const maxDuration = 60;
 export async function POST(req: Request) {
 	// Extract the `messages` from the body of the request
 	const { messages, data } = await req.json();
-	console.log('data.model', data.model);
-	console.log('data.samplingParameter', data.samplingParameter);
 
 	const model = data.model.startsWith("claude")
 		? anthropic(data.model)
