@@ -1,36 +1,38 @@
-import Box from '@mui/material/Box';
-import { Grid, IconButton, InputAdornment, TextField } from '@mui/material';
-import ImageBox from '@/components/ImageBox';
-import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
-import { TextareaAutosize } from '@mui/base';
 import React from 'react';
-import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import { Box, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
+import { TextareaAutosize } from '@mui/base';
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import SendIcon from '@mui/icons-material/Send';
 import { styled } from '@mui/material/styles';
+import AttachmentsContainer from '@/components/AttachmentsContainer';
 
-interface SelectedImagesContainerProps {
+interface SendMessageContainerProps {
 	hasImages: boolean,
+	hasFiles: boolean,
 	images: File[],
+	files: File[],
 	isLoading: boolean,
 	handleRemoveImage: any,
+	handleRemoveFile: any,
 	input: string,
 	handleInputChange: any,
 	onSubmit: any,
-	handleButtonClick: any,
 	handleFilesChange: any,
 }
 
 const SendMessageContainer = ({
 								  hasImages,
+								  hasFiles,
 								  images,
+								  files,
 								  handleRemoveImage,
+								  handleRemoveFile,
 								  isLoading,
 								  input,
 								  handleInputChange,
 								  onSubmit,
-								  handleButtonClick,
 								  handleFilesChange,
-							  }: SelectedImagesContainerProps) => {
+							  }: SendMessageContainerProps) => {
 	const VisuallyHiddenInput = styled('input')({
 		clip: 'rect(0 0 0 0)',
 		clipPath: 'inset(50%)',
@@ -42,6 +44,10 @@ const SendMessageContainer = ({
 		whiteSpace: 'nowrap',
 		width: 1,
 	});
+
+	const handleButtonClick = () => {
+		document.getElementById('file-input')?.click();
+	};
 
 	return (
 		<Grid
@@ -58,35 +64,14 @@ const SendMessageContainer = ({
 				}}>
 				<Grid item xs={12}>
 					<Box sx={{ p: 1 }}>
-						{hasImages &&
-                          <Box sx={{ display: 'flex', flexDirection: 'row', mb: -2 }}>
-							  {
-								  images.map((file: File, index: number) => {
-									  const fileURL = URL.createObjectURL(file);
-									  return (
-										  <div key={index}>
-											  <ImageBox index={index} file={file} fileURL={fileURL} />
-											  <IconButton
-												  sx={{
-													  transform: 'translate(+210%, -250%)',
-													  backgroundColor: 'rgba(255, 255, 255, 0.5)',
-													  borderRadius: '50%',
-													  boxShadow: 1,
-													  height: '20px',
-													  width: '20px',
-													  ml: -2,
-												  }}
-												  size='small'
-												  onClick={() => handleRemoveImage(index)}
-											  >
-												  <ClearOutlinedIcon />
-											  </IconButton>
-										  </div>
-									  );
-								  })
-							  }
-                          </Box>
-						}
+						<AttachmentsContainer
+							hasImages={hasImages}
+							hasFiles={hasFiles}
+							images={images}
+							files={files}
+							handleRemoveImage={handleRemoveImage}
+							handleRemoveFile={handleRemoveFile}
+						/>
 						<TextField
 							fullWidth
 							id="user-input"
@@ -133,11 +118,11 @@ const SendMessageContainer = ({
 								},
 								startAdornment: (
 									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
-										<AddPhotoAlternateOutlinedIcon />
+										<AddCircleOutlineOutlinedIcon />
 										<VisuallyHiddenInput
 											id="file-input"
 											type="file"
-											accept="image/jpeg,image/jpg,image/png"
+											// accept="image/jpeg,image/jpg,image/png"
 											onChange={handleFilesChange}
 											multiple
 										/>
@@ -159,11 +144,19 @@ const SendMessageContainer = ({
 									</InputAdornment>
 								),
 							}}
-							sx={
-								isLoading
-									? { borderRadius: '5px', backgroundColor: '#F0F0F0' }
-									: { borderRadius: '5px', backgroundColor: '#FAFAFA' }
-							}
+							sx={{
+								borderRadius: '12px',
+								backgroundColor: isLoading ? '#F0F0F0' : '#FAFAFA',
+								'& .MuiOutlinedInput-root': {
+									borderRadius: '12px',
+									'&:hover fieldset': {
+										borderRadius: '12px',
+									},
+									'&.Mui-focused fieldset': {
+										borderRadius: '12px',
+									},
+								},
+							}}
 						/>
 					</Box>
 				</Grid>

@@ -14,6 +14,7 @@ import SendMessageContainer from '@/components/SendMessageContainer';
 
 
 const MAX_IMAGES = 5;
+const MAX_FILES = 5;
 
 const models: Model[] = [
 	{
@@ -46,6 +47,11 @@ const samplingParameters: SamplingParameter[] = [
 ];
 
 export default function Chat() {
+	const [model, setModel] = useState<string>(models[0].value);
+	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
+	const [images, setImages] = useState<File[]>([]);
+	const [files, setFiles] = useState<File[]>([]);
+
 	const {
 		input,
 		isLoading,
@@ -54,10 +60,17 @@ export default function Chat() {
 		messages,
 		reload,
 		stop,
-	} = useChat();
-	const [model, setModel] = useState<string>(models[0].value);
-	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
-	const [images, setImages] = useState<File[]>([]);
+		error,
+	} = useChat(
+		{
+			keepLastMessageOnError: true,
+			body: { model, samplingParameter },
+			onError: error => {
+				console.error(error);
+			},
+		}
+	);
+
 	const scrollableGridRef = useRef(null);
 	const { data: session } = useSession();
 	const user = session?.user;
@@ -88,36 +101,33 @@ export default function Chat() {
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
+		const allFiles = [...images, ...files];
 		const dataTransfer = new DataTransfer();
-		images.forEach(file => dataTransfer.items.add(file));
+
+		allFiles.forEach(file => dataTransfer.items.add(file));
+
 		const fileList = dataTransfer.files;
 
 		handleSubmit(e, {
-			data: {
-				model: model,
-				samplingParameter: samplingParameter,
-			},
 			experimental_attachments: fileList.length > 0 ? fileList : undefined,
 		});
 
 		setImages([]);
-	};
-
-	const handleRemoveImage = (index: number) => {
-		setImages(prevImages => prevImages && prevImages.filter((_, i) => i !== index));
+		setFiles([]);
 	};
 
 	const handleFilesChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (event.target.files) {
 			const newImages: File[] = Array.from(event.target.files).filter(file => file.type.startsWith('image/'));
+			const newFiles: File[] = Array.from(event.target.files).filter(file => !file.type.startsWith('image/'));
 			const resizedImages: File[] = [];
 
-			for (const file of newImages) {
+			for (const image of newImages) {
 				try {
-					const resizedImage = await resizeImage(file, 2048);
+					const resizedImage = await resizeImage(image, 2048);
 					resizedImages.push(resizedImage);
 				} catch (error) {
-					console.error(`Error resizing image ${file.name}:`, error);
+					console.error(`Error resizing image ${image.name}:`, error);
 				}
 			}
 
@@ -129,11 +139,24 @@ export default function Chat() {
 				}
 				return updatedImages;
 			});
+
+			setFiles(prevFiles => {
+				const updatedFiles = [...prevFiles, ...newFiles].slice(0, MAX_FILES);
+
+				if (newFiles.length > MAX_FILES) {
+					console.log(`You can only upload up to ${MAX_FILES} files.`);
+				}
+				return updatedFiles;
+			});
 		}
 	};
 
-	const handleButtonClick = () => {
-		document.getElementById('file-input')?.click();
+	const handleRemoveImage = (index: number) => {
+		setImages(prevImages => prevImages && prevImages.filter((_, i) => i !== index));
+	};
+
+	const handleRemoveFile = (index: number) => {
+		setFiles(prevFiles => prevFiles && prevFiles.filter((_, i) => i !== index));
 	};
 
 	const handleModelChange = (event: SelectChangeEvent) => {
@@ -145,6 +168,7 @@ export default function Chat() {
 	};
 
 	const hasImages = images.length > 0;
+	const hasFiles = files.length > 0;
 
 	return (
 		<>
@@ -157,9 +181,9 @@ export default function Chat() {
 				samplingParameter={samplingParameter}
 			/>
 			{user &&
-              <Box
-                className="chatContainer"
-                sx={{
+							<Box
+								className="chatContainer"
+								sx={{
 					maxWidth: 1200,
 					marginLeft: "auto",
 					marginRight: "auto",
@@ -175,20 +199,27 @@ export default function Chat() {
 					},
 					position: 'relative',
 				}}>
-                <MessagesContainer hasImages={hasImages} messages={messages} models={models} />
-                <ActionButton hasImages={hasImages} messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
-                <SendMessageContainer
-                  hasImages={hasImages}
-                  images={images}
-                  isLoading={isLoading}
-                  handleRemoveImage={handleRemoveImage}
-                  input={input}
-                  handleInputChange={handleInputChange}
-                  onSubmit={onSubmit}
-                  handleButtonClick={handleButtonClick}
-                  handleFilesChange={handleFilesChange}
-                />
-              </Box>
+								<MessagesContainer
+									hasAttachments={hasFiles || hasImages}
+									messages={messages}
+									models={models}
+									error={error}
+								/>
+								<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+								<SendMessageContainer
+									hasImages={hasImages}
+									hasFiles={hasFiles}
+									images={images}
+									files={files}
+									isLoading={isLoading}
+									handleRemoveImage={handleRemoveImage}
+									handleRemoveFile={handleRemoveFile}
+									input={input}
+									handleInputChange={handleInputChange}
+									onSubmit={onSubmit}
+									handleFilesChange={handleFilesChange}
+								/>
+							</Box>
 			}
 		</>
 	)

@@ -27,7 +27,7 @@ const MarkdownText = ({children}: any) => {
 										color="primary"
 										sx={{
 											backgroundColor: '#777777',
-											borderRadius: '5px 5px 0 0',
+											borderRadius: '12px 12px 0 0',
 											zIndex: 'modal',
 											mb: '-10px'
 										}}
@@ -50,7 +50,7 @@ const MarkdownText = ({children}: any) => {
 								<SyntaxHighlighter
 									{...props}
 									style={dracula}
-									customStyle={{borderRadius: '0 0 5px 5px'}}
+									customStyle={{borderRadius: '0 0 12px 12px'}}
 									language={(match && match[1]) || ''}
 									PreTag="div"
 									showLineNumbers={false}

@@ -1,17 +1,17 @@
 import React, { useRef } from 'react';
-import { Grid, Typography } from '@mui/material';
-import Box from '@mui/material/Box';
+import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
 import { Message } from 'ai';
 import { Model } from '@/types/types';
 
 interface MessagesContainerProps {
-	hasImages: boolean,
+	hasAttachments: boolean,
 	messages: Message[],
 	models: Model[],
+	error?: any,
 }
 
-const MessagesContainer = ({ hasImages, messages, models }: MessagesContainerProps) => {
+const MessagesContainer = ({ hasAttachments, messages, models, error }: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
 
 	return (
@@ -26,7 +26,7 @@ const MessagesContainer = ({ hasImages, messages, models }: MessagesContainerPro
 				ref={scrollableGridRef}
 				item xs={12}
 				sx={{
-					height: hasImages
+					height: hasAttachments
 						? {
 							xs: 'calc(81vh - 118px)', // On extra-small devices
 							sm: 'calc(90vh - 110px)', // On small devices and up
@@ -51,7 +51,7 @@ const MessagesContainer = ({ hasImages, messages, models }: MessagesContainerPro
 						flex: 1,
 						overflow: 'auto',
 					}}>
-						<Completion messages={messages} models={models} />
+						<Completion messages={messages} models={models} error={error} />
 					</Box>
 					:
 					<Box sx={{

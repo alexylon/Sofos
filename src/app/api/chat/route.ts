@@ -6,18 +6,18 @@ import { convertToCoreMessages, StreamData, streamText, StreamTextResult } from 
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-	// Extract the `messages` from the body of the request
-	const { messages, data } = await req.json();
+	// Extract the data from the body of the request
+	const { messages, model, samplingParameter } = await req.json();
 
-	const model = data.model.startsWith("claude")
-		? anthropic(data.model)
-		: openai(data.model);
+	const modelName = model.startsWith("claude")
+		? anthropic(model)
+		: openai(model);
 
 	const result: StreamTextResult<any> = await streamText({
-		model: model,
+		model: modelName,
 		messages: convertToCoreMessages(messages),
-		temperature: data.samplingParameter,
-		topP: data.samplingParameter,
+		temperature: samplingParameter,
+		topP: samplingParameter,
 		async onFinish({ text, toolCalls, toolResults, usage, finishReason, response, responseMessages }) {
 			// implement your own logic here, e.g. for storing messages
 			// or recording token usage
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 	});
 
 	const streamData = new StreamData();
-	streamData.appendMessageAnnotation({ model: data.model });
+	streamData.appendMessageAnnotation({ model });
 	await streamData.close();
 
 	return result.toDataStreamResponse({ data: streamData });

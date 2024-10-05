@@ -1,32 +1,41 @@
-import Box from '@mui/material/Box';
+import { Box, Card } from '@mui/material';
 import React from 'react';
 
 const ImageBox = ({ file, index, fileURL }: any) => {
 	return (
-		<Box
-			key={`${file.name}-${index}`}
+		<Card
 			sx={{
 				height: 50,
 				width: 50,
-				overflow: 'hidden',
-				borderRadius: '5px',
+				borderRadius: '12px',
 				mr: 1,
-				display: 'flex',
-				justifyContent: 'center',
-				alignItems: 'center',
+				mb: '-6px',
+				display: 'inline-block',
+				overflow: 'hidden',
 			}}
 		>
 			<Box
-				component="img"
 				sx={{
-					width: '100%',
-					height: '100%',
-					objectFit: 'cover',
+					height: 50,
+					width: 50,
+					overflow: 'hidden',
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
 				}}
-				alt={file.name ?? `attachment-${index}`}
-				src={fileURL}
-			/>
-		</Box>
+			>
+				<Box
+					component="img"
+					sx={{
+						width: '100%',
+						height: '100%',
+						objectFit: 'cover',
+					}}
+					alt={file.name ?? `attachment-${index}`}
+					src={fileURL}
+				/>
+			</Box>
+		</Card>
 	);
 };
 
