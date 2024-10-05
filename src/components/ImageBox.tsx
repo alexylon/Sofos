@@ -8,7 +8,7 @@ const ImageBox = ({ file, index, fileURL }: any) => {
 				height: 50,
 				width: 50,
 				borderRadius: '12px',
-				mr: 1,
+				mr: '4px',
 				mb: '-6px',
 				display: 'inline-block',
 				overflow: 'hidden',

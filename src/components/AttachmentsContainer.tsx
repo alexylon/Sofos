@@ -26,10 +26,14 @@ const AttachmentsContainer = ({
 				const fileURL = URL.createObjectURL(file);
 				return (
 					<div key={index}>
-						<ImageBox index={index} file={file} fileURL={fileURL} />
+						<ImageBox
+							index={index}
+							file={file}
+							fileURL={fileURL}
+						/>
 						<IconButton
 							sx={{
-								transform: 'translate(-88%, -120%)',
+								transform: 'translate(-70%, -120%)',
 								backgroundColor: 'rgba(255, 255, 255, 0.5)',
 								borderRadius: '50%',
 								boxShadow: 1,
