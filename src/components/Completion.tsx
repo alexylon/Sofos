@@ -69,7 +69,8 @@ export default function Completion({ messages, models, error }: CompletionProps)
 															component="img"
 															sx={{
 																maxHeight: 200,
-																width: '100%',
+																width: 'auto',
+																height: 'auto',
 																maxWidth: {
 																	xs: 350, // On extra-small devices
 																	sm: 1280, // On small devices and up
