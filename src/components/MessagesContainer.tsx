@@ -28,11 +28,11 @@ const MessagesContainer = ({ hasAttachments, messages, models, error }: Messages
 				sx={{
 					height: hasAttachments
 						? {
-							xs: 'calc(90vh - 138px)', // On extra-small devices
+							xs: 'calc(89vh - 138px)', // On extra-small devices
 							sm: 'calc(93vh - 142px)', // On small devices and up
 						}
 						: {
-							xs: 'calc(90vh - 62px)', // On extra-small devices
+							xs: 'calc(89vh - 62px)', // On extra-small devices
 							sm: 'calc(93vh - 65px)', // On small devices and up
 						},
 					overflow: 'auto',

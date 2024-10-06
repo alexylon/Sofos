@@ -153,18 +153,18 @@ const SendMessageContainer = ({
 							}}
 							sx={{
 								borderRadius: '13px',
-								height: '50px',
+								minHeight: '59px',
 								backgroundColor: isLoading ? '#F0F0F0' : '#FAFAFA',
 								'& .MuiOutlinedInput-root': {
 									borderRadius: '13px',
-									height: '50px',
+									minHeight: '59px',
 									'&:hover fieldset': {
 										borderRadius: '13px',
-										height: '53px',
+										minHeight: '53px',
 									},
 									'&.Mui-focused fieldset': {
 										borderRadius: '13px',
-										height: '50px',
+										minHeight: '59px',
 									},
 								},
 							}}

@@ -32,7 +32,7 @@ const ActionButton = ({ messages, isLoading, reload, stop }: SelectedImagesConta
 							height: "26px",
 							borderRadius: '13px',
 							position: 'absolute',
-							bottom: 77,
+							bottom: 75,
 							backgroundColor: '#fafafa',
 							borderColor: '#bfbfbf',
 							':hover': {
