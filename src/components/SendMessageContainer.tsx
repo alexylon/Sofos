@@ -47,6 +47,8 @@ const SendMessageContainer = ({
 		width: 1,
 	});
 
+	const isDisabled = isLoading || !!error;
+
 	const handleButtonClick = () => {
 		document.getElementById('file-input')?.click();
 	};
@@ -77,9 +79,9 @@ const SendMessageContainer = ({
 						<TextField
 							fullWidth
 							id="user-input"
-							label={!isLoading && !error && !input ? "Send a message..." : ""}
+							label={!isDisabled && !input ? "Send a message..." : ""}
 							multiline
-							disabled={isLoading || !!error}
+							disabled={isDisabled}
 							size="small"
 							value={input}
 							onChange={handleInputChange}
@@ -118,7 +120,7 @@ const SendMessageContainer = ({
 										event.stopPropagation();
 									},
 								},
-								startAdornment: !isLoading && !error && (
+								startAdornment: !isDisabled && (
 									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
 										<AddCircleOutlineOutlinedIcon
 											sx={{
@@ -135,7 +137,7 @@ const SendMessageContainer = ({
 										/>
 									</IconButton>
 								),
-								endAdornment: !isLoading && (
+								endAdornment: !isDisabled && (
 									<InputAdornment position="end">
 										<IconButton
 											edge="end"
