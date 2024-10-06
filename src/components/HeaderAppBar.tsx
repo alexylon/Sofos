@@ -4,6 +4,7 @@ import * as React from 'react';
 import { AppBar, Avatar, Box, Toolbar, Button, Grid, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { signIn, signOut, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
@@ -46,18 +47,14 @@ export default function HeaderAppBar({
 							{/*</Typography>*/}
 							{user ? (
 								<>
-									<SelectSmall options={models} handleChange={handleModelChange} value={model} style={{marginRight: '5px'}} />
-									<SelectSmall options={samplingParameters} handleChange={handleSamplingParameterChange} value={samplingParameter} />
 									<IconButton
-										sx={{
-											marginLeft: { xs: 'auto', sm: 'auto' },
-											marginRight: { xs: '10px', sm: '60px' },
-											display: 'flex',
-											alignItems: 'center'
+										sx={{ mr: 1 }}
+										onClick={(e) => {
+											e.preventDefault();
+											signOut().then();
 										}}
-										onClick={() => router.push('/new')}
 									>
-										<AddBoxOutlinedIcon
+										<LogoutOutlinedIcon
 											sx={{
 												height: '26px',
 												width: '26px',
@@ -65,25 +62,18 @@ export default function HeaderAppBar({
 											}}
 										/>
 									</IconButton>
-									<Box sx={{ ml: 'auto', mr: '-12px', display: 'flex', alignItems: 'center' }}>
+									<SelectSmall options={models} handleChange={handleModelChange} value={model} style={{marginRight: '5px'}} />
+									<SelectSmall options={samplingParameters} handleChange={handleSamplingParameterChange} value={samplingParameter} />
+									<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
 										{/*<Avatar*/}
 										{/*	alt="avatar"*/}
 										{/*	src={user.image || undefined}*/}
 										{/*	sx={{ width: "30px", height: "30px" }}*/}
 										{/*/>*/}
 										<IconButton
-											sx={{
-												marginLeft: { xs: 'auto', sm: 'auto' },
-												marginRight: { xs: 'auto', sm: '100px' },
-												display: 'flex',
-												alignItems: 'center'
-											}}
-											onClick={(e) => {
-												e.preventDefault();
-												signOut().then();
-											}}
+											onClick={() => router.push('/new')}
 										>
-											<LogoutOutlinedIcon
+											<ReplayOutlinedIcon
 												sx={{
 													height: '26px',
 													width: '26px',
