@@ -174,15 +174,12 @@ export default function Completion({ messages, models, error }: CompletionProps)
 							mb: 1,
 							backgroundColor: '#eaa9a9',
 						}}>
-							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-							</Box>
 							<Box sx={{
-								mt: 3,
+								pt: 2,
+								pb: 1,
 							}}
 							>
-								<MarkdownText>
-									{error.toString()}
-								</MarkdownText>
+								{error.toString()}
 							</Box>
 						</Box>
 					</Grid>
