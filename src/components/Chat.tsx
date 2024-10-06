@@ -65,9 +65,6 @@ export default function Chat() {
 		{
 			keepLastMessageOnError: true,
 			body: { model, samplingParameter },
-			onError: error => {
-				console.error(error);
-			},
 		}
 	);
 
@@ -194,7 +191,7 @@ export default function Chat() {
 					mt: '40px',
 					pb: 5,
 					height: {
-						xs: 'calc(93vh - 60px)', // On extra-small devices
+						xs: 'calc(91vh - 60px)', // On extra-small devices
 						sm: 'calc(94vh - 60px)', // On small devices and up
 					},
 					position: 'relative',
@@ -218,6 +215,7 @@ export default function Chat() {
 									handleInputChange={handleInputChange}
 									onSubmit={onSubmit}
 									handleFilesChange={handleFilesChange}
+									error={error}
 								/>
 							</Box>
 			}

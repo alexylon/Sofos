@@ -177,7 +177,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 							<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
 							</Box>
 							<Box sx={{
-								mt: 1,
+								mt: 2,
 							}}
 							>
 								<MarkdownText>

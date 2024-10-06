@@ -13,26 +13,40 @@ export async function POST(req: Request) {
 		? anthropic(model)
 		: openai(model);
 
-	const result: StreamTextResult<any> = await streamText({
-		model: modelName,
-		messages: convertToCoreMessages(messages),
-		temperature: samplingParameter,
-		topP: samplingParameter,
-		async onFinish({ text, toolCalls, toolResults, usage, finishReason, response, responseMessages }) {
-			// implement your own logic here, e.g. for storing messages
-			// or recording token usage
+	try {
+		const result: StreamTextResult<any> = await streamText({
+			model: modelName,
+			messages: convertToCoreMessages(messages),
+			temperature: samplingParameter,
+			topP: samplingParameter,
+			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response, responseMessages }) {
+				// implement your own logic here, e.g. for storing messages
+				// or recording token usage
 
-			// const modelId = response.modelId;
-			// console.log('modelId', modelId);
-			// const streamData = new StreamData();
-			// // streamData.appendMessageAnnotation({ modelId: "TEST2" });
-			// await streamData.close();
-		},
-	});
+				// const modelId = response.modelId;
+				// console.log('modelId', modelId);
+				// const streamData = new StreamData();
+				// // streamData.appendMessageAnnotation({ modelId: "TEST2" });
+				// await streamData.close();
+			},
+		});
 
-	const streamData = new StreamData();
-	streamData.appendMessageAnnotation({ model });
-	await streamData.close();
+		const streamData = new StreamData();
+		streamData.appendMessageAnnotation({ model });
+		await streamData.close();
 
-	return result.toDataStreamResponse({ data: streamData });
+		return result.toDataStreamResponse({ data: streamData });
+	} catch (error) {
+		if (error instanceof Error) {
+			return new Response(JSON.stringify({ server: error.message }), {
+				status: 500,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		} else {
+			return new Response(JSON.stringify({ server: 'Unknown error' }), {
+				status: 500,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+	}
 }

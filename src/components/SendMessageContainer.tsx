@@ -18,6 +18,7 @@ interface SendMessageContainerProps {
 	handleInputChange: any,
 	onSubmit: any,
 	handleFilesChange: any,
+	error?: any,
 }
 
 const SendMessageContainer = ({
@@ -32,6 +33,7 @@ const SendMessageContainer = ({
 								  handleInputChange,
 								  onSubmit,
 								  handleFilesChange,
+								  error,
 							  }: SendMessageContainerProps) => {
 	const VisuallyHiddenInput = styled('input')({
 		clip: 'rect(0 0 0 0)',
@@ -75,9 +77,9 @@ const SendMessageContainer = ({
 						<TextField
 							fullWidth
 							id="user-input"
-							label={!isLoading && !input ? "Send a message..." : ""}
+							label={!isLoading && !error && !input ? "Send a message..." : ""}
 							multiline
-							disabled={isLoading}
+							disabled={isLoading || !!error}
 							size="small"
 							value={input}
 							onChange={handleInputChange}
@@ -116,7 +118,7 @@ const SendMessageContainer = ({
 										event.stopPropagation();
 									},
 								},
-								startAdornment: (
+								startAdornment: !isLoading && !error && (
 									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
 										<AddCircleOutlineOutlinedIcon
 											sx={{
@@ -151,14 +153,18 @@ const SendMessageContainer = ({
 							}}
 							sx={{
 								borderRadius: '13px',
+								height: '50px',
 								backgroundColor: isLoading ? '#F0F0F0' : '#FAFAFA',
 								'& .MuiOutlinedInput-root': {
 									borderRadius: '13px',
+									height: '50px',
 									'&:hover fieldset': {
 										borderRadius: '13px',
+										height: '53px',
 									},
 									'&.Mui-focused fieldset': {
 										borderRadius: '13px',
+										height: '50px',
 									},
 								},
 							}}
