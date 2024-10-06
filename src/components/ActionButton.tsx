@@ -29,8 +29,8 @@ const ActionButton = ({ messages, isLoading, reload, stop }: SelectedImagesConta
 												onClick={isRegenerateButton ? reload as () => void : stop as () => void}
 												sx={{
 							width: "135px",
-							height: "24px",
-							borderRadius: '12px',
+							height: "26px",
+							borderRadius: '13px',
 							position: 'absolute',
 							bottom: 77,
 							backgroundColor: '#fafafa',

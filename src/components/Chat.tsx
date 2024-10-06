@@ -194,7 +194,7 @@ export default function Chat() {
 					mt: '40px',
 					pb: 5,
 					height: {
-						xs: 'calc(85vh - 62px)', // On extra-small devices
+						xs: 'calc(94vh - 60px)', // On extra-small devices
 						sm: 'calc(94vh - 60px)', // On small devices and up
 					},
 					position: 'relative',

@@ -1,0 +1,20 @@
+{
+  "short_name": "sofos",
+  "name": "sofos",
+  "icons": [
+    {
+      "src": "sigma_256x256.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "sigma.png",
+      "sizes": "1166x1166",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#2a2a2a"
+}

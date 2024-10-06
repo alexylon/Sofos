@@ -24,7 +24,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 							?
 							<Grid item xs={12}>
 								<Box sx={{
-									borderRadius: '12px',
+									borderRadius: '13px',
 									mt: 1,
 									pb: 1,
 									pl: 2,
@@ -58,7 +58,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 														key={`${message.id}-image-${index}`}
 														sx={{
 															maxHeight: 200,
-															borderRadius: '12px',
+															borderRadius: '13px',
 															mr: 2,
 															mb: 1,
 															display: 'inline-block',
@@ -99,7 +99,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 																	mr: 1,
 																	mb: 1,
 																	backgroundColor: '#a9eae0',
-																	borderRadius: '12px',
+																	borderRadius: '13px',
 																}}
 															>
 																<Box
@@ -124,7 +124,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 							:
 							<Grid item xs={12}>
 								<Box sx={{
-									borderRadius: '12px',
+									borderRadius: '13px',
 									pb: 1,
 									pl: 2,
 									pr: 2,
@@ -166,7 +166,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 				{error && (
 					<Grid item xs={12}>
 						<Box sx={{
-							borderRadius: '12px',
+							borderRadius: '13px',
 							pb: 1,
 							pl: 2,
 							pr: 2,

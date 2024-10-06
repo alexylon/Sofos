@@ -85,7 +85,7 @@ const SendMessageContainer = ({
 							InputLabelProps={{
 								shrink: false,
 								sx: {
-									marginLeft: '30px',
+									marginLeft: '32px',
 									display: 'flex',
 									alignItems: 'center',
 									height: '70%',
@@ -118,7 +118,12 @@ const SendMessageContainer = ({
 								},
 								startAdornment: (
 									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
-										<AddCircleOutlineOutlinedIcon />
+										<AddCircleOutlineOutlinedIcon
+											sx={{
+												height: '26px',
+												width: '26px',
+											}}
+										/>
 										<VisuallyHiddenInput
 											id="file-input"
 											type="file"
@@ -145,15 +150,15 @@ const SendMessageContainer = ({
 								),
 							}}
 							sx={{
-								borderRadius: '12px',
+								borderRadius: '13px',
 								backgroundColor: isLoading ? '#F0F0F0' : '#FAFAFA',
 								'& .MuiOutlinedInput-root': {
-									borderRadius: '12px',
+									borderRadius: '13px',
 									'&:hover fieldset': {
-										borderRadius: '12px',
+										borderRadius: '13px',
 									},
 									'&.Mui-focused fieldset': {
-										borderRadius: '12px',
+										borderRadius: '13px',
 									},
 								},
 							}}

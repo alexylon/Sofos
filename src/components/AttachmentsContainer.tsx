@@ -64,7 +64,7 @@ const AttachmentsContainer = ({
 								paddingRight: '10px',
 								mr: 1,
 								backgroundColor: '#a9eae0',
-								borderRadius: '12px',
+								borderRadius: '13px',
 							}}
 						>
 							<IconButton

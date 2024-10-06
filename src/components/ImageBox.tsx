@@ -7,7 +7,7 @@ const ImageBox = ({ file, index, fileURL }: any) => {
 			sx={{
 				height: 50,
 				width: 50,
-				borderRadius: '12px',
+				borderRadius: '13px',
 				mr: '4px',
 				mb: '-6px',
 				display: 'inline-block',
