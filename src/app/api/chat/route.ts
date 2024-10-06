@@ -38,14 +38,14 @@ export async function POST(req: Request) {
 		return result.toDataStreamResponse({ data: streamData });
 	} catch (error) {
 		if (error instanceof Error) {
-			return new Response(JSON.stringify({ server: error.message }), {
+			return new Response("Server error: " + error.message, {
 				status: 500,
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'text/plain' }
 			});
 		} else {
-			return new Response(JSON.stringify({ server: 'Unknown error' }), {
+			return new Response("Server error: unknown error", {
 				status: 500,
-				headers: { 'Content-Type': 'application/json' }
+				headers: { 'Content-Type': 'text/plain' }
 			});
 		}
 	}
