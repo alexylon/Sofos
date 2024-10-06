@@ -1,11 +1,14 @@
 'use client'
 
 import * as React from 'react';
-import { AppBar, Avatar, Box, Toolbar, Button, Grid } from '@mui/material';
+import { AppBar, Avatar, Box, Toolbar, Button, Grid, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { signIn, signOut, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
 import { Model, SamplingParameter } from '@/types/types';
+import { useRouter } from 'next/navigation'
 
 interface HeaderAppBarProps {
 	models: Model[],
@@ -27,6 +30,7 @@ export default function HeaderAppBar({
 	const { data: session, status } = useSession()
 	const loading = status === "loading"
 	const user = session?.user;
+	const router = useRouter();
 
 	return (
 		<>
@@ -42,20 +46,51 @@ export default function HeaderAppBar({
 							{/*</Typography>*/}
 							{user ? (
 								<>
-									<SelectSmall options={models} handleChange={handleModelChange} value={model} />
+									<SelectSmall options={models} handleChange={handleModelChange} value={model} style={{marginRight: '5px'}} />
 									<SelectSmall options={samplingParameters} handleChange={handleSamplingParameterChange} value={samplingParameter} />
-									<Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-										<Avatar
-											alt="avatar"
-											src={user.image || undefined}
-											sx={{ width: "30px", height: "30px" }}
+									<IconButton
+										sx={{
+											marginLeft: { xs: 'auto', sm: 'auto' },
+											marginRight: { xs: '10px', sm: '60px' },
+											display: 'flex',
+											alignItems: 'center'
+										}}
+										onClick={() => router.push('/new')}
+									>
+										<AddBoxOutlinedIcon
+											sx={{
+												height: '26px',
+												width: '26px',
+												color: 'white',
+											}}
 										/>
-										<Button color="inherit" onClick={(e) => {
-											e.preventDefault();
-											signOut().then();
-										}}>
-											Logout
-										</Button>
+									</IconButton>
+									<Box sx={{ ml: 'auto', mr: '-12px', display: 'flex', alignItems: 'center' }}>
+										{/*<Avatar*/}
+										{/*	alt="avatar"*/}
+										{/*	src={user.image || undefined}*/}
+										{/*	sx={{ width: "30px", height: "30px" }}*/}
+										{/*/>*/}
+										<IconButton
+											sx={{
+												marginLeft: { xs: 'auto', sm: 'auto' },
+												marginRight: { xs: 'auto', sm: '100px' },
+												display: 'flex',
+												alignItems: 'center'
+											}}
+											onClick={(e) => {
+												e.preventDefault();
+												signOut().then();
+											}}
+										>
+											<LogoutOutlinedIcon
+												sx={{
+													height: '26px',
+													width: '26px',
+													color: 'white',
+												}}
+											/>
+										</IconButton>
 									</Box>
 								</>
 							) : (

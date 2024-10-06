@@ -8,12 +8,13 @@ interface SelectSmallProps {
 	options: Model[] | SamplingParameter[],
 	handleChange: any,
 	value: string | number,
+	style?: any,
 }
 
-export default function SelectSmall({ options, handleChange, value }: SelectSmallProps) {
+export default function SelectSmall({ options, handleChange, value, style }: SelectSmallProps) {
 
 	return (
-		<FormControl sx={{ m: 1 }} size="small">
+		<FormControl size="small">
 			<Select
 				labelId="select-small-label"
 				id="select-small"
@@ -21,6 +22,7 @@ export default function SelectSmall({ options, handleChange, value }: SelectSmal
 				label="label"
 				onChange={handleChange}
 				variant="standard"
+				style={style}
 				sx={{
 					'&:before': {
 						borderBottom: 'none',
