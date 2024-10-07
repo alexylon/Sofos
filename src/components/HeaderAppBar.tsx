@@ -3,8 +3,7 @@
 import * as React from 'react';
 import { AppBar, Avatar, Box, Toolbar, Button, Grid, IconButton } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
-import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { signIn, signOut, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
@@ -73,7 +72,7 @@ export default function HeaderAppBar({
 										<IconButton
 											onClick={() => router.push('/new')}
 										>
-											<ReplayOutlinedIcon
+											<RestartAltOutlinedIcon
 												sx={{
 													height: '26px',
 													width: '26px',

@@ -34,7 +34,7 @@ const AttachmentsContainer = ({
 						<IconButton
 							sx={{
 								transform: 'translate(-70%, -120%)',
-								backgroundColor: 'rgba(255, 255, 255, 0.5)',
+								backgroundColor: 'rgba(255, 255, 255, 0.8)',
 								borderRadius: '50%',
 								boxShadow: 1,
 								height: '20px',
