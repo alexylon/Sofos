@@ -2,8 +2,8 @@ import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { convertToCoreMessages, StreamData, streamText, StreamTextResult } from 'ai';
 
-// Allow streaming responses up to 60 seconds
-export const maxDuration = 60;
+// Allow responses up to 5 minutes
+export const maxDuration = 300;
 
 export async function POST(req: Request) {
 	// Extract the data from the body of the request
