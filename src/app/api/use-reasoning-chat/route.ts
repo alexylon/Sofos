@@ -1,8 +1,8 @@
 import { openai } from '@ai-sdk/openai';
 import { convertToCoreMessages, GenerateTextResult, generateText } from 'ai';
 
-// maxDuration text generation response time is 5 minutes
-export const maxDuration = 300;
+// maxDuration text generation response time is 5 minutes, but on vercel plan hobby it is 60 seconds
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
 	// Extract the data from the body of the request
