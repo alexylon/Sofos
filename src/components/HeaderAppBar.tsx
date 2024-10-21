@@ -65,14 +65,14 @@ export default function HeaderAppBar({
 										options={models}
 										handleChange={handleModelChange}
 										value={model}
-										style={{marginRight: '5px'}}
+										style={{ marginRight: '5px' }}
 									/>
 									{!model.startsWith('o1') &&
-										<SelectSmall
-										  options={samplingParameters}
-										  handleChange={handleSamplingParameterChange}
-										  value={samplingParameter}
-										/>
+									  <SelectSmall
+										options={samplingParameters}
+										handleChange={handleSamplingParameterChange}
+										value={samplingParameter}
+									  />
 									}
 									<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
 										{/*<Avatar*/}
@@ -81,7 +81,12 @@ export default function HeaderAppBar({
 										{/*	sx={{ width: "30px", height: "30px" }}*/}
 										{/*/>*/}
 										<IconButton
-											onClick={() => router.push('/new')}
+											onClick={
+												() => {
+													// localStorage.setItem('sofosMessages', JSON.stringify([]));
+													router.push('/new')
+												}
+											}
 										>
 											<RestartAltOutlinedIcon
 												sx={{

@@ -80,8 +80,24 @@ export default function Chat() {
 	const { data: session } = useSession();
 	const user = session?.user;
 
-	// Capture all scroll events across the entire viewport
 	useEffect(() => {
+		const storedModel = localStorage.getItem('sofosModel');
+		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
+		// const storedMessages = localStorage.getItem('sofosMessages');
+
+		if (storedModel) {
+			setModel(storedModel);
+		}
+
+		if (storedSamplingParameter) {
+			setSamplingParameter(Number(storedSamplingParameter));
+		}
+
+		// if (storedMessages) {
+		// 	setMessages(JSON.parse(storedMessages));
+		// }
+
+		// Capture all scroll events across the entire viewport
 		const handleScroll = (event: WheelEvent) => {
 			const grid = scrollableGridRef.current as HTMLDivElement | null;
 
@@ -103,8 +119,12 @@ export default function Chat() {
 		};
 	}, []);
 
-	// Set local state for the model name to assistant's last message
 	useEffect(() => {
+		// if (messages && messages.length > 0) {
+		// 	localStorage.setItem('sofosMessages', JSON.stringify(messages));
+		// }
+
+		// Set local state for the model name to assistant's last message
 		if (messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !messages[messages.length - 1].name) {
 			setMessages((prevMessages: Message[]): Message[] => {
 				const updatedMessages: Message[] = [...prevMessages];
@@ -182,10 +202,12 @@ export default function Chat() {
 
 	const handleModelChange = (event: SelectChangeEvent) => {
 		setModel(event.target.value);
+		localStorage.setItem('sofosModel', event.target.value);
 	};
 
 	const handleSamplingParameterChange = (event: SelectChangeEvent) => {
 		setSamplingParameter(Number(event.target.value));
+		localStorage.setItem('sofosSamplingParameter', event.target.value);
 	};
 
 	const hasImages = images.length > 0;
@@ -202,9 +224,9 @@ export default function Chat() {
 				samplingParameter={samplingParameter}
 			/>
 			{user &&
-							<Box
-								className="chatContainer"
-								sx={{
+              <Box
+                className="chatContainer"
+                sx={{
 					maxWidth: 1200,
 					marginLeft: "auto",
 					marginRight: "auto",
@@ -220,29 +242,29 @@ export default function Chat() {
 					},
 					position: 'relative',
 				}}>
-								<MessagesContainer
-									hasAttachments={hasFiles || hasImages}
-									messages={messages}
-									models={models}
-									error={error}
-								/>
-								<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
-								<SendMessageContainer
-									hasImages={hasImages}
-									hasFiles={hasFiles}
-									images={images}
-									files={files}
-									isLoading={isLoading}
-									handleRemoveImage={handleRemoveImage}
-									handleRemoveFile={handleRemoveFile}
-									input={input}
-									handleInputChange={handleInputChange}
-									onSubmit={onSubmit}
-									handleFilesChange={handleFilesChange}
-									isUploadDisabled={model.startsWith('o1')}
-									error={error}
-								/>
-							</Box>
+                <MessagesContainer
+                  hasAttachments={hasFiles || hasImages}
+                  messages={messages}
+                  models={models}
+                  error={error}
+                />
+                <ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+                <SendMessageContainer
+                  hasImages={hasImages}
+                  hasFiles={hasFiles}
+                  images={images}
+                  files={files}
+                  isLoading={isLoading}
+                  handleRemoveImage={handleRemoveImage}
+                  handleRemoveFile={handleRemoveFile}
+                  input={input}
+                  handleInputChange={handleInputChange}
+                  onSubmit={onSubmit}
+                  handleFilesChange={handleFilesChange}
+                  isUploadDisabled={model.startsWith('o1')}
+                  error={error}
+                />
+              </Box>
 			}
 		</>
 	)
