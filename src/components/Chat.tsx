@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react';
+import { Message } from 'ai';
 import Box from '@mui/material/Box';
 import { useChat } from 'ai/react'
 import { useSession } from "next-auth/react"
@@ -24,6 +25,10 @@ const models: Model[] = [
 	{
 		value: 'claude-3-5-sonnet-20240620',
 		label: 'Claude 3.5 Sonnet',
+	},
+	{
+		value: 'o1-mini',
+		label: 'o1-mini',
 	},
 	{
 		value: 'o1-preview',
@@ -58,11 +63,14 @@ export default function Chat() {
 		handleInputChange,
 		handleSubmit,
 		messages,
+		setMessages,
 		reload,
 		stop,
 		error,
 	} = useChat(
 		{
+			api: model.startsWith('o1') ? '/api/use-reasoning-chat' : '/api/use-chat',
+			streamProtocol: model.startsWith('o1') ? 'text' : 'data',
 			keepLastMessageOnError: true,
 			body: { model, samplingParameter },
 		}
@@ -94,6 +102,22 @@ export default function Chat() {
 			window.removeEventListener('wheel', handleScroll);
 		};
 	}, []);
+
+	// Set local state for the model name to assistant's last message
+	useEffect(() => {
+		if (messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !messages[messages.length - 1].name) {
+			setMessages((prevMessages: Message[]): Message[] => {
+				const updatedMessages: Message[] = [...prevMessages];
+
+				updatedMessages[updatedMessages.length - 1] = {
+					...updatedMessages[updatedMessages.length - 1],
+					name: model,
+				};
+
+				return updatedMessages;
+			});
+		}
+	}, [messages]);
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -215,6 +239,7 @@ export default function Chat() {
 									handleInputChange={handleInputChange}
 									onSubmit={onSubmit}
 									handleFilesChange={handleFilesChange}
+									isUploadDisabled={model.startsWith('o1')}
 									error={error}
 								/>
 							</Box>

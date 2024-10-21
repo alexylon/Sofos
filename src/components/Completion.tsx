@@ -136,9 +136,9 @@ export default function Completion({ messages, models, error }: CompletionProps)
 										<Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: '10px' }}>
 											<Chip
 												label={
-													message.annotations && message.annotations?.length > 0
+													message?.name
 														// @ts-ignore
-														? models.find((model: string) => model.value === message.annotations[0].model)?.label
+														? models.find((model: string) => model.value === message.name)?.label
 														: ''
 												}
 												variant="outlined"

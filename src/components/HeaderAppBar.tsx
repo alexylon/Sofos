@@ -61,8 +61,19 @@ export default function HeaderAppBar({
 											}}
 										/>
 									</IconButton>
-									<SelectSmall options={models} handleChange={handleModelChange} value={model} style={{marginRight: '5px'}} />
-									<SelectSmall options={samplingParameters} handleChange={handleSamplingParameterChange} value={samplingParameter} />
+									<SelectSmall
+										options={models}
+										handleChange={handleModelChange}
+										value={model}
+										style={{marginRight: '5px'}}
+									/>
+									{!model.startsWith('o1') &&
+										<SelectSmall
+										  options={samplingParameters}
+										  handleChange={handleSamplingParameterChange}
+										  value={samplingParameter}
+										/>
+									}
 									<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
 										{/*<Avatar*/}
 										{/*	alt="avatar"*/}

@@ -51,7 +51,11 @@ const MessagesContainer = ({ hasAttachments, messages, models, error }: Messages
 						flex: 1,
 						overflow: 'auto',
 					}}>
-						<Completion messages={messages} models={models} error={error} />
+						<Completion
+							messages={messages}
+							models={models}
+							error={error}
+						/>
 					</Box>
 					:
 					<Box sx={{

@@ -18,6 +18,7 @@ interface SendMessageContainerProps {
 	handleInputChange: any,
 	onSubmit: any,
 	handleFilesChange: any,
+	isUploadDisabled: boolean,
 	error?: any,
 }
 
@@ -33,6 +34,7 @@ const SendMessageContainer = ({
 								  handleInputChange,
 								  onSubmit,
 								  handleFilesChange,
+								  isUploadDisabled,
 								  error,
 							  }: SendMessageContainerProps) => {
 	const VisuallyHiddenInput = styled('input')({
@@ -121,7 +123,7 @@ const SendMessageContainer = ({
 									},
 								},
 								startAdornment: !isDisabled && (
-									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick}>
+									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick} disabled={isUploadDisabled}>
 										<AddCircleOutlineOutlinedIcon
 											sx={{
 												height: '26px',
