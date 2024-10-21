@@ -69,8 +69,8 @@ export default function Chat() {
 		error,
 	} = useChat(
 		{
-			api: model.startsWith('o1') ? '/api/use-reasoning-chat' : '/api/use-chat',
-			streamProtocol: model.startsWith('o1') ? 'text' : 'data',
+			api: '/api/use-chat',
+			streamProtocol: 'data',
 			keepLastMessageOnError: true,
 			body: { model, samplingParameter },
 		}
@@ -83,7 +83,7 @@ export default function Chat() {
 	useEffect(() => {
 		const storedModel = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
-		// const storedMessages = localStorage.getItem('sofosMessages');
+		const storedMessages = localStorage.getItem('sofosMessages');
 
 		if (storedModel) {
 			setModel(storedModel);
@@ -93,9 +93,9 @@ export default function Chat() {
 			setSamplingParameter(Number(storedSamplingParameter));
 		}
 
-		// if (storedMessages) {
-		// 	setMessages(JSON.parse(storedMessages));
-		// }
+		if (storedMessages) {
+			setMessages(JSON.parse(storedMessages));
+		}
 
 		// Capture all scroll events across the entire viewport
 		const handleScroll = (event: WheelEvent) => {
@@ -120,9 +120,9 @@ export default function Chat() {
 	}, []);
 
 	useEffect(() => {
-		// if (messages && messages.length > 0) {
-		// 	localStorage.setItem('sofosMessages', JSON.stringify(messages));
-		// }
+		if (messages && messages.length > 0) {
+			localStorage.setItem('sofosMessages', JSON.stringify(messages));
+		}
 
 		// Set local state for the model name to assistant's last message
 		if (messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !messages[messages.length - 1].name) {

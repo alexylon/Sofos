@@ -83,7 +83,7 @@ export default function HeaderAppBar({
 										<IconButton
 											onClick={
 												() => {
-													// localStorage.setItem('sofosMessages', JSON.stringify([]));
+													localStorage.setItem('sofosMessages', JSON.stringify([]));
 													router.push('/new')
 												}
 											}
