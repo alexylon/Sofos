@@ -23,7 +23,7 @@ const models: Model[] = [
 		label: 'GPT-4o',
 	},
 	{
-		value: 'claude-3-5-sonnet-20240620',
+		value: 'claude-3-5-sonnet-20241022',
 		label: 'Claude 3.5 Sonnet',
 	},
 	{
