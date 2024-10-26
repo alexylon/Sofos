@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { AppBar, Box, Button, Grid, IconButton, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
+import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
 import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
 import { Model, SamplingParameter } from '@/types/types';
@@ -22,15 +22,15 @@ interface HeaderAppBarProps {
 	setMessages: any,
 	chatHistory: Message[][],
 	setChatHistory: any,
-	currentChatId: number,
-	setCurrentChatId: any,
+	currentChatIndex: number,
+	setCurrentChatIndex: any,
 	setModel: any,
 	open: any,
 	handleDrawerOpen: any,
 }
 
 const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
-	if (chatHistory.length > 0) {
+	if (chatHistory) {
 		localStorage.setItem(
 			'sofosChatHistory',
 			JSON.stringify(chatHistory, (key, value) => {
@@ -54,8 +54,8 @@ export default function HeaderAppBar({
 										 setMessages,
 										 chatHistory,
 										 setChatHistory,
-										 currentChatId,
-										 setCurrentChatId,
+										 currentChatIndex,
+										 setCurrentChatIndex,
 										 setModel,
 										 open,
 										 handleDrawerOpen,
@@ -66,12 +66,12 @@ export default function HeaderAppBar({
 	const router = useRouter();
 
 	const handleStartNewChat = (isRemoveChat: boolean) => {
-		if (!isRemoveChat && currentChatId === -1) {
+		if (!isRemoveChat && currentChatIndex === -1) {
 			createChat();
 		}
 
 		setMessages([]);
-		setCurrentChatId(-1);
+		setCurrentChatIndex(-1);
 		localStorage.setItem('sofosMessages', JSON.stringify([]));
 		localStorage.setItem('sofosCurrentChatId', (-1).toString());
 
@@ -106,7 +106,6 @@ export default function HeaderAppBar({
 												e.stopPropagation(); // Prevent ClickAwayListener from triggering
 												handleDrawerOpen();
 											}}
-											edge="start"
 											sx={[
 												{
 													mr: 2,
@@ -138,7 +137,7 @@ export default function HeaderAppBar({
 											<IconButton
 												onClick={() => handleStartNewChat(false)}
 											>
-												<RestartAltOutlinedIcon
+												<MapsUgcOutlinedIcon
 													sx={{
 														height: '26px',
 														width: '26px',
@@ -167,8 +166,8 @@ export default function HeaderAppBar({
 						setMessages={setMessages}
 						chatHistory={chatHistory}
 						setChatHistory={setChatHistory}
-						currentChatId={currentChatId}
-						setCurrentChatId={setCurrentChatId}
+						currentChatIndex={currentChatIndex}
+						setCurrentChatIndex={setCurrentChatIndex}
 						setModel={setModel}
 						open={open}
 						handleStartNewChat={handleStartNewChat}

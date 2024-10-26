@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
 import { TextareaAutosize } from '@mui/base';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import SendIcon from '@mui/icons-material/Send';
+import ArrowCircleUpOutlinedIcon from '@mui/icons-material/ArrowCircleUpOutlined';
 import { styled } from '@mui/material/styles';
 import AttachmentsContainer from '@/components/AttachmentsContainer';
 
@@ -91,10 +91,13 @@ const SendMessageContainer = ({
 							InputLabelProps={{
 								shrink: false,
 								sx: {
-									marginLeft: '32px',
+									marginLeft: '30px',
 									display: 'flex',
 									alignItems: 'center',
 									height: '70%',
+									'&.Mui-focused': {
+										color: '#7d7d7d',
+									},
 								},
 							}}
 							InputProps={{
@@ -123,7 +126,10 @@ const SendMessageContainer = ({
 									},
 								},
 								startAdornment: !isDisabled && (
-									<IconButton sx={{ ml: '-10px' }} onClick={handleButtonClick} disabled={isUploadDisabled}>
+									<IconButton
+										edge="start"
+										onClick={handleButtonClick} disabled={isUploadDisabled}
+									>
 										<AddCircleOutlineOutlinedIcon
 											sx={{
 												height: '26px',
@@ -139,7 +145,7 @@ const SendMessageContainer = ({
 										/>
 									</IconButton>
 								),
-								endAdornment: !isDisabled && (
+								endAdornment: !isDisabled && input && (
 									<InputAdornment position="end">
 										<IconButton
 											edge="end"
@@ -150,7 +156,12 @@ const SendMessageContainer = ({
 												}
 											}}
 										>
-											<SendIcon />
+											<ArrowCircleUpOutlinedIcon
+												sx={{
+													height: '30px',
+													width: '30px',
+												}}
+											/>
 										</IconButton>
 									</InputAdornment>
 								),

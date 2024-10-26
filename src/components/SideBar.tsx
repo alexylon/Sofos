@@ -20,8 +20,8 @@ interface SideBarProps {
 	setMessages: any,
 	chatHistory: Message[][],
 	setChatHistory: any,
-	currentChatId: number,
-	setCurrentChatId: any,
+	currentChatIndex: number,
+	setCurrentChatIndex: any,
 	setModel: any,
 	open: any,
 	handleStartNewChat: any,
@@ -35,6 +35,25 @@ const formattedDate = (dateString: Date | undefined): string => {
 	}
 
 	const date = new Date(dateString);
+	const now = new Date();
+	const yesterday = new Date(now);
+	yesterday.setDate(now.getDate() - 1);
+
+	const isToday = date.toDateString() === now.toDateString();
+	const isYesterday = date.toDateString() === yesterday.toDateString();
+
+	const timeString = date.toLocaleTimeString('en-GB', {
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+		hour12: false
+	});
+
+	if (isToday) {
+		return `Today ${timeString}`;
+	} else if (isYesterday) {
+		return `Yesterday ${timeString}`;
+	}
 
 	return date.toLocaleString('en-GB', {
 		day: '2-digit',
@@ -52,8 +71,8 @@ const SideBar = ({
 					 setMessages,
 					 chatHistory,
 					 setChatHistory,
-					 currentChatId,
-					 setCurrentChatId,
+					 currentChatIndex,
+					 setCurrentChatIndex,
 					 setModel,
 					 open,
 					 handleStartNewChat,
@@ -71,14 +90,14 @@ const SideBar = ({
 	}));
 
 	const handleSelectChat = (chatIndex: number) => {
-		if (currentChatId === -1) {
+		if (currentChatIndex === -1) {
 			createChat();
 		} else {
 			updateChatHistory(chatIndex);
 		}
 
 		setMessages(chatHistory[chatIndex]);
-		setCurrentChatId(chatIndex);
+		setCurrentChatIndex(chatIndex);
 
 		const model = chatHistory[chatIndex][chatHistory[chatIndex].length - 1].name;
 
@@ -93,7 +112,7 @@ const SideBar = ({
 			setChatHistory((prevChatHistory: Message[][]) => {
 				const updatedChatHistory = [...prevChatHistory];
 
-				updatedChatHistory[currentChatId] = messages;
+				updatedChatHistory[currentChatIndex] = messages;
 				saveChatHistoryToLocalStorage(updatedChatHistory);
 				localStorage.setItem('sofosCurrentChatId', chatIndex.toString());
 
@@ -104,11 +123,16 @@ const SideBar = ({
 
 	const handleRemoveChat = (index: number) => {
 		const updatedChats = chatHistory.filter((_, i) => i !== index);
+
 		setChatHistory(updatedChats);
 		saveChatHistoryToLocalStorage(updatedChats);
 
-		if (index === currentChatId) {
+		if (index === currentChatIndex) {
 			handleStartNewChat(true);
+		}
+
+		if (index <= currentChatIndex) {
+			setCurrentChatIndex(currentChatIndex - 1);
 		}
 	};
 
@@ -130,6 +154,7 @@ const SideBar = ({
 				<Typography
 					align="center"
 					fontWeight="bold"
+					color="#7d7d7d"
 				>
 					Last 15 Chats
 				</Typography>
@@ -138,7 +163,7 @@ const SideBar = ({
 			<List>
 				{chatHistory.slice().reverse().map((chat, index) => {
 					const chatIndex = chatHistory.length - 1 - index;
-					const isSelected = chatIndex === currentChatId;
+					const isSelected = chatIndex === currentChatIndex;
 
 					return (
 						<div key={index}>
@@ -162,10 +187,10 @@ const SideBar = ({
 								<IconButton
 									sx={{
 										position: 'absolute',
-										right: 6,
+										right: 4,
 										backgroundColor: 'rgba(255, 255, 255, 0.5)',
-										height: '30px',
-										width: '30px',
+										height: '26px',
+										width: '26px',
 										border: '1px solid rgba(50, 50, 50, 0.12)',
 										borderRadius: '4px',
 									}}

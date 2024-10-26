@@ -57,7 +57,7 @@ export default function Chat() {
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
 	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
-	const [currentChatId, setCurrentChatId] = useState<number>(-1);
+	const [currentChatIndex, setCurrentChatIndex] = useState<number>(-1);
 	const [open, setOpen] = React.useState(false);
 
 	const {
@@ -104,7 +104,7 @@ export default function Chat() {
 		}
 
 		if (storedCurrentChatId) {
-			setCurrentChatId(Number(storedCurrentChatId));
+			setCurrentChatIndex(Number(storedCurrentChatId));
 		}
 
 		if (storedChatHistory) {
@@ -260,8 +260,8 @@ export default function Chat() {
 				setMessages={setMessages}
 				chatHistory={chatHistory}
 				setChatHistory={setChatHistory}
-				currentChatId={currentChatId}
-				setCurrentChatId={setCurrentChatId}
+				currentChatIndex={currentChatIndex}
+				setCurrentChatIndex={setCurrentChatIndex}
 				setModel={setModel}
 				open={open}
 				handleDrawerOpen={handleDrawerOpen}
