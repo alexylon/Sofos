@@ -56,6 +56,9 @@ export default function Chat() {
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
+	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
+	const [currentChatId, setCurrentChatId] = useState<number>(-1);
+	const [open, setOpen] = React.useState(false);
 
 	const {
 		input,
@@ -81,9 +84,12 @@ export default function Chat() {
 	const user = session?.user;
 
 	useEffect(() => {
+		// Initialize from localStorage
 		const storedModel = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
 		const storedMessages = localStorage.getItem('sofosMessages');
+		const storedChatHistory = localStorage.getItem('sofosChatHistory');
+		const storedCurrentChatId = localStorage.getItem('sofosCurrentChatId');
 
 		if (storedModel) {
 			setModel(storedModel);
@@ -95,6 +101,21 @@ export default function Chat() {
 
 		if (storedMessages) {
 			setMessages(JSON.parse(storedMessages));
+		}
+
+		if (storedCurrentChatId) {
+			setCurrentChatId(Number(storedCurrentChatId));
+		}
+
+		if (storedChatHistory) {
+			const parsedChatHistory: Message[][] = JSON.parse(storedChatHistory, (key, value) => {
+				if (key === 'createdAt' && typeof value === 'string') {
+					return new Date(value);
+				}
+				return value;
+			});
+
+			setChatHistory(parsedChatHistory);
 		}
 
 		// Capture all scroll events across the entire viewport
@@ -119,18 +140,23 @@ export default function Chat() {
 		};
 	}, []);
 
+	// Save messages to localStorage
 	useEffect(() => {
 		if (messages && messages.length > 0) {
 			localStorage.setItem('sofosMessages', JSON.stringify(messages));
 		}
 
 		// Set local state for the model name to assistant's last message
-		if (messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !messages[messages.length - 1].name) {
+		if (
+			messages.length > 0 &&
+			messages[messages.length - 1].role === 'assistant' &&
+			!messages[messages.length - 1].name
+		) {
 			setMessages((prevMessages: Message[]): Message[] => {
 				const updatedMessages: Message[] = [...prevMessages];
 
-				updatedMessages[updatedMessages.length - 1] = {
-					...updatedMessages[updatedMessages.length - 1],
+				updatedMessages[prevMessages.length - 1] = {
+					...updatedMessages[prevMessages.length - 1],
 					name: model,
 				};
 
@@ -176,7 +202,7 @@ export default function Chat() {
 				const updatedImages = [...prevImages, ...resizedImages].slice(0, MAX_IMAGES);
 
 				if (resizedImages.length > MAX_IMAGES) {
-					console.log(`You can only upload up to ${MAX_IMAGES} images.`);
+					console.warn(`You can only upload up to ${MAX_IMAGES} images.`);
 				}
 				return updatedImages;
 			});
@@ -185,7 +211,7 @@ export default function Chat() {
 				const updatedFiles = [...prevFiles, ...newFiles].slice(0, MAX_FILES);
 
 				if (newFiles.length > MAX_FILES) {
-					console.log(`You can only upload up to ${MAX_FILES} files.`);
+					console.warn(`You can only upload up to ${MAX_FILES} files.`);
 				}
 				return updatedFiles;
 			});
@@ -213,8 +239,16 @@ export default function Chat() {
 	const hasImages = images.length > 0;
 	const hasFiles = files.length > 0;
 
+	const handleDrawerOpen = () => {
+		setOpen(true);
+	};
+
+	const handleDrawerClose = () => {
+		setOpen(false);
+	};
+
 	return (
-		<>
+		<div onClick={handleDrawerClose}>
 			<HeaderAppBar
 				models={models}
 				handleModelChange={handleModelChange}
@@ -222,11 +256,20 @@ export default function Chat() {
 				samplingParameters={samplingParameters}
 				handleSamplingParameterChange={handleSamplingParameterChange}
 				samplingParameter={samplingParameter}
+				messages={messages}
+				setMessages={setMessages}
+				chatHistory={chatHistory}
+				setChatHistory={setChatHistory}
+				currentChatId={currentChatId}
+				setCurrentChatId={setCurrentChatId}
+				setModel={setModel}
+				open={open}
+				handleDrawerOpen={handleDrawerOpen}
 			/>
 			{user &&
-              <Box
-                className="chatContainer"
-                sx={{
+			  <Box
+				className="chatContainer"
+				sx={{
 					maxWidth: 1200,
 					marginLeft: "auto",
 					marginRight: "auto",
@@ -242,31 +285,31 @@ export default function Chat() {
 					},
 					position: 'relative',
 				}}>
-                <MessagesContainer
-                  hasAttachments={hasFiles || hasImages}
-                  messages={messages}
-                  models={models}
-                  error={error}
-                />
-                <ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
-                <SendMessageContainer
-                  hasImages={hasImages}
-                  hasFiles={hasFiles}
-                  images={images}
-                  files={files}
-                  isLoading={isLoading}
-                  handleRemoveImage={handleRemoveImage}
-                  handleRemoveFile={handleRemoveFile}
-                  input={input}
-                  handleInputChange={handleInputChange}
-                  onSubmit={onSubmit}
-                  handleFilesChange={handleFilesChange}
-                  isUploadDisabled={model.startsWith('o1')}
-                  error={error}
-                />
-              </Box>
+				<MessagesContainer
+				  hasAttachments={hasFiles || hasImages}
+				  messages={messages}
+				  models={models}
+				  error={error}
+				/>
+				<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+				<SendMessageContainer
+				  hasImages={hasImages}
+				  hasFiles={hasFiles}
+				  images={images}
+				  files={files}
+				  isLoading={isLoading}
+				  handleRemoveImage={handleRemoveImage}
+				  handleRemoveFile={handleRemoveFile}
+				  input={input}
+				  handleInputChange={handleInputChange}
+				  onSubmit={onSubmit}
+				  handleFilesChange={handleFilesChange}
+				  isUploadDisabled={model.startsWith('o1')}
+				  error={error}
+				/>
+			  </Box>
 			}
-		</>
+		</div>
 	)
 		;
 }

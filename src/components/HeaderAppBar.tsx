@@ -1,14 +1,15 @@
 'use client'
 
 import * as React from 'react';
-import { AppBar, Avatar, Box, Toolbar, Button, Grid, IconButton } from '@mui/material';
+import { AppBar, Box, Button, Grid, IconButton, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import { signIn, signOut, useSession } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
 import { Model, SamplingParameter } from '@/types/types';
 import { useRouter } from 'next/navigation'
+import { Message } from 'ai';
+import SideBar from '@/components/SideBar';
 
 interface HeaderAppBarProps {
 	models: Model[],
@@ -17,7 +18,30 @@ interface HeaderAppBarProps {
 	samplingParameters: SamplingParameter[],
 	handleSamplingParameterChange: any,
 	samplingParameter: number,
+	messages: Message[],
+	setMessages: any,
+	chatHistory: Message[][],
+	setChatHistory: any,
+	currentChatId: number,
+	setCurrentChatId: any,
+	setModel: any,
+	open: any,
+	handleDrawerOpen: any,
 }
+
+const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
+	if (chatHistory.length > 0) {
+		localStorage.setItem(
+			'sofosChatHistory',
+			JSON.stringify(chatHistory, (key, value) => {
+				if (key === 'createdAt' && value instanceof Date) {
+					return value.toISOString();
+				}
+				return value;
+			})
+		);
+	}
+};
 
 export default function HeaderAppBar({
 										 models,
@@ -26,11 +50,45 @@ export default function HeaderAppBar({
 										 samplingParameters,
 										 handleSamplingParameterChange,
 										 samplingParameter,
+										 messages,
+										 setMessages,
+										 chatHistory,
+										 setChatHistory,
+										 currentChatId,
+										 setCurrentChatId,
+										 setModel,
+										 open,
+										 handleDrawerOpen,
 									 }: HeaderAppBarProps) {
 	const { data: session, status } = useSession()
 	const loading = status === "loading"
 	const user = session?.user;
 	const router = useRouter();
+
+	const handleStartNewChat = (isRemoveChat: boolean) => {
+		if (!isRemoveChat && currentChatId === -1) {
+			createChat();
+		}
+
+		setMessages([]);
+		setCurrentChatId(-1);
+		localStorage.setItem('sofosMessages', JSON.stringify([]));
+		localStorage.setItem('sofosCurrentChatId', (-1).toString());
+
+		router.push('/new');
+	};
+
+	const createChat = () => {
+		if (messages.length > 0) {
+			// Save last 15 chats
+			setChatHistory((prevChatHistory: Message[][]) => {
+				const updatedChatHistory = [...prevChatHistory, messages].slice(-15);
+				saveChatHistoryToLocalStorage(updatedChatHistory);
+
+				return updatedChatHistory;
+			});
+		}
+	}
 
 	return (
 		<>
@@ -38,78 +96,86 @@ export default function HeaderAppBar({
 				<Box sx={{ flexGrow: 1 }}>
 					<AppBar position="static">
 						<Toolbar variant="dense">
-							{/*<IconButton size="large" edge="start" color="inherit" aria-label="menu">*/}
-							{/*	<MenuIcon />*/}
-							{/*</IconButton>*/}
-							{/*<Typography component="div" sx={{ flexGrow: 1 }}>*/}
-							{/*	{user ? user.email ?? user.name : "Not signed in"}*/}
-							{/*</Typography>*/}
-							{user ? (
-								<>
-									<IconButton
-										sx={{ mr: 1 }}
-										onClick={(e) => {
-											e.preventDefault();
-											signOut().then();
-										}}
-									>
-										<LogoutOutlinedIcon
-											sx={{
-												height: '26px',
-												width: '26px',
-												color: 'white',
-											}}
-										/>
-									</IconButton>
-									<SelectSmall
-										options={models}
-										handleChange={handleModelChange}
-										value={model}
-										style={{ marginRight: '5px' }}
-									/>
-									{!model.startsWith('o1') &&
-									  <SelectSmall
-										options={samplingParameters}
-										handleChange={handleSamplingParameterChange}
-										value={samplingParameter}
-									  />
-									}
-									<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-										{/*<Avatar*/}
-										{/*	alt="avatar"*/}
-										{/*	src={user.image || undefined}*/}
-										{/*	sx={{ width: "30px", height: "30px" }}*/}
-										{/*/>*/}
+							{user
+								? (
+									<>
 										<IconButton
-											onClick={
-												() => {
-													localStorage.setItem('sofosMessages', JSON.stringify([]));
-													router.push('/new')
-												}
-											}
+											color="inherit"
+											aria-label="open drawer"
+											onClick={(e) => {
+												e.stopPropagation(); // Prevent ClickAwayListener from triggering
+												handleDrawerOpen();
+											}}
+											edge="start"
+											sx={[
+												{
+													mr: 2,
+												},
+												open && { display: 'none' },
+											]}
 										>
-											<RestartAltOutlinedIcon
-												sx={{
-													height: '26px',
-													width: '26px',
-													color: 'white',
-												}}
-											/>
+											<MenuIcon />
 										</IconButton>
+										<SelectSmall
+											options={models}
+											handleChange={handleModelChange}
+											value={model}
+											style={{ marginRight: '5px' }}
+										/>
+										{!model.startsWith('o1') &&
+										  <SelectSmall
+											options={samplingParameters}
+											handleChange={handleSamplingParameterChange}
+											value={samplingParameter}
+										  />
+										}
+										<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+											{/*<Avatar*/}
+											{/*	alt="avatar"*/}
+											{/*	src={user.image || undefined}*/}
+											{/*	sx={{ width: "30px", height: "30px" }}*/}
+											{/*/>*/}
+											<IconButton
+												onClick={() => handleStartNewChat(false)}
+											>
+												<RestartAltOutlinedIcon
+													sx={{
+														height: '26px',
+														width: '26px',
+														color: 'white',
+													}}
+												/>
+											</IconButton>
+										</Box>
+									</>
+								)
+								: (
+									<Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+										<Button color="inherit" onClick={(e) => {
+											e.preventDefault();
+											signIn().then();
+										}}>
+											Login
+										</Button>
 									</Box>
-								</>
-							) : (
-								<Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-									<Button color="inherit" onClick={(e) => {
-										e.preventDefault();
-										signIn().then();
-									}}>
-										Login
-									</Button>
-								</Box>
-							)}
+								)}
 						</Toolbar>
 					</AppBar>
+					{user &&
+					  <SideBar
+						messages={messages}
+						setMessages={setMessages}
+						chatHistory={chatHistory}
+						setChatHistory={setChatHistory}
+						currentChatId={currentChatId}
+						setCurrentChatId={setCurrentChatId}
+						setModel={setModel}
+						open={open}
+						handleStartNewChat={handleStartNewChat}
+						saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
+						createChat={createChat}
+					  />
+					}
 				</Box>
 			</Grid>
 			<div>{!user && loading ? "loading..." : ""}</div>
