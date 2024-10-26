@@ -167,7 +167,7 @@ const SideBar = ({
 										height: '30px',
 										width: '30px',
 										border: '1px solid rgba(50, 50, 50, 0.12)',
-										borderRadius: 0,
+										borderRadius: '4px',
 									}}
 									onClick={() => handleRemoveChat(chatIndex)}
 								>
