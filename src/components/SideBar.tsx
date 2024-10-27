@@ -182,6 +182,7 @@ const SideBar = ({
 										primary={chat && chat.length > 0
 											? formattedDate(chat[chat.length - 1]?.createdAt)
 											: 'No Messages'}
+										sx={{ color: '#7d7d7d' }}	
 									/>
 								</ListItemButton>
 								<IconButton
@@ -216,7 +217,7 @@ const SideBar = ({
 						<ListItemIcon>
 							<LogoutOutlinedIcon />
 						</ListItemIcon>
-						<ListItemText primary='Log Out' />
+						<ListItemText primary='Log Out' sx={{ color: '#7d7d7d' }}/>
 					</ListItemButton>
 				</ListItem>
 			</List>
