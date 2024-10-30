@@ -27,21 +27,9 @@ interface HeaderAppBarProps {
 	setModel: any,
 	open: any,
 	handleDrawerOpen: any,
+	saveChatHistoryToLocalStorage: any,
+	isDisabled: boolean,
 }
-
-const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
-	if (chatHistory) {
-		localStorage.setItem(
-			'sofosChatHistory',
-			JSON.stringify(chatHistory, (key, value) => {
-				if (key === 'createdAt' && value instanceof Date) {
-					return value.toISOString();
-				}
-				return value;
-			})
-		);
-	}
-};
 
 export default function HeaderAppBar({
 										 models,
@@ -59,36 +47,21 @@ export default function HeaderAppBar({
 										 setModel,
 										 open,
 										 handleDrawerOpen,
+										 saveChatHistoryToLocalStorage,
+										 isDisabled,
 									 }: HeaderAppBarProps) {
 	const { data: session, status } = useSession()
 	const loading = status === "loading"
 	const user = session?.user;
 	const router = useRouter();
 
-	const handleStartNewChat = (isRemoveChat: boolean) => {
-		if (!isRemoveChat && currentChatIndex === -1) {
-			createChat();
-		}
-
+	const handleStartNewChat = () => {
 		setMessages([]);
 		setCurrentChatIndex(-1);
-		localStorage.setItem('sofosMessages', JSON.stringify([]));
-		localStorage.setItem('sofosCurrentChatId', (-1).toString());
+		localStorage.setItem('sofosCurrentChatIndex', (-1).toString());
 
 		router.push('/new');
 	};
-
-	const createChat = () => {
-		if (messages.length > 0) {
-			// Save last 15 chats
-			setChatHistory((prevChatHistory: Message[][]) => {
-				const updatedChatHistory = [...prevChatHistory, messages].slice(-15);
-				saveChatHistoryToLocalStorage(updatedChatHistory);
-
-				return updatedChatHistory;
-			});
-		}
-	}
 
 	return (
 		<>
@@ -100,15 +73,19 @@ export default function HeaderAppBar({
 								? (
 									<>
 										<IconButton
-											color="inherit"
+											color={isDisabled ? "primary" : "inherit"}
 											aria-label="open drawer"
 											onClick={(e) => {
-												e.stopPropagation(); // Prevent ClickAwayListener from triggering
-												handleDrawerOpen();
+												e.stopPropagation();
+
+												if (!isDisabled) {
+													handleDrawerOpen();
+												}
 											}}
 											sx={[
 												{
 													mr: 2,
+													cursor: isDisabled ? 'default' : 'pointer',
 												},
 												open && { display: 'none' },
 											]}
@@ -120,12 +97,14 @@ export default function HeaderAppBar({
 											handleChange={handleModelChange}
 											value={model}
 											style={{ marginRight: '5px' }}
+											disabled={isDisabled}
 										/>
 										{!model.startsWith('o1') &&
 										  <SelectSmall
 											options={samplingParameters}
 											handleChange={handleSamplingParameterChange}
 											value={samplingParameter}
+                                            disabled={isDisabled}
 										  />
 										}
 										<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
@@ -135,7 +114,7 @@ export default function HeaderAppBar({
 											{/*	sx={{ width: "30px", height: "30px" }}*/}
 											{/*/>*/}
 											<IconButton
-												onClick={() => handleStartNewChat(false)}
+												onClick={() => handleStartNewChat()}
 											>
 												<MapsUgcOutlinedIcon
 													sx={{
@@ -172,7 +151,6 @@ export default function HeaderAppBar({
 						open={open}
 						handleStartNewChat={handleStartNewChat}
 						saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
-						createChat={createChat}
 					  />
 					}
 				</Box>

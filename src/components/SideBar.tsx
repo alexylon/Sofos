@@ -26,7 +26,6 @@ interface SideBarProps {
 	open: any,
 	handleStartNewChat: any,
 	saveChatHistoryToLocalStorage: any,
-	createChat: any,
 }
 
 const formattedDate = (dateString: Date | undefined): string => {
@@ -67,7 +66,6 @@ const formattedDate = (dateString: Date | undefined): string => {
 };
 
 const SideBar = ({
-					 messages,
 					 setMessages,
 					 chatHistory,
 					 setChatHistory,
@@ -77,7 +75,6 @@ const SideBar = ({
 					 open,
 					 handleStartNewChat,
 					 saveChatHistoryToLocalStorage,
-					 createChat,
 				 }: SideBarProps) => {
 	const drawerWidth = 200;
 
@@ -90,14 +87,9 @@ const SideBar = ({
 	}));
 
 	const handleSelectChat = (chatIndex: number) => {
-		if (currentChatIndex === -1) {
-			createChat();
-		} else {
-			updateChatHistory(chatIndex);
-		}
-
 		setMessages(chatHistory[chatIndex]);
 		setCurrentChatIndex(chatIndex);
+		localStorage.setItem('sofosCurrentChatIndex', chatIndex.toString());
 
 		const model = chatHistory[chatIndex][chatHistory[chatIndex].length - 1].name;
 
@@ -107,20 +99,6 @@ const SideBar = ({
 		}
 	};
 
-	const updateChatHistory = (chatIndex: number) => {
-		if (messages.length > 0) {
-			setChatHistory((prevChatHistory: Message[][]) => {
-				const updatedChatHistory = [...prevChatHistory];
-
-				updatedChatHistory[currentChatIndex] = messages;
-				saveChatHistoryToLocalStorage(updatedChatHistory);
-				localStorage.setItem('sofosCurrentChatId', chatIndex.toString());
-
-				return updatedChatHistory;
-			});
-		}
-	}
-
 	const handleRemoveChat = (index: number) => {
 		const updatedChats = chatHistory.filter((_, i) => i !== index);
 
@@ -128,11 +106,12 @@ const SideBar = ({
 		saveChatHistoryToLocalStorage(updatedChats);
 
 		if (index === currentChatIndex) {
-			handleStartNewChat(true);
+			handleStartNewChat();
 		}
 
-		if (index <= currentChatIndex) {
+		if (index < currentChatIndex) {
 			setCurrentChatIndex(currentChatIndex - 1);
+			localStorage.setItem('sofosCurrentChatIndex', (currentChatIndex - 1).toString());
 		}
 	};
 
@@ -182,7 +161,7 @@ const SideBar = ({
 										primary={chat && chat.length > 0
 											? formattedDate(chat[chat.length - 1]?.createdAt)
 											: 'No Messages'}
-										sx={{ color: '#7d7d7d' }}	
+										sx={{ color: '#7d7d7d' }}
 									/>
 								</ListItemButton>
 								<IconButton

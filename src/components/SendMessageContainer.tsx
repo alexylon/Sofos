@@ -11,7 +11,7 @@ interface SendMessageContainerProps {
 	hasFiles: boolean,
 	images: File[],
 	files: File[],
-	isLoading: boolean,
+	isDisabled: boolean,
 	handleRemoveImage: any,
 	handleRemoveFile: any,
 	input: string,
@@ -29,13 +29,12 @@ const SendMessageContainer = ({
 								  files,
 								  handleRemoveImage,
 								  handleRemoveFile,
-								  isLoading,
+								  isDisabled,
 								  input,
 								  handleInputChange,
 								  onSubmit,
 								  handleFilesChange,
 								  isUploadDisabled,
-								  error,
 							  }: SendMessageContainerProps) => {
 	const VisuallyHiddenInput = styled('input')({
 		clip: 'rect(0 0 0 0)',
@@ -48,8 +47,6 @@ const SendMessageContainer = ({
 		whiteSpace: 'nowrap',
 		width: 1,
 	});
-
-	const isDisabled = isLoading || !!error;
 
 	const handleButtonClick = () => {
 		document.getElementById('file-input')?.click();
@@ -169,7 +166,7 @@ const SendMessageContainer = ({
 							sx={{
 								borderRadius: '13px',
 								minHeight: '59px',
-								backgroundColor: isLoading ? '#F0F0F0' : '#FAFAFA',
+								backgroundColor: isDisabled ? '#F0F0F0' : '#FAFAFA',
 								'& .MuiOutlinedInput-root': {
 									borderRadius: '13px',
 									minHeight: '59px',

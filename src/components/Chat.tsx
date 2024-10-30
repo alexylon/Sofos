@@ -51,6 +51,20 @@ const samplingParameters: SamplingParameter[] = [
 	},
 ];
 
+const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
+	if (chatHistory) {
+		localStorage.setItem(
+			'sofosChatHistory',
+			JSON.stringify(chatHistory, (key, value) => {
+				if (key === 'createdAt' && value instanceof Date) {
+					return value.toISOString();
+				}
+				return value;
+			})
+		);
+	}
+};
+
 export default function Chat() {
 	const [model, setModel] = useState<string>(models[0].value);
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
@@ -76,20 +90,25 @@ export default function Chat() {
 			streamProtocol: 'data',
 			keepLastMessageOnError: true,
 			body: { model, samplingParameter },
+			onFinish: (message) => {
+				onFinishCallback();
+			},
 		}
 	);
 
 	const scrollableGridRef = useRef(null);
 	const { data: session } = useSession();
 	const user = session?.user;
+	const hasImages = images.length > 0;
+	const hasFiles = files.length > 0;
+	const isDisabled = isLoading || !!error;
 
 	useEffect(() => {
 		// Initialize from localStorage
 		const storedModel = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
-		const storedMessages = localStorage.getItem('sofosMessages');
 		const storedChatHistory = localStorage.getItem('sofosChatHistory');
-		const storedCurrentChatId = localStorage.getItem('sofosCurrentChatId');
+		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
 
 		if (storedModel) {
 			setModel(storedModel);
@@ -99,15 +118,9 @@ export default function Chat() {
 			setSamplingParameter(Number(storedSamplingParameter));
 		}
 
-		if (storedMessages) {
-			setMessages(JSON.parse(storedMessages));
-		}
+		if (storedChatHistory && storedCurrentChatIndex) {
+			setCurrentChatIndex(Number(storedCurrentChatIndex));
 
-		if (storedCurrentChatId) {
-			setCurrentChatIndex(Number(storedCurrentChatId));
-		}
-
-		if (storedChatHistory) {
 			const parsedChatHistory: Message[][] = JSON.parse(storedChatHistory, (key, value) => {
 				if (key === 'createdAt' && typeof value === 'string') {
 					return new Date(value);
@@ -116,6 +129,10 @@ export default function Chat() {
 			});
 
 			setChatHistory(parsedChatHistory);
+
+			if (parsedChatHistory[Number(storedCurrentChatIndex)]?.length > 0) {
+				setMessages(parsedChatHistory[Number(storedCurrentChatIndex)]);
+			}
 		}
 
 		// Capture all scroll events across the entire viewport
@@ -139,31 +156,6 @@ export default function Chat() {
 			window.removeEventListener('wheel', handleScroll);
 		};
 	}, []);
-
-	// Save messages to localStorage
-	useEffect(() => {
-		if (messages && messages.length > 0) {
-			localStorage.setItem('sofosMessages', JSON.stringify(messages));
-		}
-
-		// Set local state for the model name to assistant's last message
-		if (
-			messages.length > 0 &&
-			messages[messages.length - 1].role === 'assistant' &&
-			!messages[messages.length - 1].name
-		) {
-			setMessages((prevMessages: Message[]): Message[] => {
-				const updatedMessages: Message[] = [...prevMessages];
-
-				updatedMessages[prevMessages.length - 1] = {
-					...updatedMessages[prevMessages.length - 1],
-					name: model,
-				};
-
-				return updatedMessages;
-			});
-		}
-	}, [messages]);
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -236,9 +228,6 @@ export default function Chat() {
 		localStorage.setItem('sofosSamplingParameter', event.target.value);
 	};
 
-	const hasImages = images.length > 0;
-	const hasFiles = files.length > 0;
-
 	const handleDrawerOpen = () => {
 		setOpen(true);
 	};
@@ -246,6 +235,42 @@ export default function Chat() {
 	const handleDrawerClose = () => {
 		setOpen(false);
 	};
+
+	// Callback to be executed after 'assistant' message is received
+	const onFinishCallback = () => {
+		if (!error) {
+			const isNewChat = currentChatIndex === -1;
+			const index = isNewChat ? chatHistory.length : currentChatIndex;
+
+			if (isNewChat) {
+				setCurrentChatIndex(index);
+				localStorage.setItem('sofosCurrentChatIndex', (index).toString());
+			}
+
+			// Set model name to the last assistant message
+			// Update chat history in the state and local storage
+			setMessages((prevMessages: Message[]): Message[] => {
+				const updatedMessages: Message[] = [...prevMessages];
+
+				updatedMessages[prevMessages.length - 1] = {
+					...updatedMessages[prevMessages.length - 1],
+					name: model,
+				};
+
+				// Update chat history in the state and local storage
+				setChatHistory((prevChatHistory: Message[][]) => {
+					const updatedChatHistory = [...prevChatHistory];
+
+					updatedChatHistory[index] = updatedMessages;
+					saveChatHistoryToLocalStorage(updatedChatHistory);
+
+					return updatedChatHistory;
+				});
+
+				return updatedMessages;
+			});
+		}
+	}
 
 	return (
 		<div onClick={handleDrawerClose}>
@@ -265,6 +290,8 @@ export default function Chat() {
 				setModel={setModel}
 				open={open}
 				handleDrawerOpen={handleDrawerOpen}
+				saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
+				isDisabled={isDisabled}
 			/>
 			{user &&
 			  <Box
@@ -297,7 +324,7 @@ export default function Chat() {
 				  hasFiles={hasFiles}
 				  images={images}
 				  files={files}
-				  isLoading={isLoading}
+                  isDisabled={isDisabled}
 				  handleRemoveImage={handleRemoveImage}
 				  handleRemoveFile={handleRemoveFile}
 				  input={input}

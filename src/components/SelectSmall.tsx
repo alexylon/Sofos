@@ -9,9 +9,10 @@ interface SelectSmallProps {
 	handleChange: any,
 	value: string | number,
 	style?: any,
+	disabled?: boolean,
 }
 
-export default function SelectSmall({ options, handleChange, value, style }: SelectSmallProps) {
+export default function SelectSmall({ options, handleChange, value, style, disabled }: SelectSmallProps) {
 
 	return (
 		<FormControl size="small">
@@ -23,6 +24,7 @@ export default function SelectSmall({ options, handleChange, value, style }: Sel
 				onChange={handleChange}
 				variant="standard"
 				style={style}
+				disabled={disabled}
 				sx={{
 					'&:before': {
 						borderBottom: 'none',
@@ -41,6 +43,17 @@ export default function SelectSmall({ options, handleChange, value, style }: Sel
 					},
 					'& .MuiSelect-icon': {
 						color: 'white',
+					},
+					'&.Mui-disabled': {
+						'& .MuiSelect-select': {
+							color: 'grey',
+						},
+						'& .MuiSelect-icon': {
+							display: 'none',
+						},
+						'&:before': {
+							borderBottom: 'none',
+						},
 					},
 				}}
 			>
