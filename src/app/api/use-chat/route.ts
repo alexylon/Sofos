@@ -1,6 +1,6 @@
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
-import { convertToCoreMessages, streamText, StreamTextResult } from 'ai';
+import { convertToCoreMessages, StreamData, streamText, StreamTextResult } from 'ai';
 
 // maxDuration streaming response time is 60 seconds
 export const maxDuration = 60;
@@ -25,7 +25,11 @@ export async function POST(req: Request) {
 			},
 		});
 
-		return result.toDataStreamResponse();
+		const streamData = new StreamData();
+		streamData.appendMessageAnnotation({ model });
+		await streamData.close();
+
+		return result.toDataStreamResponse({ data: streamData });
 	} catch (error) {
 		if (error instanceof Error) {
 			return new Response("Server error: " + error.message, {

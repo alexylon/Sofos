@@ -29,6 +29,7 @@ interface HeaderAppBarProps {
 	handleDrawerOpen: any,
 	saveChatHistoryToLocalStorage: any,
 	isDisabled: boolean,
+	isLoading: boolean,
 }
 
 export default function HeaderAppBar({
@@ -49,6 +50,7 @@ export default function HeaderAppBar({
 										 handleDrawerOpen,
 										 saveChatHistoryToLocalStorage,
 										 isDisabled,
+										 isLoading,
 									 }: HeaderAppBarProps) {
 	const { data: session, status } = useSession()
 	const loading = status === "loading"
@@ -73,19 +75,19 @@ export default function HeaderAppBar({
 								? (
 									<>
 										<IconButton
-											color={isDisabled ? "primary" : "inherit"}
+											color={isLoading ? "primary" : "inherit"}
 											aria-label="open drawer"
 											onClick={(e) => {
 												e.stopPropagation();
 
-												if (!isDisabled) {
+												if (!isLoading) {
 													handleDrawerOpen();
 												}
 											}}
 											sx={[
 												{
 													mr: 2,
-													cursor: isDisabled ? 'default' : 'pointer',
+													cursor: isLoading ? 'default' : 'pointer',
 												},
 												open && { display: 'none' },
 											]}

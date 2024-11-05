@@ -247,15 +247,9 @@ export default function Chat() {
 				localStorage.setItem('sofosCurrentChatIndex', (index).toString());
 			}
 
-			// Set model name to the last assistant message
 			// Update chat history in the state and local storage
 			setMessages((prevMessages: Message[]): Message[] => {
 				const updatedMessages: Message[] = [...prevMessages];
-
-				updatedMessages[prevMessages.length - 1] = {
-					...updatedMessages[prevMessages.length - 1],
-					name: model,
-				};
 
 				// Update chat history in the state and local storage
 				setChatHistory((prevChatHistory: Message[][]) => {
@@ -292,6 +286,7 @@ export default function Chat() {
 				handleDrawerOpen={handleDrawerOpen}
 				saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
 				isDisabled={isDisabled}
+				isLoading={isLoading}
 			/>
 			{user &&
 			  <Box
