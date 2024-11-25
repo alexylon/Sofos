@@ -135,7 +135,7 @@ const SideBar = ({
 					fontWeight="bold"
 					color="#7d7d7d"
 				>
-					Last 15 Chats
+					Last 20 Chats
 				</Typography>
 			</DrawerHeader>
 			<Divider />

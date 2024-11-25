@@ -253,7 +253,7 @@ export default function Chat() {
 
 				// Update chat history in the state and local storage
 				setChatHistory((prevChatHistory: Message[][]) => {
-					const updatedChatHistory = [...prevChatHistory];
+					const updatedChatHistory = [...prevChatHistory].slice(-20);
 
 					updatedChatHistory[index] = updatedMessages;
 					saveChatHistoryToLocalStorage(updatedChatHistory);
