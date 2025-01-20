@@ -53,9 +53,11 @@ const samplingParameters: SamplingParameter[] = [
 
 const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
 	if (chatHistory) {
+		const filteredChatHistory = chatHistory.filter(chat => chat !== null && chat !== undefined);
+
 		localStorage.setItem(
 			'sofosChatHistory',
-			JSON.stringify(chatHistory, (key, value) => {
+			JSON.stringify(filteredChatHistory, (key, value) => {
 				if (key === 'createdAt' && value instanceof Date) {
 					return value.toISOString();
 				}
@@ -128,10 +130,14 @@ export default function Chat() {
 				return value;
 			});
 
-			setChatHistory(parsedChatHistory);
+			if (parsedChatHistory?.length > 0) {
+				setChatHistory(parsedChatHistory);
 
-			if (parsedChatHistory[Number(storedCurrentChatIndex)]?.length > 0) {
-				setMessages(parsedChatHistory[Number(storedCurrentChatIndex)]);
+				const parsedMessages = parsedChatHistory[Number(storedCurrentChatIndex)];
+
+				if (parsedMessages?.length > 0) {
+					setMessages(parsedMessages);
+				}
 			}
 		}
 
@@ -251,17 +257,19 @@ export default function Chat() {
 			setMessages((prevMessages: Message[]): Message[] => {
 				const updatedMessages: Message[] = [...prevMessages];
 
-				// Update chat history in the state and local storage
-				setChatHistory((prevChatHistory: Message[][]) => {
-					const updatedChatHistory = [...prevChatHistory].slice(-20);
+				if (updatedMessages && updatedMessages.length > 0) {
+					// Update chat history in the state and local storage
+					setChatHistory((prevChatHistory: Message[][]) => {
+						const updatedChatHistory = [...prevChatHistory].slice(-20);
 
-					updatedChatHistory[index] = updatedMessages;
-					saveChatHistoryToLocalStorage(updatedChatHistory);
+						updatedChatHistory[index] = updatedMessages;
+						saveChatHistoryToLocalStorage(updatedChatHistory);
 
-					return updatedChatHistory;
-				});
+						return updatedChatHistory;
+					});
+				}
 
-				return updatedMessages;
+				return updatedMessages || [];
 			});
 		}
 	}
