@@ -9,11 +9,11 @@ export async function POST(req: Request) {
 	// Extract the data from the body of the request
 	const { messages, model, samplingParameter, reasoningEffort } = await req.json();
 
-	const modelName = model.startsWith("claude")
-		? anthropic(model)
-		: openai(model);
+	const modelName = model.provider === 'anthropic'
+		? anthropic(model.value)
+		: openai(model.value);
 
-	const providerOptions = model.startsWith("o")
+	const providerOptions = model.provider === 'openAI' && model.isReasoning
 		? { openai: { reasoningEffort } }
 		: undefined;
 
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 		});
 
 		const streamData = new StreamData();
-		streamData.appendMessageAnnotation({ model });
+		streamData.appendMessageAnnotation({ modelValue: model.value });
 		await streamData.close();
 
 		return result.toDataStreamResponse({ data: streamData });

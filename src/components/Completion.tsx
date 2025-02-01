@@ -138,7 +138,7 @@ export default function Completion({ messages, models, error }: CompletionProps)
 												label={
 													message.annotations && message.annotations?.length > 0
 														// @ts-ignore
-														? models.find((model: string) => model.value === message.annotations[0].model)?.label
+														? models.find((model: string) => model.value === message.annotations[0].modelValue)?.label
 														: ''
 												}
 												variant="outlined"

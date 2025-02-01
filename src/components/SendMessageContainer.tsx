@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
 import { TextareaAutosize } from '@mui/base';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -19,6 +19,7 @@ interface SendMessageContainerProps {
 	onSubmit: any,
 	handleFilesChange: any,
 	isUploadDisabled: boolean,
+	isLoading: boolean,
 	error?: any,
 }
 
@@ -35,7 +36,16 @@ const SendMessageContainer = ({
 								  onSubmit,
 								  handleFilesChange,
 								  isUploadDisabled,
+								  isLoading,
 							  }: SendMessageContainerProps) => {
+	const textFieldRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (!isLoading && textFieldRef.current) {
+			textFieldRef.current.focus();
+		}
+	}, [isLoading]);
+
 	const VisuallyHiddenInput = styled('input')({
 		clip: 'rect(0 0 0 0)',
 		clipPath: 'inset(50%)',
@@ -76,6 +86,7 @@ const SendMessageContainer = ({
 							handleRemoveFile={handleRemoveFile}
 						/>
 						<TextField
+							inputRef={textFieldRef}
 							fullWidth
 							id="user-input"
 							label={!isDisabled && !input ? "Send a message..." : ""}

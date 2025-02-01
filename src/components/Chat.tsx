@@ -21,26 +21,38 @@ const models: Model[] = [
 	{
 		value: 'gpt-4o',
 		label: 'GPT-4o',
+		provider: 'openAI',
+		isReasoning: false,
 	},
 	{
 		value: 'gpt-4o-mini',
 		label: 'GPT-4o mini',
+		provider: 'openAI',
+		isReasoning: false,
 	},
 	{
 		value: 'claude-3-5-sonnet-latest',
 		label: 'Claude 3.5 Sonnet',
+		provider: 'anthropic',
+		isReasoning: false,
 	},
 	{
 		value: 'claude-3-5-haiku-latest',
 		label: 'Claude 3.5 Haiku',
+		provider: 'anthropic',
+		isReasoning: false,
 	},
 	{
 		value: 'o1',
 		label: 'o1',
+		provider: 'openAI',
+		isReasoning: true,
 	},
 	{
 		value: 'o3-mini',
 		label: 'o3-mini',
+		provider: 'openAI',
+		isReasoning: true,
 	},
 ];
 
@@ -91,7 +103,7 @@ const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
 };
 
 export default function Chat() {
-	const [model, setModel] = useState<string>(models[0].value);
+	const [model, setModel] = useState<Model>(models[0]);
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(reasoningEfforts[0].value);
 	const [images, setImages] = useState<File[]>([]);
@@ -131,14 +143,18 @@ export default function Chat() {
 
 	useEffect(() => {
 		// Initialize from localStorage
-		const storedModel = localStorage.getItem('sofosModel');
+		const storedModelValue = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
 		const storedReasoningEffort = localStorage.getItem('sofosReasoningEffort');
 		const storedChatHistory = localStorage.getItem('sofosChatHistory');
 		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
 
-		if (storedModel) {
-			setModel(storedModel);
+		if (storedModelValue) {
+			const foundModel = models.find(model => model.value === storedModelValue);
+
+			if (foundModel) {
+				setModel(foundModel);
+			}
 		}
 
 		if (storedSamplingParameter) {
@@ -254,13 +270,20 @@ export default function Chat() {
 	};
 
 	const handleModelChange = (event: SelectChangeEvent) => {
-		setModel(event.target.value);
-		localStorage.setItem('sofosModel', event.target.value);
+		const { value } = event.target;
+		const modelValue = models.find(model => model.value === value);
+
+		if (modelValue) {
+			setModel(modelValue);
+			localStorage.setItem('sofosModel', value);
+		}
 	};
 
 	const handleSamplingParameterChange = (event: SelectChangeEvent) => {
-		setSamplingParameter(Number(event.target.value));
-		localStorage.setItem('sofosSamplingParameter', event.target.value);
+		const { value } = event.target;
+
+		setSamplingParameter(Number(value));
+		localStorage.setItem('sofosSamplingParameter', value);
 	};
 
 	const handleReasoningEffortChange = (event: SelectChangeEvent) => {
@@ -371,7 +394,8 @@ export default function Chat() {
 									handleInputChange={handleInputChange}
 									onSubmit={onSubmit}
 									handleFilesChange={handleFilesChange}
-									isUploadDisabled={model.startsWith('o1')}
+									isUploadDisabled={model.isReasoning}
+									isLoading={isLoading}
 									error={error}
 								/>
 							</Box>

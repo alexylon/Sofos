@@ -14,7 +14,7 @@ import SideBar from '@/components/SideBar';
 interface HeaderAppBarProps {
 	models: Model[],
 	handleModelChange: any,
-	model: string,
+	model: Model,
 	samplingParameters: SamplingParameter[],
 	handleSamplingParameterChange: any,
 	samplingParameter: number,
@@ -103,12 +103,13 @@ export default function HeaderAppBar({
 										<SelectSmall
 											options={models}
 											handleChange={handleModelChange}
-											value={model}
+											value={model.value}
 											style={{ marginRight: '5px' }}
 											disabled={isDisabled}
 										/>
-										{model.startsWith('o')
+										{model.isReasoning
 											? <SelectSmall
+												// @ts-ignore
 												options={reasoningEfforts}
 												handleChange={handleReasoningEffortChange}
 												value={reasoningEffort}

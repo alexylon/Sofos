@@ -1,6 +1,8 @@
 export interface Model {
 	value: string;
 	label: string;
+	provider: string;
+	isReasoning: boolean;
 }
 
 export interface SamplingParameter {
