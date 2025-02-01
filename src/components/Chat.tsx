@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react"
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { Model, SamplingParameter } from '@/types/types';
+import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
 import MessagesContainer from '@/components/MessagesContainer';
 import ActionButton from '@/components/ActionButton';
 import SendMessageContainer from '@/components/SendMessageContainer';
@@ -23,16 +23,24 @@ const models: Model[] = [
 		label: 'GPT-4o',
 	},
 	{
+		value: 'gpt-4o-mini',
+		label: 'GPT-4o mini',
+	},
+	{
 		value: 'claude-3-5-sonnet-latest',
 		label: 'Claude 3.5 Sonnet',
 	},
 	{
-		value: 'o1-mini',
-		label: 'o1-mini',
+		value: 'claude-3-5-haiku-latest',
+		label: 'Claude 3.5 Haiku',
 	},
 	{
-		value: 'o1-preview',
-		label: 'o1-preview',
+		value: 'o1',
+		label: 'o1',
+	},
+	{
+		value: 'o3-mini',
+		label: 'o3-mini',
 	},
 ];
 
@@ -48,6 +56,21 @@ const samplingParameters: SamplingParameter[] = [
 	{
 		value: 0.7,
 		label: 'Creative',
+	},
+];
+
+const reasoningEfforts: ReasoningEffort[] = [
+	{
+		value: 'low',
+		label: 'Low',
+	},
+	{
+		value: 'medium',
+		label: 'Medium',
+	},
+	{
+		value: 'high',
+		label: 'High',
 	},
 ];
 
@@ -70,6 +93,7 @@ const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
 export default function Chat() {
 	const [model, setModel] = useState<string>(models[0].value);
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
+	const [reasoningEffort, setReasoningEffort] = useState<string>(reasoningEfforts[0].value);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
 	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
@@ -91,7 +115,7 @@ export default function Chat() {
 			api: '/api/use-chat',
 			streamProtocol: 'data',
 			keepLastMessageOnError: true,
-			body: { model, samplingParameter },
+			body: { model, samplingParameter, reasoningEffort },
 			onFinish: (message) => {
 				onFinishCallback();
 			},
@@ -109,6 +133,7 @@ export default function Chat() {
 		// Initialize from localStorage
 		const storedModel = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
+		const storedReasoningEffort = localStorage.getItem('sofosReasoningEffort');
 		const storedChatHistory = localStorage.getItem('sofosChatHistory');
 		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
 
@@ -118,6 +143,10 @@ export default function Chat() {
 
 		if (storedSamplingParameter) {
 			setSamplingParameter(Number(storedSamplingParameter));
+		}
+
+		if (storedReasoningEffort) {
+			setReasoningEffort(storedReasoningEffort);
 		}
 
 		if (storedChatHistory && storedCurrentChatIndex) {
@@ -234,6 +263,11 @@ export default function Chat() {
 		localStorage.setItem('sofosSamplingParameter', event.target.value);
 	};
 
+	const handleReasoningEffortChange = (event: SelectChangeEvent) => {
+		setReasoningEffort(event.target.value);
+		localStorage.setItem('sofosReasoningEffort', event.target.value);
+	};
+
 	const handleDrawerOpen = () => {
 		setOpen(true);
 	};
@@ -283,6 +317,9 @@ export default function Chat() {
 				samplingParameters={samplingParameters}
 				handleSamplingParameterChange={handleSamplingParameterChange}
 				samplingParameter={samplingParameter}
+				reasoningEfforts={reasoningEfforts}
+				reasoningEffort={reasoningEffort}
+				handleReasoningEffortChange={handleReasoningEffortChange}
 				messages={messages}
 				setMessages={setMessages}
 				chatHistory={chatHistory}
@@ -297,9 +334,9 @@ export default function Chat() {
 				isLoading={isLoading}
 			/>
 			{user &&
-			  <Box
-				className="chatContainer"
-				sx={{
+							<Box
+								className="chatContainer"
+								sx={{
 					maxWidth: 1200,
 					marginLeft: "auto",
 					marginRight: "auto",
@@ -315,29 +352,29 @@ export default function Chat() {
 					},
 					position: 'relative',
 				}}>
-				<MessagesContainer
-				  hasAttachments={hasFiles || hasImages}
-				  messages={messages}
-				  models={models}
-				  error={error}
-				/>
-				<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
-				<SendMessageContainer
-				  hasImages={hasImages}
-				  hasFiles={hasFiles}
-				  images={images}
-				  files={files}
-                  isDisabled={isDisabled}
-				  handleRemoveImage={handleRemoveImage}
-				  handleRemoveFile={handleRemoveFile}
-				  input={input}
-				  handleInputChange={handleInputChange}
-				  onSubmit={onSubmit}
-				  handleFilesChange={handleFilesChange}
-				  isUploadDisabled={model.startsWith('o1')}
-				  error={error}
-				/>
-			  </Box>
+								<MessagesContainer
+									hasAttachments={hasFiles || hasImages}
+									messages={messages}
+									models={models}
+									error={error}
+								/>
+								<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+								<SendMessageContainer
+									hasImages={hasImages}
+									hasFiles={hasFiles}
+									images={images}
+									files={files}
+									isDisabled={isDisabled}
+									handleRemoveImage={handleRemoveImage}
+									handleRemoveFile={handleRemoveFile}
+									input={input}
+									handleInputChange={handleInputChange}
+									onSubmit={onSubmit}
+									handleFilesChange={handleFilesChange}
+									isUploadDisabled={model.startsWith('o1')}
+									error={error}
+								/>
+							</Box>
 			}
 		</div>
 	)

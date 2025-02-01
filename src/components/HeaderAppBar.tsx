@@ -6,7 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
 import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
-import { Model, SamplingParameter } from '@/types/types';
+import { Model, SamplingParameter, ReasoningEffort } from '@/types/types';
 import { useRouter } from 'next/navigation'
 import { Message } from 'ai';
 import SideBar from '@/components/SideBar';
@@ -18,6 +18,9 @@ interface HeaderAppBarProps {
 	samplingParameters: SamplingParameter[],
 	handleSamplingParameterChange: any,
 	samplingParameter: number,
+	reasoningEfforts: ReasoningEffort[],
+	reasoningEffort: string,
+	handleReasoningEffortChange: any,
 	messages: Message[],
 	setMessages: any,
 	chatHistory: Message[][],
@@ -39,6 +42,9 @@ export default function HeaderAppBar({
 										 samplingParameters,
 										 handleSamplingParameterChange,
 										 samplingParameter,
+										 reasoningEfforts,
+										 reasoningEffort,
+										 handleReasoningEffortChange,
 										 messages,
 										 setMessages,
 										 chatHistory,
@@ -101,13 +107,19 @@ export default function HeaderAppBar({
 											style={{ marginRight: '5px' }}
 											disabled={isDisabled}
 										/>
-										{!model.startsWith('o1') &&
-										  <SelectSmall
-											options={samplingParameters}
-											handleChange={handleSamplingParameterChange}
-											value={samplingParameter}
-                                            disabled={isDisabled}
-										  />
+										{model.startsWith('o')
+											? <SelectSmall
+												options={reasoningEfforts}
+												handleChange={handleReasoningEffortChange}
+												value={reasoningEffort}
+												disabled={isDisabled}
+											/>
+											: <SelectSmall
+												options={samplingParameters}
+												handleChange={handleSamplingParameterChange}
+												value={samplingParameter}
+												disabled={isDisabled}
+											/>
 										}
 										<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
 											{/*<Avatar*/}
@@ -142,18 +154,18 @@ export default function HeaderAppBar({
 						</Toolbar>
 					</AppBar>
 					{user &&
-					  <SideBar
-						messages={messages}
-						setMessages={setMessages}
-						chatHistory={chatHistory}
-						setChatHistory={setChatHistory}
-						currentChatIndex={currentChatIndex}
-						setCurrentChatIndex={setCurrentChatIndex}
-						setModel={setModel}
-						open={open}
-						handleStartNewChat={handleStartNewChat}
-						saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
-					  />
+											<SideBar
+												messages={messages}
+												setMessages={setMessages}
+												chatHistory={chatHistory}
+												setChatHistory={setChatHistory}
+												currentChatIndex={currentChatIndex}
+												setCurrentChatIndex={setCurrentChatIndex}
+												setModel={setModel}
+												open={open}
+												handleStartNewChat={handleStartNewChat}
+												saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
+											/>
 					}
 				</Box>
 			</Grid>

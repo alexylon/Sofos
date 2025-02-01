@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 	const { messages, model, samplingParameter } = await req.json();
 
 	try {
-		const result: GenerateTextResult<any> = await generateText({
+		const result: GenerateTextResult<any, any> = await generateText({
 			model: openai(model),
 			messages: convertToCoreMessages(messages),
 			temperature: samplingParameter,

@@ -7,19 +7,24 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
 	// Extract the data from the body of the request
-	const { messages, model, samplingParameter } = await req.json();
+	const { messages, model, samplingParameter, reasoningEffort } = await req.json();
 
 	const modelName = model.startsWith("claude")
 		? anthropic(model)
 		: openai(model);
 
+	const providerOptions = model.startsWith("o")
+		? { openai: { reasoningEffort } }
+		: undefined;
+
 	try {
-		const result: StreamTextResult<any> = await streamText({
+		const result: StreamTextResult<any, any> = streamText({
 			model: modelName,
 			messages: convertToCoreMessages(messages),
 			temperature: samplingParameter,
 			topP: samplingParameter,
-			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response, responseMessages }) {
+			providerOptions,
+			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response }) {
 				// implement your own logic here, e.g. for storing messages
 				// or recording token usage
 			},
