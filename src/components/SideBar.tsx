@@ -91,6 +91,7 @@ const SideBar = ({
 		setCurrentChatIndex(chatIndex);
 		localStorage.setItem('sofosCurrentChatIndex', chatIndex.toString());
 
+		// @ts-ignore
 		const model = chatHistory[chatIndex][chatHistory[chatIndex].length - 1].name;
 
 		if (model) {
