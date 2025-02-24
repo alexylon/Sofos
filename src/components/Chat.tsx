@@ -31,8 +31,8 @@ const models: Model[] = [
 		isReasoning: false,
 	},
 	{
-		value: 'claude-3-5-sonnet-latest',
-		label: 'Claude 3.5 Sonnet',
+		value: 'claude-3-7-sonnet-latest',
+		label: 'Claude 3.7 Sonnet',
 		provider: 'anthropic',
 		isReasoning: false,
 	},
