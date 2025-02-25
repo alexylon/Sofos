@@ -6,7 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
 import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
-import { Model, SamplingParameter, ReasoningEffort } from '@/types/types';
+import { Model, ModelType, ReasoningEffort, SamplingParameter } from '@/types/types';
 import { useRouter } from 'next/navigation'
 import { Message } from 'ai';
 import SideBar from '@/components/SideBar';
@@ -21,6 +21,9 @@ interface HeaderAppBarProps {
 	reasoningEfforts: ReasoningEffort[],
 	reasoningEffort: string,
 	handleReasoningEffortChange: any,
+	hybridParameters: SamplingParameter[],
+	handleHybridParameterChange: any,
+	hybridParameter: number,
 	messages: Message[],
 	setMessages: any,
 	chatHistory: Message[][],
@@ -45,6 +48,9 @@ export default function HeaderAppBar({
 										 reasoningEfforts,
 										 reasoningEffort,
 										 handleReasoningEffortChange,
+										 hybridParameters,
+										 handleHybridParameterChange,
+										 hybridParameter,
 										 messages,
 										 setMessages,
 										 chatHistory,
@@ -107,18 +113,27 @@ export default function HeaderAppBar({
 											style={{ marginRight: '5px' }}
 											disabled={isDisabled}
 										/>
-										{model.isReasoning
-											? <SelectSmall
-												// @ts-ignore
+										{model.type === ModelType.REASONING &&
+										  <SelectSmall
 												options={reasoningEfforts}
 												handleChange={handleReasoningEffortChange}
 												value={reasoningEffort}
 												disabled={isDisabled}
 											/>
-											: <SelectSmall
+										}
+										{model.type === ModelType.STANDARD &&
+										  <SelectSmall
 												options={samplingParameters}
 												handleChange={handleSamplingParameterChange}
 												value={samplingParameter}
+												disabled={isDisabled}
+											/>
+										}
+										{model.type === ModelType.HYBRID &&
+										  <SelectSmall
+												options={hybridParameters}
+												handleChange={handleHybridParameterChange}
+												value={hybridParameter}
 												disabled={isDisabled}
 											/>
 										}

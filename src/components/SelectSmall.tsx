@@ -2,10 +2,10 @@ import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { Model, SamplingParameter } from '@/types/types';
+import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
 
 interface SelectSmallProps {
-	options: Model[] | SamplingParameter[],
+	options: Model[] | SamplingParameter[] | ReasoningEffort[],
 	handleChange: any,
 	value: string | number,
 	style?: any,

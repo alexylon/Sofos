@@ -2,7 +2,13 @@ export interface Model {
 	value: string;
 	label: string;
 	provider: string;
-	isReasoning: boolean;
+	type: ModelType;
+}
+
+export enum ModelType {
+	STANDARD = "STANDARD",
+	REASONING = "REASONING",
+	HYBRID = "HYBRID",
 }
 
 export interface SamplingParameter {
@@ -14,3 +20,12 @@ export interface ReasoningEffort {
 	value: string;
 	label: string;
 }
+
+export enum Status {
+	SUBMITTED = "submitted",
+	STREAMING = "streaming",
+	READY = "ready",
+	ERROR = "error",
+}
+
+export type StatusType = "submitted" | "streaming" | "ready" | "error";

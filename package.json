@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.1.6",
-    "@ai-sdk/openai": "^1.1.9",
-    "@ai-sdk/react": "^1.1.8",
-    "@ai-sdk/ui-utils": "^1.1.8",
+    "@ai-sdk/anthropic": "^1.1.10",
+    "@ai-sdk/openai": "^1.1.14",
+    "@ai-sdk/react": "^1.1.18",
+    "@ai-sdk/ui-utils": "^1.1.16",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.2",

@@ -3,12 +3,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Message } from 'ai';
 import Box from '@mui/material/Box';
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { useSession } from "next-auth/react"
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
+import { Model, ModelType, ReasoningEffort, SamplingParameter, Status } from '@/types/types';
 import MessagesContainer from '@/components/MessagesContainer';
 import ActionButton from '@/components/ActionButton';
 import SendMessageContainer from '@/components/SendMessageContainer';
@@ -22,37 +22,37 @@ const models: Model[] = [
 		value: 'gpt-4o',
 		label: 'GPT-4o',
 		provider: 'openAI',
-		isReasoning: false,
+		type: ModelType.STANDARD,
 	},
 	{
 		value: 'gpt-4o-mini',
 		label: 'GPT-4o mini',
 		provider: 'openAI',
-		isReasoning: false,
+		type: ModelType.STANDARD,
 	},
 	{
 		value: 'claude-3-7-sonnet-latest',
 		label: 'Claude 3.7 Sonnet',
 		provider: 'anthropic',
-		isReasoning: false,
+		type: ModelType.HYBRID,
 	},
 	{
 		value: 'claude-3-5-haiku-latest',
 		label: 'Claude 3.5 Haiku',
 		provider: 'anthropic',
-		isReasoning: false,
+		type: ModelType.STANDARD,
 	},
 	{
 		value: 'o1',
 		label: 'o1',
 		provider: 'openAI',
-		isReasoning: true,
+		type: ModelType.REASONING,
 	},
 	{
 		value: 'o3-mini',
 		label: 'o3-mini',
 		provider: 'openAI',
-		isReasoning: true,
+		type: ModelType.REASONING,
 	},
 ];
 
@@ -86,6 +86,23 @@ const reasoningEfforts: ReasoningEffort[] = [
 	},
 ];
 
+const hybridParameters: SamplingParameter[] = [
+	...samplingParameters,
+	{
+		value: 12000,
+		label: 'Low',
+	},
+	{
+		value: 24000,
+		label: 'Medium',
+	},
+	{
+		value: 36000,
+		label: 'High',
+	},
+];
+
+
 const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
 	if (chatHistory) {
 		const filteredChatHistory = chatHistory.filter(chat => chat !== null && chat !== undefined);
@@ -106,15 +123,16 @@ export default function Chat() {
 	const [model, setModel] = useState<Model>(models[0]);
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(reasoningEfforts[0].value);
+	const [hybridParameter, setHybridParameter] = useState<number>(hybridParameters[0].value);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
 	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
 	const [currentChatIndex, setCurrentChatIndex] = useState<number>(-1);
-	const [open, setOpen] = React.useState(false);
+	const [open, setOpen] = useState(false);
 
 	const {
 		input,
-		isLoading,
+		status, // submitted, streaming, ready, error
 		handleInputChange,
 		handleSubmit,
 		messages,
@@ -127,10 +145,12 @@ export default function Chat() {
 			api: '/api/use-chat',
 			streamProtocol: 'data',
 			keepLastMessageOnError: true,
-			body: { model, samplingParameter, reasoningEffort },
+			body: { model, samplingParameter, reasoningEffort, hybridParameter },
 			onFinish: (message) => {
 				onFinishCallback();
 			},
+			// Prevent "Maximum update depth exceeded" error
+			experimental_throttle: 50,
 		}
 	);
 
@@ -139,6 +159,7 @@ export default function Chat() {
 	const user = session?.user;
 	const hasImages = images.length > 0;
 	const hasFiles = files.length > 0;
+	const isLoading = status === Status.SUBMITTED || status === Status.STREAMING;
 	const isDisabled = isLoading || !!error;
 
 	useEffect(() => {
@@ -146,6 +167,7 @@ export default function Chat() {
 		const storedModelValue = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
 		const storedReasoningEffort = localStorage.getItem('sofosReasoningEffort');
+		const storedHybridParameter = localStorage.getItem('sofosHybridParameter');
 		const storedChatHistory = localStorage.getItem('sofosChatHistory');
 		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
 
@@ -163,6 +185,10 @@ export default function Chat() {
 
 		if (storedReasoningEffort) {
 			setReasoningEffort(storedReasoningEffort);
+		}
+
+		if (storedHybridParameter) {
+			setHybridParameter(Number(storedHybridParameter));
 		}
 
 		if (storedChatHistory && storedCurrentChatIndex) {
@@ -291,6 +317,14 @@ export default function Chat() {
 		localStorage.setItem('sofosReasoningEffort', event.target.value);
 	};
 
+	const handleHybridParameterChange = (event: SelectChangeEvent) => {
+		const { value } = event.target;
+
+		setHybridParameter(Number(value));
+		localStorage.setItem('sofosHybridParameter', value);
+	};
+
+
 	const handleDrawerOpen = () => {
 		setOpen(true);
 	};
@@ -343,6 +377,9 @@ export default function Chat() {
 				reasoningEfforts={reasoningEfforts}
 				reasoningEffort={reasoningEffort}
 				handleReasoningEffortChange={handleReasoningEffortChange}
+				hybridParameters={hybridParameters}
+				handleHybridParameterChange={handleHybridParameterChange}
+				hybridParameter={hybridParameter}
 				messages={messages}
 				setMessages={setMessages}
 				chatHistory={chatHistory}
@@ -394,13 +431,12 @@ export default function Chat() {
 									handleInputChange={handleInputChange}
 									onSubmit={onSubmit}
 									handleFilesChange={handleFilesChange}
-									isUploadDisabled={model.isReasoning}
+									isUploadDisabled={model.type === ModelType.REASONING}
 									isLoading={isLoading}
 									error={error}
 								/>
 							</Box>
 			}
 		</div>
-	)
-		;
+	);
 }

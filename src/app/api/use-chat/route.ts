@@ -7,22 +7,50 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
 	// Extract the data from the body of the request
-	const { messages, model, samplingParameter, reasoningEffort } = await req.json();
+	const { messages, model, samplingParameter, reasoningEffort, hybridParameter } = await req.json();
 
 	const modelName = model.provider === 'anthropic'
 		? anthropic(model.value)
 		: openai(model.value);
 
-	const providerOptions = model.provider === 'openAI' && model.isReasoning
-		? { openai: { reasoningEffort } }
-		: undefined;
+	let providerOptions;
+	let temperature = samplingParameter;
+	let topP = samplingParameter;
+
+	if (model.provider === 'openAI' && model.type === 'REASONING') {
+		providerOptions = { openai: { reasoningEffort } };
+		temperature = undefined;
+		topP = undefined;
+	}
+
+	if (model.provider === 'anthropic' && model.type === 'HYBRID' && hybridParameter > 1000) {
+		providerOptions = {
+			anthropic: {
+				thinking: { type: 'enabled', budgetTokens: hybridParameter },
+			},
+		};
+
+		temperature = undefined;
+		topP = undefined;
+	}
+
+	if (model.provider === 'anthropic' && model.type === 'HYBRID' && hybridParameter < 2) {
+		providerOptions = {
+			anthropic: {
+				thinking: { type: 'disabled' },
+			},
+		};
+
+		temperature = hybridParameter;
+		topP = hybridParameter;
+	}
 
 	try {
 		const result: StreamTextResult<any, any> = streamText({
 			model: modelName,
 			messages: convertToCoreMessages(messages),
-			temperature: samplingParameter,
-			topP: samplingParameter,
+			temperature,
+			topP,
 			providerOptions,
 			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response }) {
 				// implement your own logic here, e.g. for storing messages
