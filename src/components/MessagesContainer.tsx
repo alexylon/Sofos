@@ -8,11 +8,14 @@ interface MessagesContainerProps {
 	hasAttachments: boolean,
 	messages: Message[],
 	models: Model[],
+	isScrolling: boolean,
+	handleScroll: any,
 	error?: any,
 }
 
-const MessagesContainer = ({ hasAttachments, messages, models, error }: MessagesContainerProps) => {
+const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, handleScroll, error }: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
+	const windowHeight = window.innerHeight;
 
 	return (
 		<Grid
@@ -28,12 +31,12 @@ const MessagesContainer = ({ hasAttachments, messages, models, error }: Messages
 				sx={{
 					height: hasAttachments
 						? {
-							xs: 'calc(89vh - 138px)', // On extra-small devices
-							sm: 'calc(93vh - 142px)', // On small devices and up
+							xs: (windowHeight - 304), // On extra-small devices
+							sm: (windowHeight - 234), // On small devices and up
 						}
 						: {
-							xs: 'calc(89vh - 62px)', // On extra-small devices
-							sm: 'calc(93vh - 65px)', // On small devices and up
+							xs: (windowHeight - 230), // On extra-small devices
+							sm: (windowHeight - 160), // On small devices and up
 						},
 					overflow: 'auto',
 					width: '100%',
@@ -54,6 +57,8 @@ const MessagesContainer = ({ hasAttachments, messages, models, error }: Messages
 						<Completion
 							messages={messages}
 							models={models}
+							isScrolling={isScrolling}
+							handleScroll={handleScroll}
 							error={error}
 						/>
 					</Box>

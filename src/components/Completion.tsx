@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Grid, Box, Chip, Card } from "@mui/material";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
@@ -10,158 +10,206 @@ import { Model } from '@/types/types';
 interface CompletionProps {
 	messages?: Message[],
 	models: Model[],
+	isScrolling: boolean,
+	handleScroll: any,
 	error?: any,
 }
 
-export default function Completion({ messages, models, error }: CompletionProps) {
+export default function Completion({ messages, models, isScrolling, handleScroll, error }: CompletionProps) {
+	const isLastMessageFromUser = messages && messages.length > 0 && messages[messages.length - 1].role === 'user';
+	const containerRef = useRef<HTMLDivElement>(null);
+	const [containerHeight, setContainerHeight] = useState<number | 'auto'>('auto');
+
+	useEffect(() => {
+		const calculateDistance = () => {
+			if (!containerRef.current) return;
+			const windowHeight = window.innerHeight;
+			const userMessages = containerRef.current.querySelectorAll('[data-role="user"]');
+
+			if (userMessages.length > 0) {
+				const firstUserMessage = userMessages[0];
+				const lastUserMessage = userMessages[userMessages.length - 1];
+				const firstUserMessageRect = firstUserMessage.getBoundingClientRect();
+				const lastUserMessageRect = lastUserMessage.getBoundingClientRect();
+				const userMessagesHeight = lastUserMessageRect.bottom - firstUserMessageRect.top;
+				const containerHeight = containerRef.current.getBoundingClientRect().height;
+				const chatHeight = windowHeight > 1000 ? windowHeight - 242 : windowHeight - 270;
+
+				if (isLastMessageFromUser && (containerHeight - userMessagesHeight) < chatHeight && messages && messages.length > 1) {
+					setContainerHeight(containerHeight + chatHeight - (containerHeight - userMessagesHeight));
+					handleScroll();
+				}
+			}
+		};
+
+		calculateDistance();
+	}, [isLastMessageFromUser]);
 
 	return (
-		<AutoScrollingWindow style={{ flexGrow: 1 }} messages={messages}>
-			<div style={{ minHeight: "auto", height: "auto" }}>
+		<>
+			<div
+				ref={containerRef}  // Make sure this ref is here
+				data-testid="messages-container"
+				style={{
+					minHeight: 'auto',
+					height: typeof containerHeight === 'number' ? `${containerHeight}px` : containerHeight,
+					msOverflowStyle: 'none',
+					scrollbarWidth: 'none',
+					overflow: 'auto'
+				}}
+			>
 				{messages?.map((message: Message) => (
-					<div key={message.id}>
-						{message.role === 'user'
-							?
-							<Grid item xs={12}>
-								<Box sx={{
-									borderRadius: '13px',
-									mt: 1,
-									pb: 1,
-									pl: 2,
-									pr: 2,
-									mb: 1,
-									backgroundColor: '#a9d3ea',
-								}}
-								>
+					<AutoScrollingWindow
+						key={message.id}
+						style={{ flexGrow: 1 }}
+						isScrolling={isScrolling}
+					>
+						<div
+							data-role={message.role}
+						>
+							{message.role === 'user'
+								?
+								<Grid item xs={12}>
 									<Box sx={{
-										display: 'flex',
-										justifyContent: 'flex-end',
-										mr: -1,
+										borderRadius: '13px',
+										mt: 1,
+										pb: 1,
+										pl: 2,
+										pr: 2,
+										mb: 1,
+										backgroundColor: '#a9d3ea',
 									}}
 									>
-										<CopyToClipboardButton value={message.content} color="#000000" />
+										<Box sx={{
+											display: 'flex',
+											justifyContent: 'flex-end',
+											mr: -1,
+										}}
+										>
+											<CopyToClipboardButton value={message.content} color="#000000" />
+										</Box>
+										<Box sx={{
+											mt: -4,
+										}}
+										>
+											<>
+												<MarkdownText>
+													{message.content}
+												</MarkdownText>
+												{message?.experimental_attachments
+													?.filter((attachment: Attachment | undefined) =>
+														attachment?.contentType?.startsWith('image/'),
+													)
+													.map((attachment: any, index: number) => (
+														<Card
+															key={`${message.id}-image-${index}`}
+															sx={{
+																maxHeight: 200,
+																borderRadius: '13px',
+																mr: 2,
+																mb: 1,
+																display: 'inline-block',
+																overflow: 'hidden',
+															}}
+														>
+															<Box
+																component="img"
+																sx={{
+																	maxHeight: 200,
+																	width: 'auto',
+																	height: 'auto',
+																	maxWidth: {
+																		xs: 350, // On extra-small devices
+																		sm: 1280, // On small devices and up
+																	},
+																}}
+																alt={attachment.name ?? `attachment-${index}`}
+																src={attachment.url}
+															/>
+														</Card>
+													))}
+												<Box sx={{ display: 'flex', flexDirection: 'row' }}>
+													{message?.experimental_attachments
+														?.filter((attachment: Attachment | undefined) =>
+															!attachment?.contentType?.startsWith('image/'),
+														)
+														.map((attachment: any, index: number) => (
+															<Box key={`${message.id}-file-${index}`} sx={{ display: 'flex' }}>
+																<Card
+																	sx={{
+																		maxWidth: 300,
+																		height: 35,
+																		position: 'relative',
+																		display: 'flex',
+																		alignItems: 'center',
+																		paddingRight: '10px',
+																		mr: 1,
+																		mb: 1,
+																		backgroundColor: '#a9eae0',
+																		borderRadius: '13px',
+																	}}
+																>
+																	<Box
+																		sx={{
+																			overflow: 'hidden',
+																			textOverflow: 'ellipsis',
+																			whiteSpace: 'nowrap',
+																			ml: 1,
+																			color: '#707070',
+																		}}
+																	>
+																		{attachment.name}
+																	</Box>
+																</Card>
+															</Box>
+														))}
+												</Box>
+											</>
+										</Box>
 									</Box>
+								</Grid>
+								:
+								<Grid item xs={12}>
 									<Box sx={{
-										mt: -4,
-									}}
-									>
-										<>
+										borderRadius: '13px',
+										pb: 1,
+										pl: 2,
+										pr: 2,
+										mt: 1,
+										mb: 1,
+										backgroundColor: '#d5d5d5',
+									}}>
+										<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+											<Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: '10px' }}>
+												<Chip
+													label={
+														message.annotations && message.annotations?.length > 0
+															// @ts-ignore
+															? models.find((model: string) => model.value === message.annotations[0].modelValue)?.label
+															: ''
+													}
+													variant="outlined"
+													size="small"
+													sx={{ fontSize: '0.70rem' }}
+												/>
+											</Box>
+											<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1 }}>
+												<CopyToClipboardButton value={message.content} color="#000000" />
+											</Box>
+										</Box>
+										<Box sx={{
+											mt: -2,
+										}}
+										>
 											<MarkdownText>
 												{message.content}
 											</MarkdownText>
-											{message?.experimental_attachments
-												?.filter((attachment: Attachment | undefined) =>
-													attachment?.contentType?.startsWith('image/'),
-												)
-												.map((attachment: any, index: number) => (
-													<Card
-														key={`${message.id}-image-${index}`}
-														sx={{
-															maxHeight: 200,
-															borderRadius: '13px',
-															mr: 2,
-															mb: 1,
-															display: 'inline-block',
-															overflow: 'hidden',
-														}}
-													>
-														<Box
-															component="img"
-															sx={{
-																maxHeight: 200,
-																width: 'auto',
-																height: 'auto',
-																maxWidth: {
-																	xs: 350, // On extra-small devices
-																	sm: 1280, // On small devices and up
-																},
-															}}
-															alt={attachment.name ?? `attachment-${index}`}
-															src={attachment.url}
-														/>
-													</Card>
-												))}
-											<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-												{message?.experimental_attachments
-													?.filter((attachment: Attachment | undefined) =>
-														!attachment?.contentType?.startsWith('image/'),
-													)
-													.map((attachment: any, index: number) => (
-														<Box key={`${message.id}-file-${index}`} sx={{ display: 'flex' }}>
-															<Card
-																sx={{
-																	maxWidth: 300,
-																	height: 35,
-																	position: 'relative',
-																	display: 'flex',
-																	alignItems: 'center',
-																	paddingRight: '10px',
-																	mr: 1,
-																	mb: 1,
-																	backgroundColor: '#a9eae0',
-																	borderRadius: '13px',
-																}}
-															>
-																<Box
-																	sx={{
-																		overflow: 'hidden',
-																		textOverflow: 'ellipsis',
-																		whiteSpace: 'nowrap',
-																		ml: 1,
-																		color: '#707070',
-																	}}
-																>
-																	{attachment.name}
-																</Box>
-															</Card>
-														</Box>
-													))}
-											</Box>
-										</>
-									</Box>
-								</Box>
-							</Grid>
-							:
-							<Grid item xs={12}>
-								<Box sx={{
-									borderRadius: '13px',
-									pb: 1,
-									pl: 2,
-									pr: 2,
-									mt: 1,
-									mb: 1,
-									backgroundColor: '#d5d5d5',
-								}}>
-									<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-										<Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: '10px' }}>
-											<Chip
-												label={
-													message.annotations && message.annotations?.length > 0
-														// @ts-ignore
-														? models.find((model: string) => model.value === message.annotations[0].modelValue)?.label
-														: ''
-												}
-												variant="outlined"
-												size="small"
-												sx={{ fontSize: '0.70rem' }}
-											/>
-										</Box>
-										<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1 }}>
-											<CopyToClipboardButton value={message.content} color="#000000" />
 										</Box>
 									</Box>
-									<Box sx={{
-										mt: -2,
-									}}
-									>
-										<MarkdownText>
-											{message.content}
-										</MarkdownText>
-									</Box>
-								</Box>
-							</Grid>
-						}
-					</div>
+								</Grid>
+							}
+						</div>
+					</AutoScrollingWindow>
 				))}
 				{error && (
 					<Grid item xs={12}>
@@ -185,6 +233,6 @@ export default function Completion({ messages, models, error }: CompletionProps)
 					</Grid>
 				)}
 			</div>
-		</AutoScrollingWindow>
+		</>
 	)
 }

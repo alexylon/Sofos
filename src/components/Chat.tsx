@@ -12,6 +12,8 @@ import { Model, ModelType, ReasoningEffort, SamplingParameter, Status } from '@/
 import MessagesContainer from '@/components/MessagesContainer';
 import ActionButton from '@/components/ActionButton';
 import SendMessageContainer from '@/components/SendMessageContainer';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { Button } from '@mui/material';
 
 
 const MAX_IMAGES = 5;
@@ -124,6 +126,7 @@ export default function Chat() {
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(reasoningEfforts[0].value);
 	const [hybridParameter, setHybridParameter] = useState<number>(hybridParameters[0].value);
+	const [isScrolling, setIsScrolling] = useState<boolean>(false);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
 	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
@@ -333,6 +336,14 @@ export default function Chat() {
 		setOpen(false);
 	};
 
+	const handleScroll = () => {
+		setIsScrolling(true);
+
+		setTimeout(() => {
+			setIsScrolling(false);
+		}, 2000);
+	}
+
 	// Callback to be executed after 'assistant' message is received
 	const onFinishCallback = () => {
 		if (!error) {
@@ -416,9 +427,35 @@ export default function Chat() {
 									hasAttachments={hasFiles || hasImages}
 									messages={messages}
 									models={models}
+									isScrolling={isScrolling}
+									handleScroll={handleScroll}
 									error={error}
 								/>
 								<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+								<Button
+									variant="outlined"
+									color="primary"
+									size="small"
+									onClick={() => handleScroll()}
+									sx={{
+										backgroundColor: 'rgba(255, 255, 255, 0.5)',
+										float: 'right',
+										right: 8,
+										width: "50px",
+										height: "26px",
+										borderRadius: '13px',
+										position: 'absolute',
+										bottom: 75,
+										borderColor: '#bfbfbf',
+										':hover': {
+											backgroundColor: '#fafafa',
+											borderColor: '#000000',
+										},
+								}}
+									disabled={messages.length < 1}
+								>
+									<ArrowDownwardIcon color="primary" sx={{ fontSize: 20 }} />
+								</Button>
 								<SendMessageContainer
 									hasImages={hasImages}
 									hasFiles={hasFiles}
