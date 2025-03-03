@@ -9,11 +9,11 @@ interface MessagesContainerProps {
 	messages: Message[],
 	models: Model[],
 	isScrolling: boolean,
-	handleScroll: any,
+	autoScroll: any,
 	error?: any,
 }
 
-const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, handleScroll, error }: MessagesContainerProps) => {
+const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, autoScroll, error }: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
 	const windowHeight = window.innerHeight;
 
@@ -58,7 +58,7 @@ const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, hand
 							messages={messages}
 							models={models}
 							isScrolling={isScrolling}
-							handleScroll={handleScroll}
+							autoScroll={autoScroll}
 							error={error}
 						/>
 					</Box>

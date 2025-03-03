@@ -11,11 +11,11 @@ interface CompletionProps {
 	messages?: Message[],
 	models: Model[],
 	isScrolling: boolean,
-	handleScroll: any,
+	autoScroll: any,
 	error?: any,
 }
 
-export default function Completion({ messages, models, isScrolling, handleScroll, error }: CompletionProps) {
+export default function Completion({ messages, models, isScrolling, autoScroll, error }: CompletionProps) {
 	const isLastMessageFromUser = messages && messages.length > 0 && messages[messages.length - 1].role === 'user';
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [containerHeight, setContainerHeight] = useState<number | 'auto'>('auto');
@@ -31,13 +31,12 @@ export default function Completion({ messages, models, isScrolling, handleScroll
 				const lastUserMessage = userMessages[userMessages.length - 1];
 				const firstUserMessageRect = firstUserMessage.getBoundingClientRect();
 				const lastUserMessageRect = lastUserMessage.getBoundingClientRect();
-				const userMessagesHeight = lastUserMessageRect.bottom - firstUserMessageRect.top;
-				const containerHeight = containerRef.current.getBoundingClientRect().height;
-				const chatHeight = windowHeight > 1000 ? windowHeight - 250 : windowHeight + 87;
+				const firstToLastUserMessageHeight = lastUserMessageRect.bottom - firstUserMessageRect.top;
+				const offsetHeight = windowHeight > 1000 ? windowHeight - 250 : windowHeight + 87;
 
-				if (isLastMessageFromUser && (containerHeight - userMessagesHeight) < chatHeight && messages && messages.length > 1) {
-					setContainerHeight(containerHeight + chatHeight - (containerHeight - userMessagesHeight));
-					handleScroll();
+				if (isLastMessageFromUser && messages && messages.length > 1) {
+					setContainerHeight(firstToLastUserMessageHeight + offsetHeight);
+					autoScroll();
 				}
 			}
 		};
@@ -48,8 +47,7 @@ export default function Completion({ messages, models, isScrolling, handleScroll
 	return (
 		<>
 			<div
-				ref={containerRef}  // Make sure this ref is here
-				data-testid="messages-container"
+				ref={containerRef}
 				style={{
 					minHeight: typeof containerHeight === 'number' ? `${containerHeight}px` : containerHeight,
 					height: 'auto',

@@ -216,7 +216,7 @@ export default function Chat() {
 		}
 
 		// Capture all scroll events across the entire viewport
-		const handleScroll = (event: WheelEvent) => {
+		const autoScroll = (event: WheelEvent) => {
 			const grid = scrollableGridRef.current as HTMLDivElement | null;
 
 			// Check if the scrollableGridRef is currently in the viewport
@@ -230,10 +230,10 @@ export default function Chat() {
 			}
 		};
 
-		window.addEventListener('wheel', handleScroll, { passive: false });
+		window.addEventListener('wheel', autoScroll, { passive: false });
 
 		return () => {
-			window.removeEventListener('wheel', handleScroll);
+			window.removeEventListener('wheel', autoScroll);
 		};
 	}, []);
 
@@ -336,7 +336,7 @@ export default function Chat() {
 		setOpen(false);
 	};
 
-	const handleScroll = () => {
+	const autoScroll = () => {
 		setIsScrolling(true);
 
 		setTimeout(() => {
@@ -428,7 +428,7 @@ export default function Chat() {
 									messages={messages}
 									models={models}
 									isScrolling={isScrolling}
-									handleScroll={handleScroll}
+									autoScroll={autoScroll}
 									error={error}
 								/>
 								<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
@@ -436,7 +436,7 @@ export default function Chat() {
 									variant="outlined"
 									color="primary"
 									size="small"
-									onClick={() => handleScroll()}
+									onClick={() => autoScroll()}
 									sx={{
 										backgroundColor: 'rgba(255, 255, 255, 0.5)',
 										float: 'right',
