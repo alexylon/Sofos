@@ -31,12 +31,12 @@ const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, auto
 				sx={{
 					height: hasAttachments
 						? {
-							xs: (windowHeight - 234), // On extra-small devices
-							sm: (windowHeight - 234), // On small devices and up
+							xs: 'calc (89vh - 138px)', // On extra-small devices
+							sm: 'calc (93vh - 142px)', // On small devices and up
 						}
 						: {
-							xs: (windowHeight - 160), // On extra-small devices
-							sm: (windowHeight - 160), // On small devices and up
+							xs: 'calc (89vh - 62px)', // On extra-small devices
+							sm: 'calc (93vh - 65px)', // On small devices and up
 						},
 					overflow: 'auto',
 					width: '100%',
