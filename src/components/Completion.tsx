@@ -33,7 +33,7 @@ export default function Completion({ messages, models, isScrolling, handleScroll
 				const lastUserMessageRect = lastUserMessage.getBoundingClientRect();
 				const userMessagesHeight = lastUserMessageRect.bottom - firstUserMessageRect.top;
 				const containerHeight = containerRef.current.getBoundingClientRect().height;
-				const chatHeight = windowHeight > 1000 ? windowHeight - 250 : windowHeight + 88;
+				const chatHeight = windowHeight > 1000 ? windowHeight - 250 : windowHeight + 87;
 
 				if (isLastMessageFromUser && (containerHeight - userMessagesHeight) < chatHeight && messages && messages.length > 1) {
 					setContainerHeight(containerHeight + chatHeight - (containerHeight - userMessagesHeight));
