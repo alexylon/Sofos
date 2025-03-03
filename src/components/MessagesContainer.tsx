@@ -16,7 +16,6 @@ interface MessagesContainerProps {
 const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, handleScroll, error }: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
 	const windowHeight = window.innerHeight;
-	console.log('windowHeight', windowHeight)
 
 	return (
 		<Grid
@@ -32,11 +31,11 @@ const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, hand
 				sx={{
 					height: hasAttachments
 						? {
-							xs: (windowHeight - 274), // On extra-small devices
+							xs: (windowHeight - 234), // On extra-small devices
 							sm: (windowHeight - 234), // On small devices and up
 						}
 						: {
-							xs: (windowHeight - 200), // On extra-small devices
+							xs: (windowHeight - 160), // On extra-small devices
 							sm: (windowHeight - 160), // On small devices and up
 						},
 					overflow: 'auto',
