@@ -33,7 +33,7 @@ export default function Completion({ messages, models, isScrolling, handleScroll
 				const lastUserMessageRect = lastUserMessage.getBoundingClientRect();
 				const userMessagesHeight = lastUserMessageRect.bottom - firstUserMessageRect.top;
 				const containerHeight = containerRef.current.getBoundingClientRect().height;
-				const chatHeight = windowHeight > 1000 ? windowHeight - 242 : windowHeight + 100;
+				const chatHeight = windowHeight > 1000 ? windowHeight - 250 : windowHeight + 92;
 
 				if (isLastMessageFromUser && (containerHeight - userMessagesHeight) < chatHeight && messages && messages.length > 1) {
 					setContainerHeight(containerHeight + chatHeight - (containerHeight - userMessagesHeight));
@@ -51,11 +51,8 @@ export default function Completion({ messages, models, isScrolling, handleScroll
 				ref={containerRef}  // Make sure this ref is here
 				data-testid="messages-container"
 				style={{
-					minHeight: 'auto',
-					height: typeof containerHeight === 'number' ? `${containerHeight}px` : containerHeight,
-					msOverflowStyle: 'none',
-					scrollbarWidth: 'none',
-					overflow: 'auto'
+					minHeight: typeof containerHeight === 'number' ? `${containerHeight}px` : containerHeight,
+					height: 'auto',
 				}}
 			>
 				{messages?.map((message: Message) => (
