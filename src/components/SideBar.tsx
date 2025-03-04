@@ -11,21 +11,21 @@ import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
 import { signOut } from "next-auth/react"
-import { Message } from 'ai';
+import { Message } from '@ai-sdk/react'
 import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 
 interface SideBarProps {
-	messages: Message[],
-	setMessages: any,
-	chatHistory: Message[][],
-	setChatHistory: any,
-	currentChatIndex: number,
-	setCurrentChatIndex: any,
-	setModel: any,
-	open: any,
-	handleStartNewChat: any,
-	saveChatHistoryToLocalStorage: any,
+	messages: Message[];
+	setMessages: (messages: Message[]) => void;
+	chatHistory: Message[][];
+	setChatHistory: (history: Message[][]) => void;
+	currentChatIndex: number;
+	setCurrentChatIndex: (index: number) => void;
+	setModel: (model: string) => void;
+	open: boolean;
+	handleStartNewChat: () => void;
+	saveChatHistoryToLocalStorage: (history: Message[][]) => void;
 }
 
 const formattedDate = (dateString: Date | undefined): string => {

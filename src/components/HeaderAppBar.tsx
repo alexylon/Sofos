@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react';
 import { AppBar, Box, Button, Grid, IconButton, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -8,7 +6,7 @@ import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
 import { Model, ModelType, ReasoningEffort, SamplingParameter } from '@/types/types';
 import { useRouter } from 'next/navigation'
-import { Message } from 'ai';
+import { Message } from '@ai-sdk/react'
 import SideBar from '@/components/SideBar';
 
 interface HeaderAppBarProps {

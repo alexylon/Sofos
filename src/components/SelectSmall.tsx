@@ -1,15 +1,16 @@
 import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
+import { ReactNode } from 'react';
 
 interface SelectSmallProps {
-	options: Model[] | SamplingParameter[] | ReasoningEffort[],
-	handleChange: any,
-	value: string | number,
-	style?: any,
-	disabled?: boolean,
+	options: Model[] | SamplingParameter[] | ReasoningEffort[];
+	handleChange: (event: SelectChangeEvent<string | number>, child: ReactNode) => void;
+	value: string | number;
+	style?: React.CSSProperties;
+	disabled?: boolean;
 }
 
 export default function SelectSmall({ options, handleChange, value, style, disabled }: SelectSmallProps) {

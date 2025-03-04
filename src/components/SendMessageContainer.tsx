@@ -5,22 +5,28 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import ArrowCircleUpOutlinedIcon from '@mui/icons-material/ArrowCircleUpOutlined';
 import { styled } from '@mui/material/styles';
 import AttachmentsContainer from '@/components/AttachmentsContainer';
+import { Message } from '@ai-sdk/react'
+import ActionButton from '@/components/ActionButton';
+import { useMediaQuery } from 'react-responsive';
 
 interface SendMessageContainerProps {
-	hasImages: boolean,
-	hasFiles: boolean,
-	images: File[],
-	files: File[],
-	isDisabled: boolean,
-	handleRemoveImage: any,
-	handleRemoveFile: any,
-	input: string,
-	handleInputChange: any,
-	onSubmit: any,
-	handleFilesChange: any,
-	isUploadDisabled: boolean,
-	isLoading: boolean,
-	error?: any,
+	hasImages: boolean;
+	hasFiles: boolean;
+	images: File[];
+	files: File[];
+	isDisabled: boolean;
+	handleRemoveImage: (index: number) => void;
+	handleRemoveFile: (index: number) => void;
+	input: string;
+	handleInputChange: any;
+	onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+	handleFilesChange: any;
+	isUploadDisabled: boolean;
+	isLoading: boolean;
+	messages: Message[];
+	reload: () => void;
+	stop: () => void;
+	error?: Error;
 }
 
 const SendMessageContainer = ({
@@ -37,11 +43,15 @@ const SendMessageContainer = ({
 								  handleFilesChange,
 								  isUploadDisabled,
 								  isLoading,
+								  messages,
+								  reload,
+								  stop,
 							  }: SendMessageContainerProps) => {
 	const textFieldRef = useRef<HTMLInputElement>(null);
+	const isMobile = useMediaQuery({ maxWidth: 767 });
 
 	useEffect(() => {
-		if (!isLoading && textFieldRef.current) {
+		if (!isLoading && textFieldRef.current && !isMobile) {
 			textFieldRef.current.focus();
 		}
 	}, [isLoading]);
@@ -153,24 +163,28 @@ const SendMessageContainer = ({
 										/>
 									</IconButton>
 								),
-								endAdornment: !isDisabled && input && (
+								endAdornment: (
 									<InputAdornment position="end">
-										<IconButton
-											edge="end"
-											color="primary"
-											onClick={(event: any) => {
+										{
+											!isDisabled && input &&
+												<IconButton
+													edge="end"
+													color="primary"
+													onClick={(event: any) => {
 												if (!!input?.trim()) {
 													onSubmit(event);
 												}
 											}}
-										>
-											<ArrowCircleUpOutlinedIcon
-												sx={{
-													height: '30px',
-													width: '30px',
-												}}
-											/>
-										</IconButton>
+												>
+													<ArrowCircleUpOutlinedIcon
+														sx={{
+															height: '30px',
+															width: '30px',
+											 			}}
+													/>
+												</IconButton>
+										}
+										<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
 									</InputAdornment>
 								),
 							}}

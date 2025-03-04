@@ -1,19 +1,17 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Message } from 'ai';
 import Box from '@mui/material/Box';
-import { useChat } from '@ai-sdk/react'
+import { useChat, Message } from '@ai-sdk/react'
 import { useSession } from "next-auth/react"
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Model, ModelType, ReasoningEffort, SamplingParameter, Status } from '@/types/types';
 import MessagesContainer from '@/components/MessagesContainer';
-import ActionButton from '@/components/ActionButton';
 import SendMessageContainer from '@/components/SendMessageContainer';
+import { IconButton } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { Button } from '@mui/material';
 
 
 const MAX_IMAGES = 5;
@@ -132,6 +130,7 @@ export default function Chat() {
 	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
 	const [currentChatIndex, setCurrentChatIndex] = useState<number>(-1);
 	const [open, setOpen] = useState(false);
+	const [distanceFromBottom, setDistanceFromBottom] = useState<number | null>(null);
 
 	const {
 		input,
@@ -150,7 +149,7 @@ export default function Chat() {
 			keepLastMessageOnError: true,
 			body: { model, samplingParameter, reasoningEffort, hybridParameter },
 			onFinish: (message) => {
-				onFinishCallback();
+				onFinishCallback(message);
 			},
 			// Prevent "Maximum update depth exceeded" error
 			experimental_throttle: 50,
@@ -345,7 +344,7 @@ export default function Chat() {
 	}
 
 	// Callback to be executed after 'assistant' message is received
-	const onFinishCallback = () => {
+	const onFinishCallback = (message: Message) => {
 		if (!error) {
 			const isNewChat = currentChatIndex === -1;
 			const index = isNewChat ? chatHistory.length : currentChatIndex;
@@ -358,6 +357,9 @@ export default function Chat() {
 			// Update chat history in the state and local storage
 			setMessages((prevMessages: Message[]): Message[] => {
 				const updatedMessages: Message[] = [...prevMessages];
+				// For some reason the last assistant message is incomplete after
+				// importing 'useChat' from '@ai-sdk/react' instead of 'ai'
+				updatedMessages[updatedMessages.length - 1] = message;
 
 				if (updatedMessages && updatedMessages.length > 0) {
 					// Update chat history in the state and local storage
@@ -405,74 +407,79 @@ export default function Chat() {
 				isLoading={isLoading}
 			/>
 			{user &&
-							<Box
-								className="chatContainer"
-								sx={{
-					maxWidth: 1200,
-					marginLeft: "auto",
-					marginRight: "auto",
-					display: 'flex',
-					flexDirection: 'column',
-					justifyContent: 'space-between',
-					overflow: 'hidden',
-					mt: '40px',
-					pb: 5,
-					height: {
-						xs: 'calc(91vh - 60px)', // On extra-small devices
-						sm: 'calc(94vh - 60px)', // On small devices and up
-					},
-					position: 'relative',
-				}}>
-								<MessagesContainer
-									hasAttachments={hasFiles || hasImages}
-									messages={messages}
-									models={models}
-									isScrolling={isScrolling}
-									autoScroll={autoScroll}
-									error={error}
-								/>
-								<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
-								<Button
-									variant="outlined"
-									color="primary"
-									size="small"
-									onClick={() => autoScroll()}
+					<Box
+						className="chatContainer"
+						sx={{
+							maxWidth: 1200,
+							marginLeft: "auto",
+							marginRight: "auto",
+							display: 'flex',
+							flexDirection: 'column',
+							justifyContent: 'space-between',
+							overflow: 'hidden',
+							mt: '40px',
+							pb: 5,
+							height: {
+								xs: 'calc(91vh - 60px)', // On extra-small devices
+								sm: 'calc(94vh - 60px)', // On small devices and up
+							},
+							position: 'relative',
+							}}
+					>
+						<MessagesContainer
+							hasAttachments={hasFiles || hasImages}
+							messages={messages}
+							models={models}
+							isScrolling={isScrolling}
+							autoScroll={autoScroll}
+							setDistanceFromBottom={setDistanceFromBottom}
+							error={error}
+						/>
+						{distanceFromBottom && distanceFromBottom < 100 &&
+							<IconButton
+								edge="end"
+								color="primary"
+								onClick={() => autoScroll()}
+							>
+								<ArrowDownwardIcon
 									sx={{
-										backgroundColor: 'rgba(255, 255, 255, 0.5)',
-										float: 'right',
-										right: 8,
-										width: "50px",
-										height: "26px",
-										borderRadius: '13px',
+										height: '20px',
+										width: '20px',
+										left: '50%',
+										transform: 'translateX(-50%)',
 										position: 'absolute',
-										bottom: 75,
-										borderColor: '#bfbfbf',
-										':hover': {
-											backgroundColor: '#fafafa',
-											borderColor: '#000000',
-										},
-								}}
-									disabled={messages.length < 1}
-								>
-									<ArrowDownwardIcon color="primary" sx={{ fontSize: 20 }} />
-								</Button>
-								<SendMessageContainer
-									hasImages={hasImages}
-									hasFiles={hasFiles}
-									images={images}
-									files={files}
-									isDisabled={isDisabled}
-									handleRemoveImage={handleRemoveImage}
-									handleRemoveFile={handleRemoveFile}
-									input={input}
-									handleInputChange={handleInputChange}
-									onSubmit={onSubmit}
-									handleFilesChange={handleFilesChange}
-									isUploadDisabled={model.type === ModelType.REASONING}
-									isLoading={isLoading}
-									error={error}
+										bottom: 30,
+										color: 'white',
+										backgroundColor: 'rgba(82, 82, 82, 0.7)',
+										borderRadius: '50%',
+										padding: '10px',
+										'&:hover': {
+											backgroundColor: 'rgba(64, 64, 64, 0.7)',
+										}
+									}}
 								/>
-							</Box>
+							</IconButton>
+						}
+						<SendMessageContainer
+							hasImages={hasImages}
+							hasFiles={hasFiles}
+							images={images}
+							files={files}
+							isDisabled={isDisabled}
+							handleRemoveImage={handleRemoveImage}
+							handleRemoveFile={handleRemoveFile}
+							input={input}
+							handleInputChange={handleInputChange}
+							onSubmit={onSubmit}
+							handleFilesChange={handleFilesChange}
+							isUploadDisabled={model.type === ModelType.REASONING}
+							isLoading={isLoading}
+							messages={messages}
+							reload={reload}
+							stop={stop}
+							error={error}
+						/>
+					</Box>
 			}
 		</div>
 	);

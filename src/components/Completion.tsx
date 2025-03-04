@@ -3,22 +3,26 @@ import { Grid, Box, Chip, Card } from "@mui/material";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton';
-import { Attachment, Message } from 'ai';
+import { Attachment } from 'ai';
+import { Message } from '@ai-sdk/react'
 import { Model } from '@/types/types';
+import { useMediaQuery } from 'react-responsive';
 
 
 interface CompletionProps {
 	messages?: Message[],
 	models: Model[],
 	isScrolling: boolean,
-	autoScroll: any,
-	error?: any,
+	autoScroll: () => void,
+	setDistanceFromBottom: (n: number) => void,
+	error?: Error,
 }
 
-export default function Completion({ messages, models, isScrolling, autoScroll, error }: CompletionProps) {
+export default function Completion({ messages, models, isScrolling, autoScroll, setDistanceFromBottom, error }: CompletionProps) {
 	const isLastMessageFromUser = messages && messages.length > 0 && messages[messages.length - 1].role === 'user';
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [containerHeight, setContainerHeight] = useState<number | 'auto'>('auto');
+	const isMobile = useMediaQuery({ maxWidth: 767 });
 
 	useEffect(() => {
 		const calculateDistance = () => {
@@ -32,7 +36,7 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 				const firstUserMessageRect = firstUserMessage.getBoundingClientRect();
 				const lastUserMessageRect = lastUserMessage.getBoundingClientRect();
 				const firstToLastUserMessageHeight = lastUserMessageRect.bottom - firstUserMessageRect.top;
-				const offsetHeight = windowHeight > 1000 ? windowHeight - 250 : windowHeight + 87;
+				const offsetHeight = isMobile ? windowHeight + 83 : windowHeight - 254;
 
 				if (isLastMessageFromUser && messages && messages.length > 1) {
 					setContainerHeight(firstToLastUserMessageHeight + offsetHeight);
@@ -43,6 +47,37 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 
 		calculateDistance();
 	}, [isLastMessageFromUser]);
+
+	// Determine if the autoscroll button should be displayed by calculating the last assistant message distance from the bottom
+	useEffect(() => {
+		const calculateDistanceFromBottom = () => {
+			if (containerRef.current) {
+				const assistantMessages = containerRef.current.querySelectorAll('[data-role="assistant"]');
+				const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
+
+				if (lastAssistantMessage) {
+					const rect = lastAssistantMessage.getBoundingClientRect();
+					const windowHeight = window.innerHeight;
+					const distanceFromBottom = windowHeight - rect.bottom;
+
+					setDistanceFromBottom(distanceFromBottom);
+				}
+			}
+		};
+
+		calculateDistanceFromBottom();
+
+		const handleScroll = () => {
+			calculateDistanceFromBottom();
+		};
+
+		window.addEventListener('scroll', handleScroll, true); // true for capture phase
+
+		return () => {
+			window.removeEventListener('scroll', handleScroll, true);
+		};
+	}, [messages]);
+
 
 	return (
 		<>

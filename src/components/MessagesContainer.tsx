@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
-import { Message } from 'ai';
+import { Message } from '@ai-sdk/react'
 import { Model } from '@/types/types';
 
 interface MessagesContainerProps {
@@ -9,13 +9,21 @@ interface MessagesContainerProps {
 	messages: Message[],
 	models: Model[],
 	isScrolling: boolean,
-	autoScroll: any,
-	error?: any,
+	autoScroll: () => void,
+	setDistanceFromBottom: (n: number) => void,
+	error?: Error,
 }
 
-const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, autoScroll, error }: MessagesContainerProps) => {
+const MessagesContainer = ({
+							   hasAttachments,
+							   messages,
+							   models,
+							   isScrolling,
+							   autoScroll,
+							   setDistanceFromBottom,
+							   error
+}: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
-	const windowHeight = window.innerHeight;
 
 	return (
 		<Grid
@@ -59,6 +67,7 @@ const MessagesContainer = ({ hasAttachments, messages, models, isScrolling, auto
 							models={models}
 							isScrolling={isScrolling}
 							autoScroll={autoScroll}
+							setDistanceFromBottom={setDistanceFromBottom}
 							error={error}
 						/>
 					</Box>
