@@ -9,9 +9,25 @@ export async function POST(req: Request) {
 	// Extract the data from the body of the request
 	const { messages, model, samplingParameter, reasoningEffort, hybridParameter } = await req.json();
 
-	const modelName = model.provider === 'anthropic'
-		? anthropic(model.value)
-		: openai(model.value);
+	let modelName;
+	let tools;
+
+	if (model.provider === 'anthropic') {
+		modelName = anthropic(model.value);
+	} else if (model.provider === 'openAI' && (model.value === 'gpt-4o' || model.value === 'gpt-4o-mini')) {
+		modelName = openai.responses(model.value);
+		tools = {
+			web_search_preview: openai.tools.webSearchPreview({
+				// optional configuration:
+				searchContextSize: 'high',
+				userLocation: {
+					type: 'approximate',
+				},
+			}),
+		};
+	} else {
+		modelName = openai(model.value);
+	}
 
 	let providerOptions;
 	let temperature = samplingParameter;
@@ -49,9 +65,13 @@ export async function POST(req: Request) {
 		const result: StreamTextResult<any, any> = streamText({
 			model: modelName,
 			messages: convertToCoreMessages(messages),
+			system: `When presenting any code examples (in any programming language) or data tables in your responses, always format them using markdown code blocks. 
+					For code, use triple backticks (\`\`\`) at the beginning and end of the code block, and specify the language when applicable for proper syntax highlighting (e.g., \`\`\`python, \`\`\`javascript, \`\`\`rust). 
+					For tables, also enclose them within triple backticks (e.g., \`\`\`markdown). Never present code or tables as plain text without proper markdown formatting.`,
 			temperature,
 			topP,
 			providerOptions,
+			tools,
 			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response }) {
 				// implement your own logic here, e.g. for storing messages
 				// or recording token usage
