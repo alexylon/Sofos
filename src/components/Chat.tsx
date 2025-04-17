@@ -43,14 +43,14 @@ const models: Model[] = [
 		type: ModelType.STANDARD,
 	},
 	{
-		value: 'o1',
-		label: 'o1',
+		value: 'o3',
+		label: 'o3',
 		provider: 'openAI',
 		type: ModelType.REASONING,
 	},
 	{
-		value: 'o3-mini',
-		label: 'o3-mini',
+		value: 'o4-mini',
+		label: 'o4-mini',
 		provider: 'openAI',
 		type: ModelType.REASONING,
 	},
