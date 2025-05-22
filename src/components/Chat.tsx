@@ -19,20 +19,20 @@ const MAX_FILES = 5;
 
 const models: Model[] = [
 	{
-		value: 'gpt-4o',
-		label: 'GPT-4o',
+		value: 'gpt-4.1',
+		label: 'GPT-4.1',
 		provider: 'openAI',
 		type: ModelType.STANDARD,
 	},
 	{
-		value: 'gpt-4o-mini',
-		label: 'GPT-4o mini',
+		value: 'gpt-4.1-mini',
+		label: 'GPT-4.1 mini',
 		provider: 'openAI',
 		type: ModelType.STANDARD,
 	},
 	{
-		value: 'claude-3-7-sonnet-latest',
-		label: 'Claude 3.7 Sonnet',
+		value: 'claude-sonnet-4-0',
+		label: 'Claude Sonnet 4',
 		provider: 'anthropic',
 		type: ModelType.HYBRID,
 	},
@@ -41,6 +41,12 @@ const models: Model[] = [
 		label: 'Claude 3.5 Haiku',
 		provider: 'anthropic',
 		type: ModelType.STANDARD,
+	},
+	{
+		value: 'claude-opus-4-0',
+		label: 'Claude Opus 4',
+		provider: 'anthropic',
+		type: ModelType.HYBRID,
 	},
 	{
 		value: 'o3',

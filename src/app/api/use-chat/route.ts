@@ -14,7 +14,7 @@ export async function POST(req: Request) {
 
 	if (model.provider === 'anthropic') {
 		modelName = anthropic(model.value);
-	} else if (model.provider === 'openAI' && (model.value === 'gpt-4o' || model.value === 'gpt-4o-mini')) {
+	} else if (model.provider === 'openAI' && (model.value === 'gpt-4.1' || model.value === 'gpt-4.1-mini')) {
 		modelName = openai.responses(model.value);
 		tools = {
 			web_search_preview: openai.tools.webSearchPreview({
