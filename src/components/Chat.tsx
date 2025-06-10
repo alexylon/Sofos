@@ -55,6 +55,12 @@ const models: Model[] = [
 		type: ModelType.REASONING,
 	},
 	{
+		value: 'o3-pro',
+		label: 'o3-pro',
+		provider: 'openAI',
+		type: ModelType.REASONING,
+	},
+	{
 		value: 'o4-mini',
 		label: 'o4-mini',
 		provider: 'openAI',
@@ -478,7 +484,7 @@ export default function Chat() {
 							handleInputChange={handleInputChange}
 							onSubmit={onSubmit}
 							handleFilesChange={handleFilesChange}
-							isUploadDisabled={model.type === ModelType.REASONING}
+							isUploadDisabled={false}
 							isLoading={isLoading}
 							messages={messages}
 							reload={reload}
