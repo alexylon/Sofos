@@ -446,7 +446,7 @@ export default function Chat() {
 							setDistanceFromBottom={setDistanceFromBottom}
 							error={error}
 						/>
-						{distanceFromBottom && distanceFromBottom < 100 &&
+						{distanceFromBottom && distanceFromBottom < 80 &&
 							<IconButton
 								edge="end"
 								color="primary"

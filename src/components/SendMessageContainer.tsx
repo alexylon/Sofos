@@ -47,13 +47,22 @@ const SendMessageContainer = ({
 								  reload,
 								  stop,
 							  }: SendMessageContainerProps) => {
-	const textFieldRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
 	const isMobile = useMediaQuery({ maxWidth: 767 });
 
 	useEffect(() => {
-		if (!isLoading && textFieldRef.current && !isMobile) {
-			textFieldRef.current.focus();
+		if (isLoading || !inputRef.current || isMobile) {
+			return;
 		}
+
+		const element = inputRef.current;
+		const timeout = setTimeout(() => {
+			element.focus();
+		}, 100);
+
+		return () => {
+			clearTimeout(timeout);
+		};
 	}, [isLoading]);
 
 	const VisuallyHiddenInput = styled('input')({
@@ -96,7 +105,7 @@ const SendMessageContainer = ({
 							handleRemoveFile={handleRemoveFile}
 						/>
 						<TextField
-							inputRef={textFieldRef}
+							inputRef={inputRef}
 							fullWidth
 							id="user-input"
 							label={!isDisabled && !input ? "Send a message..." : ""}
