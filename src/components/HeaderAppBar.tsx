@@ -70,7 +70,12 @@ export default function HeaderAppBar({
 	const handleStartNewChat = () => {
 		setMessages([]);
 		setCurrentChatIndex(-1);
-		localStorage.setItem('sofosCurrentChatIndex', (-1).toString());
+
+		try {
+			localStorage.setItem('sofosCurrentChatIndex', (-1).toString());
+		} catch (error) {
+			console.error('Error saving current chat index to localStorage:', error);
+		}
 
 		router.push('/new');
 	};

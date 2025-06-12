@@ -89,14 +89,24 @@ const SideBar = ({
 	const handleSelectChat = (chatIndex: number) => {
 		setMessages(chatHistory[chatIndex]);
 		setCurrentChatIndex(chatIndex);
-		localStorage.setItem('sofosCurrentChatIndex', chatIndex.toString());
+
+		try {
+			localStorage.setItem('sofosCurrentChatIndex', chatIndex.toString());
+		} catch (error) {
+			console.error('Error saving current chat index to localStorage:', error);
+		}
 
 		// @ts-ignore
 		const model = chatHistory[chatIndex][chatHistory[chatIndex].length - 1].name;
 
 		if (model) {
 			setModel(model);
-			localStorage.setItem('sofosModel', model);
+
+			try {
+				localStorage.setItem('sofosModel', model);
+			} catch (error) {
+				console.error('Error saving model to localStorage:', error);
+			}
 		}
 	};
 
@@ -112,7 +122,12 @@ const SideBar = ({
 
 		if (index < currentChatIndex) {
 			setCurrentChatIndex(currentChatIndex - 1);
-			localStorage.setItem('sofosCurrentChatIndex', (currentChatIndex - 1).toString());
+
+			try {
+				localStorage.setItem('sofosCurrentChatIndex', (currentChatIndex - 1).toString());
+			} catch (error) {
+				console.error('Error saving current chat index to localStorage:', error);
+			}
 		}
 	};
 

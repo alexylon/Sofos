@@ -7,127 +7,42 @@ import { useSession } from "next-auth/react"
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { Model, ModelType, ReasoningEffort, SamplingParameter, Status } from '@/types/types';
+import { Model, Status } from '@/types/types';
 import MessagesContainer from '@/components/MessagesContainer';
 import SendMessageContainer from '@/components/SendMessageContainer';
 import { IconButton } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-
-
-const MAX_IMAGES = 5;
-const MAX_FILES = 5;
-
-const models: Model[] = [
-	{
-		value: 'gpt-4.1',
-		label: 'GPT-4.1',
-		provider: 'openAI',
-		type: ModelType.STANDARD,
-	},
-	{
-		value: 'gpt-4.1-mini',
-		label: 'GPT-4.1 mini',
-		provider: 'openAI',
-		type: ModelType.STANDARD,
-	},
-	{
-		value: 'claude-sonnet-4-0',
-		label: 'Claude Sonnet 4',
-		provider: 'anthropic',
-		type: ModelType.HYBRID,
-	},
-	{
-		value: 'claude-3-5-haiku-latest',
-		label: 'Claude 3.5 Haiku',
-		provider: 'anthropic',
-		type: ModelType.STANDARD,
-	},
-	{
-		value: 'claude-opus-4-0',
-		label: 'Claude Opus 4',
-		provider: 'anthropic',
-		type: ModelType.HYBRID,
-	},
-	{
-		value: 'o3',
-		label: 'o3',
-		provider: 'openAI',
-		type: ModelType.REASONING,
-	},
-	{
-		value: 'o3-pro',
-		label: 'o3-pro',
-		provider: 'openAI',
-		type: ModelType.REASONING,
-	},
-	{
-		value: 'o4-mini',
-		label: 'o4-mini',
-		provider: 'openAI',
-		type: ModelType.REASONING,
-	},
-];
-
-const samplingParameters: SamplingParameter[] = [
-	{
-		value: 0.2,
-		label: 'Focused',
-	},
-	{
-		value: 0.5,
-		label: 'Balanced',
-	},
-	{
-		value: 0.7,
-		label: 'Creative',
-	},
-];
-
-const reasoningEfforts: ReasoningEffort[] = [
-	{
-		value: 'low',
-		label: 'Low',
-	},
-	{
-		value: 'medium',
-		label: 'Medium',
-	},
-	{
-		value: 'high',
-		label: 'High',
-	},
-];
-
-const hybridParameters: SamplingParameter[] = [
-	...samplingParameters,
-	{
-		value: 12000,
-		label: 'Low',
-	},
-	{
-		value: 24000,
-		label: 'Medium',
-	},
-	{
-		value: 36000,
-		label: 'High',
-	},
-];
-
+import {
+	MAX_IMAGES,
+	MAX_FILES,
+	models,
+	samplingParameters,
+	reasoningEfforts,
+	hybridParameters
+} from '@/components/utils/constants';
 
 const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
 	if (chatHistory) {
 		const filteredChatHistory = chatHistory.filter(chat => chat !== null && chat !== undefined);
 
-		localStorage.setItem(
-			'sofosChatHistory',
-			JSON.stringify(filteredChatHistory, (key, value) => {
-				if (key === 'createdAt' && value instanceof Date) {
-					return value.toISOString();
-				}
-				return value;
-			})
-		);
+		try {
+			localStorage.setItem(
+				'sofosChatHistory',
+				JSON.stringify(filteredChatHistory, (key, value) => {
+					if (key === 'createdAt' && value instanceof Date) {
+						return value.toISOString();
+					}
+
+					if (key === 'experimental_attachments' && value) {
+						value = null;
+					}
+
+					return value;
+				})
+			);
+		} catch (error) {
+			console.error('Error saving chat history to localStorage:', error);
+		}
 	}
 };
 
@@ -314,7 +229,12 @@ export default function Chat() {
 
 		if (modelValue) {
 			setModel(modelValue);
-			localStorage.setItem('sofosModel', value);
+
+			try {
+				localStorage.setItem('sofosModel', value);
+			} catch (error) {
+				console.error('Error saving model to localStorage:', error);
+			}
 		}
 	};
 
@@ -322,19 +242,34 @@ export default function Chat() {
 		const { value } = event.target;
 
 		setSamplingParameter(Number(value));
-		localStorage.setItem('sofosSamplingParameter', value);
+
+		try {
+			localStorage.setItem('sofosSamplingParameter', value);
+		} catch (error) {
+			console.error('Error saving sampling parameter to localStorage:', error);
+		}
 	};
 
 	const handleReasoningEffortChange = (event: SelectChangeEvent) => {
 		setReasoningEffort(event.target.value);
-		localStorage.setItem('sofosReasoningEffort', event.target.value);
+
+		try {
+			localStorage.setItem('sofosReasoningEffort', event.target.value);
+		} catch (error) {
+			console.error('Error saving reasoning effort to localStorage:', error);
+		}
 	};
 
 	const handleHybridParameterChange = (event: SelectChangeEvent) => {
 		const { value } = event.target;
 
 		setHybridParameter(Number(value));
-		localStorage.setItem('sofosHybridParameter', value);
+
+		try {
+			localStorage.setItem('sofosHybridParameter', value);
+		} catch (error) {
+			console.error('Error saving hybrid parameter to localStorage:', error);
+		}
 	};
 
 
@@ -362,7 +297,12 @@ export default function Chat() {
 
 			if (isNewChat) {
 				setCurrentChatIndex(index);
-				localStorage.setItem('sofosCurrentChatIndex', (index).toString());
+
+				try {
+					localStorage.setItem('sofosCurrentChatIndex', (index).toString());
+				} catch (error) {
+					console.error('Error saving current chat index to localStorage:', error);
+				}
 			}
 
 			// Update chat history in the state and local storage
