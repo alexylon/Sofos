@@ -158,7 +158,6 @@ export default function Chat() {
 		{
 			api: '/api/use-chat',
 			streamProtocol: 'data',
-			keepLastMessageOnError: true,
 			body: { model, samplingParameter, reasoningEffort, hybridParameter },
 			onFinish: (message) => {
 				onFinishCallback(message);

@@ -213,9 +213,10 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 											<Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: '10px' }}>
 												<Chip
 													label={
-														message.annotations && message.annotations?.length > 0
+														// @ts-ignore
+														message.annotations && message.annotations?.length > 0 && message.annotations[0].modelId
 															// @ts-ignore
-															? models.find((model: string) => model.value === message.annotations[0].modelValue)?.label
+															? message.annotations[0].modelId
 															: ''
 													}
 													variant="outlined"

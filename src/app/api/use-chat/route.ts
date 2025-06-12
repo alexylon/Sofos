@@ -62,25 +62,33 @@ export async function POST(req: Request) {
 	}
 
 	try {
+		const streamData = new StreamData();
+
 		const result: StreamTextResult<any, any> = streamText({
 			model: modelName,
 			messages: convertToCoreMessages(messages),
 			system: `When presenting any code examples (in any programming language) or data tables in your responses, always format them using markdown code blocks. 
-					For code, use triple backticks (\`\`\`) at the beginning and end of the code block, and specify the language when applicable for proper syntax highlighting (e.g., \`\`\`python, \`\`\`javascript, \`\`\`rust). 
+					For code, use triple backticks (\`\`\`) at the beginning and end of the code block, and specify the language when applicable for proper syntax highlighting (e.g., \`\`\`java, \`\`\`javascript, \`\`\`rust). 
 					For tables, also enclose them within triple backticks (e.g., \`\`\`markdown). Never present code or tables as plain text without proper markdown formatting.`,
 			temperature,
 			topP,
 			providerOptions,
 			tools,
+			async onStepFinish({ response }) {
+				if (response?.modelId) {
+					streamData.appendMessageAnnotation({
+						modelId: response.modelId,
+					});
+				}
+
+				await streamData.close();
+
+			},
 			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response }) {
 				// implement your own logic here, e.g. for storing messages
 				// or recording token usage
 			},
 		});
-
-		const streamData = new StreamData();
-		streamData.appendMessageAnnotation({ modelValue: model.value });
-		await streamData.close();
 
 		return result.toDataStreamResponse({ data: streamData });
 	} catch (error) {
