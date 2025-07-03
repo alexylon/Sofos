@@ -292,21 +292,20 @@ export default function Chat() {
 	// Callback to be executed after 'assistant' message is received
 	const onFinishCallback = (message: Message) => {
 		if (!error) {
-			const isNewChat = currentChatIndex === -1;
-			const index = isNewChat ? chatHistory.length : currentChatIndex;
-
-			if (isNewChat) {
-				setCurrentChatIndex(index);
-
-				try {
-					localStorage.setItem('sofosCurrentChatIndex', (index).toString());
-				} catch (error) {
-					console.error('Error saving current chat index to localStorage:', error);
-				}
-			}
-
-			// Update chat history in the state and local storage
 			setMessages((prevMessages: Message[]): Message[] => {
+				const isNewChat = prevMessages.length <= 2;
+				const index = isNewChat ? chatHistory.length : currentChatIndex;
+
+				if (isNewChat) {
+					setCurrentChatIndex(index);
+
+					try {
+						localStorage.setItem('sofosCurrentChatIndex', (index).toString());
+					} catch (error) {
+						console.error('Error saving current chat index to localStorage:', error);
+					}
+				}
+
 				const updatedMessages: Message[] = [...prevMessages];
 				// For some reason the last assistant message is incomplete after
 				// importing 'useChat' from '@ai-sdk/react' instead of 'ai'
