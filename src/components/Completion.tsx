@@ -37,7 +37,7 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 				const firstUserMessageRect = firstUserMessage.getBoundingClientRect();
 				const lastAssistantMessageRect = lastAssistantMessage.getBoundingClientRect();
 				const firstToLastUserMessageHeight = lastAssistantMessageRect.bottom - firstUserMessageRect.top;
-				const offsetHeight = isMobile ? windowHeight - 208 : windowHeight - 170;
+				const offsetHeight = isMobile ? windowHeight + 167 : windowHeight - 170;
 
 				if (isLastMessageFromUser && messages && messages.length > 1) {
 					setContainerHeight(firstToLastUserMessageHeight + offsetHeight);
