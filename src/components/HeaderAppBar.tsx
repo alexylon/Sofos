@@ -1,11 +1,12 @@
 import * as React from 'react';
+import { useRouter } from 'next/navigation'
+import { useMediaQuery } from 'react-responsive';
 import { AppBar, Box, Button, Grid, IconButton, Toolbar } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
 import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
 import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
-import { useRouter } from 'next/navigation'
 import { UIMessage } from '@ai-sdk/react'
 import SideBar from '@/components/SideBar';
 
@@ -60,6 +61,7 @@ export default function HeaderAppBar({
 	const loading = status === "loading"
 	const user = session?.user;
 	const router = useRouter();
+	const isSmallScreen = useMediaQuery({ maxWidth: 420 });
 
 	const handleStartNewChat = () => {
 		setMessages([]);
@@ -93,14 +95,22 @@ export default function HeaderAppBar({
 													handleDrawerOpen();
 												}
 											}}
-											sx={[
-												{
-													mr: 0,
-													ml: 0,
-													cursor: isLoading ? 'default' : 'pointer',
-												},
-												open && { display: 'none' },
-											]}
+											sx={isSmallScreen
+												? [
+													{
+														ml: -1,
+														cursor: isLoading ? 'default' : 'pointer',
+													},
+													open && { display: 'none' },
+												]
+												: [
+													{
+														mr: 1,
+														cursor: isLoading ? 'default' : 'pointer',
+													},
+													open && { display: 'none' },
+												]
+											}
 										>
 											<MenuIcon />
 										</IconButton>
@@ -108,23 +118,36 @@ export default function HeaderAppBar({
 											options={models}
 											handleChange={handleModelChange}
 											value={model.value}
-											style={{ marginRight: '5px' }}
+											style={isSmallScreen
+												? { marginRight: '0' }
+												: { marginRight: '7px' }
+											}
 											disabled={isDisabled}
 										/>
 										<SelectSmall
 											options={reasoningEfforts}
 											handleChange={handleReasoningEffortChange}
 											value={reasoningEffort}
-											style={{ marginRight: '5px' }}
+											style={isSmallScreen
+												? { marginRight: '0' }
+												: { marginRight: '7px' }
+											}
 											disabled={isDisabled}
 										/>
 										<SelectSmall
 											options={samplingParameters}
 											handleChange={handleSamplingParameterChange}
 											value={samplingParameter}
+											style={isSmallScreen
+												? { marginRight: '-7px' }
+												: { marginRight: '3px' }
+											}
 											disabled={isDisabled}
 										/>
-										<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+										<Box sx={isSmallScreen
+											? { ml: 'auto', mr: -1, display: 'flex' }
+											: { ml: 'auto', display: 'flex' }
+										}>
 											{/*<Avatar*/}
 											{/*	alt="avatar"*/}
 											{/*	src={user.image || undefined}*/}

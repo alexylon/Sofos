@@ -44,6 +44,7 @@ export default function SelectSmall({ options, handleChange, value, style, disab
 					},
 					'& .MuiSelect-icon': {
 						color: 'white',
+						right: '2px',
 					},
 					'&.Mui-disabled': {
 						'& .MuiSelect-select': {
