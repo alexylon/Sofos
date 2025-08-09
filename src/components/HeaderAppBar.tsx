@@ -4,9 +4,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
 import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
-import { Model, ModelType, ReasoningEffort, SamplingParameter } from '@/types/types';
+import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
 import { useRouter } from 'next/navigation'
-import { Message } from '@ai-sdk/react'
+import { UIMessage } from '@ai-sdk/react'
 import SideBar from '@/components/SideBar';
 
 interface HeaderAppBarProps {
@@ -19,12 +19,9 @@ interface HeaderAppBarProps {
 	reasoningEfforts: ReasoningEffort[],
 	reasoningEffort: string,
 	handleReasoningEffortChange: any,
-	hybridParameters: SamplingParameter[],
-	handleHybridParameterChange: any,
-	hybridParameter: number,
-	messages: Message[],
+	messages: UIMessage[],
 	setMessages: any,
-	chatHistory: Message[][],
+	chatHistory: UIMessage[][],
 	setChatHistory: any,
 	currentChatIndex: number,
 	setCurrentChatIndex: any,
@@ -46,9 +43,6 @@ export default function HeaderAppBar({
 										 reasoningEfforts,
 										 reasoningEffort,
 										 handleReasoningEffortChange,
-										 hybridParameters,
-										 handleHybridParameterChange,
-										 hybridParameter,
 										 messages,
 										 setMessages,
 										 chatHistory,
@@ -101,7 +95,8 @@ export default function HeaderAppBar({
 											}}
 											sx={[
 												{
-													mr: 2,
+													mr: 0,
+													ml: 0,
 													cursor: isLoading ? 'default' : 'pointer',
 												},
 												open && { display: 'none' },
@@ -116,30 +111,19 @@ export default function HeaderAppBar({
 											style={{ marginRight: '5px' }}
 											disabled={isDisabled}
 										/>
-										{model.type === ModelType.REASONING &&
-										  <SelectSmall
-												options={reasoningEfforts}
-												handleChange={handleReasoningEffortChange}
-												value={reasoningEffort}
-												disabled={isDisabled}
-											/>
-										}
-										{model.type === ModelType.STANDARD &&
-										  <SelectSmall
-												options={samplingParameters}
-												handleChange={handleSamplingParameterChange}
-												value={samplingParameter}
-												disabled={isDisabled}
-											/>
-										}
-										{model.type === ModelType.HYBRID &&
-										  <SelectSmall
-												options={hybridParameters}
-												handleChange={handleHybridParameterChange}
-												value={hybridParameter}
-												disabled={isDisabled}
-											/>
-										}
+										<SelectSmall
+											options={reasoningEfforts}
+											handleChange={handleReasoningEffortChange}
+											value={reasoningEffort}
+											style={{ marginRight: '5px' }}
+											disabled={isDisabled}
+										/>
+										<SelectSmall
+											options={samplingParameters}
+											handleChange={handleSamplingParameterChange}
+											value={samplingParameter}
+											disabled={isDisabled}
+										/>
 										<Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
 											{/*<Avatar*/}
 											{/*	alt="avatar"*/}

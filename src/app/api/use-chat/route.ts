@@ -1,96 +1,100 @@
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
-import { convertToCoreMessages, StreamData, streamText, StreamTextResult } from 'ai';
+import { convertToModelMessages, streamText, StreamTextResult } from 'ai';
 
 // maxDuration streaming response time is 60 seconds
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
 	// Extract the data from the body of the request
-	const { messages, model, samplingParameter, reasoningEffort, hybridParameter } = await req.json();
+	const requestBody = await req.json();
+	const { messages, model, samplingParameter, reasoningEffort } = requestBody;
 
 	let modelName;
 	let tools;
 
 	if (model.provider === 'anthropic') {
 		modelName = anthropic(model.value);
-	} else if (model.provider === 'openAI' && (model.value === 'gpt-4.1' || model.value === 'gpt-4.1-mini' || model.value === 'o3-pro')) {
+	} else if (model.provider === 'openAI') {
 		modelName = openai.responses(model.value);
-		tools = {
-			web_search_preview: openai.tools.webSearchPreview({
-				// optional configuration:
-				searchContextSize: 'high',
-				userLocation: {
-					type: 'approximate',
-				},
-			}),
-		};
+
+		if (reasoningEffort !== 'minimal') {
+			tools = {
+				web_search_preview: openai.tools.webSearchPreview({
+					// optional configuration:
+					searchContextSize: 'high',
+					userLocation: {
+						type: 'approximate',
+					},
+				}),
+			};
+		}
 	} else {
 		modelName = openai(model.value);
 	}
 
 	let providerOptions;
-	let temperature = samplingParameter;
-	let topP = samplingParameter;
 
-	if (model.provider === 'openAI' && model.type === 'REASONING') {
+	if (model.provider === 'openAI') {
 		providerOptions = { openai: { reasoningEffort } };
-		temperature = undefined;
-		topP = undefined;
 	}
 
-	if (model.provider === 'anthropic' && model.type === 'HYBRID' && hybridParameter > 1000) {
-		providerOptions = {
-			anthropic: {
-				thinking: { type: 'enabled', budgetTokens: hybridParameter },
-			},
-		};
+	if (model.provider === 'anthropic') {
+		if (reasoningEffort === 'minimal') {
+			providerOptions = {
+				anthropic: {
+					thinking: { type: 'disabled' },
+				},
+			};
+		} else {
+			let budgetTokens = 0;
 
-		temperature = undefined;
-		topP = undefined;
-	}
+			if (reasoningEffort === 'low') {
+				budgetTokens = 12000;
+			}
 
-	if (model.provider === 'anthropic' && model.type === 'HYBRID' && hybridParameter < 2) {
-		providerOptions = {
-			anthropic: {
-				thinking: { type: 'disabled' },
-			},
-		};
+			if (reasoningEffort === 'medium') {
+				budgetTokens = 24000;
+			}
 
-		temperature = hybridParameter;
-		topP = hybridParameter;
+			if (reasoningEffort === 'high') {
+				budgetTokens = 36000;
+			}
+
+			providerOptions = {
+				anthropic: {
+					thinking: { type: 'enabled', budgetTokens },
+				},
+			};
+		}
 	}
 
 	try {
-		const streamData = new StreamData();
-
 		const result: StreamTextResult<any, any> = streamText({
 			model: modelName,
-			messages: convertToCoreMessages(messages),
+			messages: convertToModelMessages(messages),
 			system: `When presenting any code examples (in any programming language) or data tables in your responses, always format them using markdown code blocks. 
 					For code, use triple backticks (\`\`\`) at the beginning and end of the code block, and specify the language when applicable for proper syntax highlighting (e.g., \`\`\`java, \`\`\`javascript, \`\`\`rust). 
 					For tables, also enclose them within triple backticks (e.g., \`\`\`markdown). Never present code or tables as plain text without proper markdown formatting.`,
-			temperature,
-			topP,
+			temperature: samplingParameter,
+			topP: 0.8,
 			providerOptions,
 			tools,
 			async onStepFinish({ response }) {
-				if (response?.modelId) {
-					streamData.appendMessageAnnotation({
-						modelId: response.modelId,
-					});
-				}
-
-				await streamData.close();
 
 			},
 			async onFinish({ text, toolCalls, toolResults, usage, finishReason, response }) {
 				// implement your own logic here, e.g. for storing messages
 				// or recording token usage
 			},
+			async onError({ error }) {
+				if (error instanceof Error) {
+					console.error('Error:', error.message);
+				}
+			}
 		});
 
-		return result.toDataStreamResponse({ data: streamData });
+		return result.toUIMessageStreamResponse();
 	} catch (error) {
 		if (error instanceof Error) {
 			return new Response("Server error: " + error.message, {

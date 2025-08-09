@@ -1,11 +1,11 @@
 import React from 'react';
 import { IconButton } from '@mui/material';
-import { Message } from '@ai-sdk/react'
+import { UIMessage } from '@ai-sdk/react'
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined';
 import ReplayCircleFilledOutlinedIcon from '@mui/icons-material/ReplayCircleFilledOutlined';
 
 interface SelectedImagesContainerProps {
-	messages: Message[],
+	messages: UIMessage[],
 	isLoading: boolean,
 	reload: () => void,
 	stop: () => void,

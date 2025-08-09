@@ -5,34 +5,28 @@ export const MAX_FILES = 5;
 
 export const models: Model[] = [
 	{
-		value: 'gpt-4.1',
-		label: 'GPT-4.1',
+		value: 'gpt-5',
+		label: 'GPT-5',
 		provider: 'openAI',
-		type: ModelType.STANDARD,
+		type: ModelType.REASONING,
 	},
 	{
-		value: 'gpt-4.1-mini',
-		label: 'GPT-4.1 mini',
+		value: 'gpt-5-mini',
+		label: 'GPT-5-mini',
 		provider: 'openAI',
-		type: ModelType.STANDARD,
+		type: ModelType.REASONING,
 	},
 	{
 		value: 'claude-sonnet-4-0',
 		label: 'Claude Sonnet 4',
 		provider: 'anthropic',
-		type: ModelType.HYBRID,
-	},
-	{
-		value: 'claude-3-5-haiku-latest',
-		label: 'Claude 3.5 Haiku',
-		provider: 'anthropic',
-		type: ModelType.STANDARD,
+		type: ModelType.REASONING,
 	},
 	{
 		value: 'claude-opus-4-0',
 		label: 'Claude Opus 4',
 		provider: 'anthropic',
-		type: ModelType.HYBRID,
+		type: ModelType.REASONING,
 	},
 	{
 		value: 'o3',
@@ -71,6 +65,10 @@ export const samplingParameters: SamplingParameter[] = [
 
 export const reasoningEfforts: ReasoningEffort[] = [
 	{
+		value: 'minimal',
+		label: 'Minimal',
+	},
+	{
 		value: 'low',
 		label: 'Low',
 	},
@@ -84,18 +82,9 @@ export const reasoningEfforts: ReasoningEffort[] = [
 	},
 ];
 
-export const hybridParameters: SamplingParameter[] = [
-	...samplingParameters,
-	{
-		value: 12000,
-		label: 'Low',
-	},
-	{
-		value: 24000,
-		label: 'Medium',
-	},
-	{
-		value: 36000,
-		label: 'High',
-	},
-];
+export const getReasoningEfforts = (hasMinimalEffort: boolean) => {
+	if (hasMinimalEffort) {
+		return reasoningEfforts;
+	}
+	return reasoningEfforts.slice(1);
+}

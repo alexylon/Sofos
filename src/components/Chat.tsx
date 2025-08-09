@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
-import { useChat, Message } from '@ai-sdk/react'
+import { useChat, UIMessage } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai';
 import { useSession } from "next-auth/react"
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
@@ -18,10 +19,10 @@ import {
 	models,
 	samplingParameters,
 	reasoningEfforts,
-	hybridParameters
+	getReasoningEfforts,
 } from '@/components/utils/constants';
 
-const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
+const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]) => {
 	if (chatHistory) {
 		const filteredChatHistory = chatHistory.filter(chat => chat !== null && chat !== undefined);
 
@@ -48,33 +49,33 @@ const saveChatHistoryToLocalStorage = (chatHistory: Message[][]) => {
 
 export default function Chat() {
 	const [model, setModel] = useState<Model>(models[0]);
+	const hasMinimalEffort = !model.value.startsWith('o');
+	const updatedReasoningEfforts = getReasoningEfforts(hasMinimalEffort);
 	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
-	const [reasoningEffort, setReasoningEffort] = useState<string>(reasoningEfforts[0].value);
-	const [hybridParameter, setHybridParameter] = useState<number>(hybridParameters[0].value);
+	const [reasoningEffort, setReasoningEffort] = useState<string>(updatedReasoningEfforts[0].value);
 	const [isScrolling, setIsScrolling] = useState<boolean>(false);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
-	const [chatHistory, setChatHistory] = useState<Message[][]>([]);
+	const [chatHistory, setChatHistory] = useState<UIMessage[][]>([]);
 	const [currentChatIndex, setCurrentChatIndex] = useState<number>(-1);
 	const [open, setOpen] = useState(false);
 	const [distanceFromBottom, setDistanceFromBottom] = useState<number | null>(null);
+	const [input, setInput] = useState('');
 
 	const {
-		input,
 		status, // submitted, streaming, ready, error
-		handleInputChange,
-		handleSubmit,
 		messages,
+		sendMessage,
 		setMessages,
-		reload,
+		regenerate,
 		stop,
 		error,
 	} = useChat(
 		{
-			api: '/api/use-chat',
-			streamProtocol: 'data',
-			body: { model, samplingParameter, reasoningEffort, hybridParameter },
-			onFinish: (message) => {
+			transport: new DefaultChatTransport({
+				api: '/api/use-chat',
+			}),
+			onFinish: ({ message }) => {
 				onFinishCallback(message);
 			},
 			// Prevent "Maximum update depth exceeded" error
@@ -95,7 +96,6 @@ export default function Chat() {
 		const storedModelValue = localStorage.getItem('sofosModel');
 		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
 		const storedReasoningEffort = localStorage.getItem('sofosReasoningEffort');
-		const storedHybridParameter = localStorage.getItem('sofosHybridParameter');
 		const storedChatHistory = localStorage.getItem('sofosChatHistory');
 		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
 
@@ -115,14 +115,10 @@ export default function Chat() {
 			setReasoningEffort(storedReasoningEffort);
 		}
 
-		if (storedHybridParameter) {
-			setHybridParameter(Number(storedHybridParameter));
-		}
-
 		if (storedChatHistory && storedCurrentChatIndex) {
 			setCurrentChatIndex(Number(storedCurrentChatIndex));
 
-			const parsedChatHistory: Message[][] = JSON.parse(storedChatHistory, (key, value) => {
+			const parsedChatHistory: UIMessage[][] = JSON.parse(storedChatHistory, (key, value) => {
 				if (key === 'createdAt' && typeof value === 'string') {
 					return new Date(value);
 				}
@@ -172,9 +168,7 @@ export default function Chat() {
 
 		const fileList = dataTransfer.files;
 
-		handleSubmit(e, {
-			experimental_attachments: fileList.length > 0 ? fileList : undefined,
-		});
+		handleSubmit(e, fileList);
 
 		setImages([]);
 		setFiles([]);
@@ -236,6 +230,16 @@ export default function Chat() {
 				console.error('Error saving model to localStorage:', error);
 			}
 		}
+
+		if (value.startsWith('o') && reasoningEffort === reasoningEfforts[0].value) {
+			setReasoningEffort(reasoningEfforts[1].value);
+
+			try {
+				localStorage.setItem('sofosReasoningEffort', reasoningEfforts[1].value);
+			} catch (error) {
+				console.error('Error saving reasoning effort to localStorage:', error);
+			}
+		}
 	};
 
 	const handleSamplingParameterChange = (event: SelectChangeEvent) => {
@@ -260,19 +264,6 @@ export default function Chat() {
 		}
 	};
 
-	const handleHybridParameterChange = (event: SelectChangeEvent) => {
-		const { value } = event.target;
-
-		setHybridParameter(Number(value));
-
-		try {
-			localStorage.setItem('sofosHybridParameter', value);
-		} catch (error) {
-			console.error('Error saving hybrid parameter to localStorage:', error);
-		}
-	};
-
-
 	const handleDrawerOpen = () => {
 		setOpen(true);
 	};
@@ -290,36 +281,65 @@ export default function Chat() {
 	}
 
 	// Callback to be executed after 'assistant' message is received
-	const onFinishCallback = (message: Message) => {
+	const onFinishCallback = (message: UIMessage) => {
 		if (!error) {
-			setMessages((prevMessages: Message[]): Message[] => {
+			setMessages((prevMessages: UIMessage[]): UIMessage[] => {
 				const isNewChat = prevMessages.length <= 2;
-				const index = isNewChat ? chatHistory.length : currentChatIndex;
+				// @ts-ignore
+				message.createdAt = new Date();
 
-				if (isNewChat) {
-					setCurrentChatIndex(index);
+				setModel((prevModel) => {
+					console.log('prevModel', prevModel);
+					// @ts-ignore
+					message.modelId = prevModel.label;
+					return prevModel;
+				});
 
-					try {
-						localStorage.setItem('sofosCurrentChatIndex', (index).toString());
-					} catch (error) {
-						console.error('Error saving current chat index to localStorage:', error);
-					}
-				}
-
-				const updatedMessages: Message[] = [...prevMessages];
+				const updatedMessages: UIMessage[] = [...prevMessages];
 				// For some reason the last assistant message is incomplete after
 				// importing 'useChat' from '@ai-sdk/react' instead of 'ai'
 				updatedMessages[updatedMessages.length - 1] = message;
 
 				if (updatedMessages && updatedMessages.length > 0) {
 					// Update chat history in the state and local storage
-					setChatHistory((prevChatHistory: Message[][]) => {
-						const updatedChatHistory = [...prevChatHistory].slice(-20);
+					setChatHistory((prevChatHistory: UIMessage[][]) => {
+						setCurrentChatIndex((prevCurrentChatIndex) => {
+							const index = isNewChat ? prevChatHistory.length : prevCurrentChatIndex;
 
-						updatedChatHistory[index] = updatedMessages;
-						saveChatHistoryToLocalStorage(updatedChatHistory);
+							// Only update currentChatIndex if it's a new chat
+							if (isNewChat) {
+								try {
+									localStorage.setItem('sofosCurrentChatIndex', index.toString());
+								} catch (error) {
+									console.error('Error saving current chat index to localStorage:', error);
+								}
+								return index;
+							}
 
-						return updatedChatHistory;
+							return prevCurrentChatIndex;
+						});
+
+						const updatedChatHistory = [...prevChatHistory];
+
+						if (isNewChat) {
+							updatedChatHistory.push(updatedMessages);
+						} else {
+							// For existing chats, update at the current index
+							// Note: we need to get the current index again since we can't access it directly
+							// We'll use the length check to determine if we should push or update
+							if (prevChatHistory.length === 0) {
+								updatedChatHistory.push(updatedMessages);
+							} else {
+								// Update the last chat in history for existing chats
+								updatedChatHistory[updatedChatHistory.length - 1] = updatedMessages;
+							}
+						}
+
+						// Keep only the last 20 conversations
+						const finalChatHistory = updatedChatHistory.slice(-20);
+						saveChatHistoryToLocalStorage(finalChatHistory);
+
+						return finalChatHistory;
 					});
 				}
 
@@ -327,6 +347,28 @@ export default function Chat() {
 			});
 		}
 	}
+
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>, fileList: FileList) => {
+		e.preventDefault();
+
+		if (fileList?.length > 0) {
+			sendMessage(
+				{ text: input, files: fileList },
+				{
+					body: { model, samplingParameter, reasoningEffort },
+				},
+			).then();
+		} else {
+			sendMessage(
+				{ text: input },
+				{
+					body: { model, samplingParameter, reasoningEffort },
+				},
+			).then();
+		}
+
+		setInput('');
+	};
 
 	return (
 		<div onClick={handleDrawerClose}>
@@ -337,12 +379,9 @@ export default function Chat() {
 				samplingParameters={samplingParameters}
 				handleSamplingParameterChange={handleSamplingParameterChange}
 				samplingParameter={samplingParameter}
-				reasoningEfforts={reasoningEfforts}
+				reasoningEfforts={updatedReasoningEfforts}
 				reasoningEffort={reasoningEffort}
 				handleReasoningEffortChange={handleReasoningEffortChange}
-				hybridParameters={hybridParameters}
-				handleHybridParameterChange={handleHybridParameterChange}
-				hybridParameter={hybridParameter}
 				messages={messages}
 				setMessages={setMessages}
 				chatHistory={chatHistory}
@@ -379,7 +418,6 @@ export default function Chat() {
 						<MessagesContainer
 							hasAttachments={hasFiles || hasImages}
 							messages={messages}
-							models={models}
 							isScrolling={isScrolling}
 							autoScroll={autoScroll}
 							setDistanceFromBottom={setDistanceFromBottom}
@@ -419,13 +457,13 @@ export default function Chat() {
 							handleRemoveImage={handleRemoveImage}
 							handleRemoveFile={handleRemoveFile}
 							input={input}
-							handleInputChange={handleInputChange}
+							handleInputChange={setInput}
 							onSubmit={onSubmit}
 							handleFilesChange={handleFilesChange}
 							isUploadDisabled={false}
 							isLoading={isLoading}
 							messages={messages}
-							reload={reload}
+							reload={regenerate}
 							stop={stop}
 							error={error}
 						/>

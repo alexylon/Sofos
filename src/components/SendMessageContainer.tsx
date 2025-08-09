@@ -5,7 +5,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import ArrowCircleUpOutlinedIcon from '@mui/icons-material/ArrowCircleUpOutlined';
 import { styled } from '@mui/material/styles';
 import AttachmentsContainer from '@/components/AttachmentsContainer';
-import { Message } from '@ai-sdk/react'
+import { UIMessage } from '@ai-sdk/react'
 import ActionButton from '@/components/ActionButton';
 import { useMediaQuery } from 'react-responsive';
 
@@ -23,7 +23,7 @@ interface SendMessageContainerProps {
 	handleFilesChange: any;
 	isUploadDisabled: boolean;
 	isLoading: boolean;
-	messages: Message[];
+	messages: UIMessage[];
 	reload: () => void;
 	stop: () => void;
 	error?: Error;
@@ -113,7 +113,7 @@ const SendMessageContainer = ({
 							disabled={isDisabled}
 							size="small"
 							value={input}
-							onChange={handleInputChange}
+							onChange={e => handleInputChange(e.target.value)}
 							variant="outlined"
 							InputLabelProps={{
 								shrink: false,

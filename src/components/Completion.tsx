@@ -3,22 +3,19 @@ import { Grid, Box, Chip, Card } from "@mui/material";
 import MarkdownText from "@/components/MarkdownText";
 import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton';
-import { Attachment } from 'ai';
-import { Message } from '@ai-sdk/react'
-import { Model } from '@/types/types';
+import { UIMessage } from '@ai-sdk/react'
 import { useMediaQuery } from 'react-responsive';
 
 
 interface CompletionProps {
-	messages?: Message[],
-	models: Model[],
+	messages?: UIMessage[],
 	isScrolling: boolean,
 	autoScroll: () => void,
 	setDistanceFromBottom: (n: number) => void,
 	error?: Error,
 }
 
-export default function Completion({ messages, models, isScrolling, autoScroll, setDistanceFromBottom, error }: CompletionProps) {
+export default function Completion({ messages, isScrolling, autoScroll, setDistanceFromBottom, error }: CompletionProps) {
 	const isLastMessageFromUser = messages && messages.length > 0 && messages[messages.length - 1].role === 'user';
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [containerHeight, setContainerHeight] = useState<number | 'auto'>('auto');
@@ -89,7 +86,7 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 					height: 'auto',
 				}}
 			>
-				{messages?.map((message: Message) => (
+				{messages?.map((message: UIMessage) => (
 					<AutoScrollingWindow
 						key={message.id}
 						style={{ flexGrow: 1 }}
@@ -117,19 +114,26 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 											mr: -1,
 										}}
 										>
-											<CopyToClipboardButton value={message.content} color="#000000" />
+											{message.parts.find((part) => part.type === 'text') &&
+												<CopyToClipboardButton
+													value={message.parts.find((part) => part.type === 'text')?.text || ''}
+													color="#000000"
+												/>
+											}
 										</Box>
 										<Box sx={{
 											mt: -4,
 										}}
 										>
 											<>
-												<MarkdownText>
-													{message.content}
-												</MarkdownText>
-												{message?.experimental_attachments
-													?.filter((attachment: Attachment | undefined) =>
-														attachment?.contentType?.startsWith('image/'),
+												{message.parts.find((part) => part.type === 'text') &&
+													<MarkdownText>
+													  {message.parts.find((part) => part.type === 'text')?.text || ''}
+													</MarkdownText>
+												}
+												{message?.parts
+													?.filter((attachment:  any) =>
+														attachment.type === 'file' && attachment?.mediaType?.startsWith('image/'),
 													)
 													.map((attachment: any, index: number) => (
 														<Card
@@ -160,9 +164,9 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 														</Card>
 													))}
 												<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-													{message?.experimental_attachments
-														?.filter((attachment: Attachment | undefined) =>
-															!attachment?.contentType?.startsWith('image/'),
+													{message?.parts
+														?.filter((attachment: any) =>
+															attachment.type === 'file' && !attachment?.mediaType?.startsWith('image/'),
 														)
 														.map((attachment: any, index: number) => (
 															<Box key={`${message.id}-file-${index}`} sx={{ display: 'flex' }}>
@@ -213,29 +217,28 @@ export default function Completion({ messages, models, isScrolling, autoScroll, 
 										<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
 											<Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: '10px' }}>
 												<Chip
-													label={
-														// @ts-ignore
-														message.annotations && message.annotations?.length > 0 && message.annotations[0].modelId
-															// @ts-ignore
-															? message.annotations[0].modelId
-															: ''
-													}
+													// @ts-ignore
+													label={message?.modelId}
 													variant="outlined"
 													size="small"
 													sx={{ fontSize: '0.70rem' }}
 												/>
 											</Box>
 											<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1 }}>
-												<CopyToClipboardButton value={message.content} color="#000000" />
+												{message.parts.find((part) => part.type === 'text') &&
+													<CopyToClipboardButton value={message.parts.find((part) => part.type === 'text')?.text || ''} color="#000000" />
+												}
 											</Box>
 										</Box>
 										<Box sx={{
 											mt: -2,
 										}}
 										>
-											<MarkdownText>
-												{message.content}
-											</MarkdownText>
+											{message.parts.find((part) => part.type === 'text') &&
+												<MarkdownText>
+													{message.parts.find((part) => part.type === 'text')?.text || ''}
+												</MarkdownText>
+											}
 										</Box>
 									</Box>
 								</Grid>

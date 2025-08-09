@@ -1,13 +1,11 @@
 import React, { useRef } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
-import { Message } from '@ai-sdk/react'
-import { Model } from '@/types/types';
+import { UIMessage } from '@ai-sdk/react'
 
 interface MessagesContainerProps {
 	hasAttachments: boolean,
-	messages: Message[],
-	models: Model[],
+	messages: UIMessage[],
 	isScrolling: boolean,
 	autoScroll: () => void,
 	setDistanceFromBottom: (n: number) => void,
@@ -17,7 +15,6 @@ interface MessagesContainerProps {
 const MessagesContainer = ({
 							   hasAttachments,
 							   messages,
-							   models,
 							   isScrolling,
 							   autoScroll,
 							   setDistanceFromBottom,
@@ -64,7 +61,6 @@ const MessagesContainer = ({
 					}}>
 						<Completion
 							messages={messages}
-							models={models}
 							isScrolling={isScrolling}
 							autoScroll={autoScroll}
 							setDistanceFromBottom={setDistanceFromBottom}
