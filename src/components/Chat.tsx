@@ -79,7 +79,7 @@ export default function Chat() {
 				onFinishCallback(message);
 			},
 			// Prevent "Maximum update depth exceeded" error
-			experimental_throttle: 50,
+			experimental_throttle: 100,
 		}
 	);
 

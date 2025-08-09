@@ -19,7 +19,7 @@ const MessagesContainer = ({
 							   autoScroll,
 							   setDistanceFromBottom,
 							   error
-}: MessagesContainerProps) => {
+						   }: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
 
 	return (
