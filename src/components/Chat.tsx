@@ -54,7 +54,7 @@ export default function Chat() {
 	const updatedReasoningEfforts = getReasoningEfforts(hasMinimalEffort);
 	const [temperature, setTemperature] = useState<number>(temperatures[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(updatedReasoningEfforts[0].value);
-	const [textVerbosity, setTextVerbosity] = useState<string>(textVerbosities[0].value);
+	const [textVerbosity, setTextVerbosity] = useState<string>(textVerbosities[1].value);
 	const [isScrolling, setIsScrolling] = useState<boolean>(false);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
