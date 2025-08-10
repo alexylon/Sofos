@@ -17,9 +17,10 @@ import {
 	MAX_IMAGES,
 	MAX_FILES,
 	models,
-	samplingParameters,
+	temperatures,
 	reasoningEfforts,
 	getReasoningEfforts,
+	textVerbosities,
 } from '@/components/utils/constants';
 
 const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]) => {
@@ -51,8 +52,9 @@ export default function Chat() {
 	const [model, setModel] = useState<Model>(models[0]);
 	const hasMinimalEffort = !model.value.startsWith('o');
 	const updatedReasoningEfforts = getReasoningEfforts(hasMinimalEffort);
-	const [samplingParameter, setSamplingParameter] = useState<number>(samplingParameters[0].value);
+	const [temperature, setTemperature] = useState<number>(temperatures[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(updatedReasoningEfforts[0].value);
+	const [textVerbosity, setTextVerbosity] = useState<string>(textVerbosities[0].value);
 	const [isScrolling, setIsScrolling] = useState<boolean>(false);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
@@ -73,7 +75,7 @@ export default function Chat() {
 	} = useChat(
 		{
 			transport: new DefaultChatTransport({
-				api: '/api/use-chat',
+				api: '/api/use-stream-text',
 			}),
 			onFinish: ({ message }) => {
 				onFinishCallback(message);
@@ -94,8 +96,9 @@ export default function Chat() {
 	useEffect(() => {
 		// Initialize from localStorage
 		const storedModelValue = localStorage.getItem('sofosModel');
-		const storedSamplingParameter = localStorage.getItem('sofosSamplingParameter');
+		const storedTemperature = localStorage.getItem('sofosTemperature');
 		const storedReasoningEffort = localStorage.getItem('sofosReasoningEffort');
+		const storedTextVerbosity = localStorage.getItem('sofosTextVerbosity');
 		const storedChatHistory = localStorage.getItem('sofosChatHistory');
 		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
 
@@ -107,12 +110,16 @@ export default function Chat() {
 			}
 		}
 
-		if (storedSamplingParameter) {
-			setSamplingParameter(Number(storedSamplingParameter));
+		if (storedTemperature) {
+			setTemperature(Number(storedTemperature));
 		}
 
 		if (storedReasoningEffort) {
 			setReasoningEffort(storedReasoningEffort);
+		}
+
+		if (storedTextVerbosity) {
+			setTextVerbosity(storedTextVerbosity);
 		}
 
 		if (storedChatHistory && storedCurrentChatIndex) {
@@ -242,15 +249,15 @@ export default function Chat() {
 		}
 	};
 
-	const handleSamplingParameterChange = (event: SelectChangeEvent) => {
+	const handleTemperatureChange = (event: SelectChangeEvent) => {
 		const { value } = event.target;
 
-		setSamplingParameter(Number(value));
+		setTemperature(Number(value));
 
 		try {
-			localStorage.setItem('sofosSamplingParameter', value);
+			localStorage.setItem('sofosTemperature', value);
 		} catch (error) {
-			console.error('Error saving sampling parameter to localStorage:', error);
+			console.error('Error saving temperature to localStorage:', error);
 		}
 	};
 
@@ -263,6 +270,18 @@ export default function Chat() {
 			console.error('Error saving reasoning effort to localStorage:', error);
 		}
 	};
+
+	const handleTextVerbosityChange = (event: SelectChangeEvent) => {
+		const { value } = event.target;
+
+		setTextVerbosity(value);
+
+		try {
+			localStorage.setItem('sofosTextVerbosity', value);
+		} catch (error) {
+			console.error('Error saving text verbosity to localStorage:', error);
+		}
+	}
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -355,14 +374,14 @@ export default function Chat() {
 			sendMessage(
 				{ text: input, files: fileList },
 				{
-					body: { model, samplingParameter, reasoningEffort },
+					body: { model, temperature, reasoningEffort, textVerbosity },
 				},
 			).then();
 		} else {
 			sendMessage(
 				{ text: input },
 				{
-					body: { model, samplingParameter, reasoningEffort },
+					body: { model, temperature, reasoningEffort, textVerbosity },
 				},
 			).then();
 		}
@@ -376,12 +395,15 @@ export default function Chat() {
 				models={models}
 				handleModelChange={handleModelChange}
 				model={model}
-				samplingParameters={samplingParameters}
-				handleSamplingParameterChange={handleSamplingParameterChange}
-				samplingParameter={samplingParameter}
+				temperatures={temperatures}
+				handleTemperatureChange={handleTemperatureChange}
+				temperature={temperature}
 				reasoningEfforts={updatedReasoningEfforts}
 				reasoningEffort={reasoningEffort}
 				handleReasoningEffortChange={handleReasoningEffortChange}
+				textVerbosities={textVerbosities}
+				textVerbosity={textVerbosity}
+				handleTextVerbosityChange={handleTextVerbosityChange}
 				messages={messages}
 				setMessages={setMessages}
 				chatHistory={chatHistory}

@@ -6,7 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MapsUgcOutlinedIcon from '@mui/icons-material/MapsUgcOutlined';
 import { signIn, useSession } from "next-auth/react"
 import SelectSmall from '@/components/SelectSmall';
-import { Model, ReasoningEffort, SamplingParameter } from '@/types/types';
+import { Model, ReasoningEffort, Temperature, TextVerbosity } from '@/types/types';
 import { UIMessage } from '@ai-sdk/react'
 import SideBar from '@/components/SideBar';
 
@@ -14,12 +14,15 @@ interface HeaderAppBarProps {
 	models: Model[],
 	handleModelChange: any,
 	model: Model,
-	samplingParameters: SamplingParameter[],
-	handleSamplingParameterChange: any,
-	samplingParameter: number,
+	temperatures: Temperature[],
+	handleTemperatureChange: any,
+	temperature: number,
 	reasoningEfforts: ReasoningEffort[],
 	reasoningEffort: string,
 	handleReasoningEffortChange: any,
+	textVerbosities: TextVerbosity[],
+	textVerbosity: string,
+	handleTextVerbosityChange: any,
 	messages: UIMessage[],
 	setMessages: any,
 	chatHistory: UIMessage[][],
@@ -38,12 +41,15 @@ export default function HeaderAppBar({
 										 models,
 										 handleModelChange,
 										 model,
-										 samplingParameters,
-										 handleSamplingParameterChange,
-										 samplingParameter,
+										 temperatures,
+										 handleTemperatureChange,
+										 temperature,
 										 reasoningEfforts,
 										 reasoningEffort,
 										 handleReasoningEffortChange,
+										 textVerbosities,
+										 textVerbosity,
+										 handleTextVerbosityChange,
 										 messages,
 										 setMessages,
 										 chatHistory,
@@ -134,16 +140,30 @@ export default function HeaderAppBar({
 											}
 											disabled={isDisabled}
 										/>
-										<SelectSmall
-											options={samplingParameters}
-											handleChange={handleSamplingParameterChange}
-											value={samplingParameter}
-											style={isSmallScreen
-												? { marginRight: '-7px' }
-												: { marginRight: '3px' }
-											}
-											disabled={isDisabled}
-										/>
+										{ model.provider === 'anthropic' &&
+											<SelectSmall
+												options={temperatures}
+												handleChange={handleTemperatureChange}
+												value={temperature}
+												style={isSmallScreen
+													? { marginRight: '-7px' }
+													: { marginRight: '3px' }
+												}
+												disabled={isDisabled}
+											/>
+										}
+										{ model.value.startsWith('gpt-5') &&
+											<SelectSmall
+												options={textVerbosities}
+												handleChange={handleTextVerbosityChange}
+												value={textVerbosity}
+												style={isSmallScreen
+													? { marginRight: '-7px' }
+													: { marginRight: '3px' }
+												}
+												disabled={isDisabled}
+												/>
+										}
 										<Box sx={isSmallScreen
 											? { ml: 'auto', mr: -1, display: 'flex' }
 											: { ml: 'auto', display: 'flex' }

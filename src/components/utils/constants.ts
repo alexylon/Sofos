@@ -1,4 +1,4 @@
-import { Model, ModelType, ReasoningEffort, SamplingParameter } from '@/types/types';
+import { Model, ModelType, ReasoningEffort, Temperature, TextVerbosity } from '@/types/types';
 
 export const MAX_IMAGES = 5;
 export const MAX_FILES = 5;
@@ -48,17 +48,17 @@ export const models: Model[] = [
 	},
 ];
 
-export const samplingParameters: SamplingParameter[] = [
+export const temperatures: Temperature[] = [
 	{
 		value: 0.2,
 		label: 'Focused',
 	},
 	{
-		value: 0.5,
+		value: 0.6,
 		label: 'Balanced',
 	},
 	{
-		value: 0.7,
+		value: 1,
 		label: 'Creative',
 	},
 ];
@@ -88,3 +88,18 @@ export const getReasoningEfforts = (hasMinimalEffort: boolean) => {
 	}
 	return reasoningEfforts.slice(1);
 }
+
+export const textVerbosities: TextVerbosity[] = [
+	{
+		value: 'low',
+		label: 'Short',
+	},
+	{
+		value: 'medium',
+		label: 'Normal',
+	},
+	{
+		value: 'high',
+		label: 'Long',
+	},
+];

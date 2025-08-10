@@ -11,12 +11,17 @@ export enum ModelType {
 	HYBRID = "HYBRID",
 }
 
-export interface SamplingParameter {
+export interface Temperature {
 	value: number;
 	label: string;
 }
 
 export interface ReasoningEffort {
+	value: string;
+	label: string;
+}
+
+export interface TextVerbosity {
 	value: string;
 	label: string;
 }
