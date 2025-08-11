@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
 import { UIMessage } from '@ai-sdk/react'
+import { ChatStatus } from 'ai';
 
 interface MessagesContainerProps {
 	hasAttachments: boolean,
@@ -9,6 +10,7 @@ interface MessagesContainerProps {
 	isScrolling: boolean,
 	autoScroll: () => void,
 	setDistanceFromBottom: (n: number) => void,
+	status:  ChatStatus,
 	error?: Error,
 }
 
@@ -18,6 +20,7 @@ const MessagesContainer = ({
 							   isScrolling,
 							   autoScroll,
 							   setDistanceFromBottom,
+							   status,
 							   error
 						   }: MessagesContainerProps) => {
 	const scrollableGridRef = useRef(null);
@@ -64,6 +67,7 @@ const MessagesContainer = ({
 							isScrolling={isScrolling}
 							autoScroll={autoScroll}
 							setDistanceFromBottom={setDistanceFromBottom}
+							status={status}
 							error={error}
 						/>
 					</Box>

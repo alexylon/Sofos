@@ -443,6 +443,7 @@ export default function Chat() {
 							isScrolling={isScrolling}
 							autoScroll={autoScroll}
 							setDistanceFromBottom={setDistanceFromBottom}
+							status={status}
 							error={error}
 						/>
 						{distanceFromBottom && distanceFromBottom < 80 &&

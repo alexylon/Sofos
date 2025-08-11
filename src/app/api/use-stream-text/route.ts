@@ -65,7 +65,13 @@ export async function POST(req: Request) {
 			};
 		}
 	} else {
-		providerOptions = { openai: { reasoningEffort, textVerbosity } };
+		providerOptions = {
+			openai: {
+				reasoningEffort,
+				textVerbosity,
+				include: ['reasoning.encrypted_content'],
+			}
+		};
 	}
 
 	try {
