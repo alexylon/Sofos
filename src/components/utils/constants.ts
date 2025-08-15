@@ -3,6 +3,15 @@ import { Model, ModelType, ReasoningEffort, Temperature, TextVerbosity } from '@
 export const MAX_IMAGES = 5;
 export const MAX_FILES = 5;
 
+export const STORAGE_KEYS = {
+	CHAT_HISTORY: 'sofosChatHistory',
+	MODEL: 'sofosModel',
+	TEMPERATURE: 'sofosTemperature',
+	REASONING_EFFORT: 'sofosReasoningEffort',
+	TEXT_VERBOSITY: 'sofosTextVerbosity',
+	CURRENT_CHAT_INDEX: 'sofosCurrentChatIndex',
+};
+
 export const models: Model[] = [
 	{
 		value: 'gpt-5',

@@ -14,6 +14,7 @@ import MessagesContainer from '@/components/MessagesContainer';
 import SendMessageContainer from '@/components/SendMessageContainer';
 import { Model, Status } from '@/types/types';
 import {
+	STORAGE_KEYS,
 	MAX_IMAGES,
 	MAX_FILES,
 	models,
@@ -22,15 +23,6 @@ import {
 	getReasoningEfforts,
 	textVerbosities,
 } from '@/components/utils/constants';
-
-const STORAGE_KEYS = {
-	CHAT_HISTORY: 'sofosChatHistory',
-	MODEL: 'sofosModel',
-	TEMPERATURE: 'sofosTemperature',
-	REASONING_EFFORT: 'sofosReasoningEffort',
-	TEXT_VERBOSITY: 'sofosTextVerbosity',
-	CURRENT_CHAT_INDEX: 'sofosCurrentChatIndex',
-} as const;
 
 const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]): void => {
 	if (!chatHistory) return;
@@ -46,9 +38,11 @@ const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]): void => {
 				if (key === 'createdAt' && value instanceof Date) {
 					return value.toISOString();
 				}
+
 				if (key === 'experimental_attachments' && value) {
 					return null;
 				}
+
 				return value;
 			})
 		);
@@ -137,6 +131,7 @@ const Chat: React.FC = () => {
 				if (key === 'createdAt' && typeof value === 'string') {
 					return new Date(value);
 				}
+
 				return value;
 			});
 
@@ -209,6 +204,7 @@ const Chat: React.FC = () => {
 			if (resizedImages.length > MAX_IMAGES) {
 				console.warn(`You can only upload up to ${MAX_IMAGES} images.`);
 			}
+
 			return updatedImages;
 		});
 

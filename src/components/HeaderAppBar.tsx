@@ -9,6 +9,7 @@ import SelectSmall from '@/components/SelectSmall';
 import { Model, ReasoningEffort, Temperature, TextVerbosity } from '@/types/types';
 import { UIMessage } from '@ai-sdk/react'
 import SideBar from '@/components/SideBar';
+import { STORAGE_KEYS } from '@/components/utils/constants';
 
 interface HeaderAppBarProps {
 	models: Model[],
@@ -74,7 +75,7 @@ export default function HeaderAppBar({
 		setCurrentChatIndex(-1);
 
 		try {
-			localStorage.setItem('sofosCurrentChatIndex', (-1).toString());
+			localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, (-1).toString());
 		} catch (error) {
 			console.error('Error saving current chat index to localStorage:', error);
 		}

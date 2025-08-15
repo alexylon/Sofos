@@ -14,6 +14,7 @@ import { signOut } from "next-auth/react"
 import { UIMessage } from '@ai-sdk/react'
 import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
+import { STORAGE_KEYS } from '@/components/utils/constants';
 
 interface SideBarProps {
 	messages: UIMessage[];
@@ -91,7 +92,7 @@ const SideBar = ({
 		setCurrentChatIndex(chatIndex);
 
 		try {
-			localStorage.setItem('sofosCurrentChatIndex', chatIndex.toString());
+			localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, chatIndex.toString());
 		} catch (error) {
 			console.error('Error saving current chat index to localStorage:', error);
 		}
@@ -103,7 +104,7 @@ const SideBar = ({
 			setModel(model);
 
 			try {
-				localStorage.setItem('sofosModel', model);
+				localStorage.setItem(STORAGE_KEYS.MODEL, model);
 			} catch (error) {
 				console.error('Error saving model to localStorage:', error);
 			}
@@ -124,7 +125,7 @@ const SideBar = ({
 			setCurrentChatIndex(currentChatIndex - 1);
 
 			try {
-				localStorage.setItem('sofosCurrentChatIndex', (currentChatIndex - 1).toString());
+				localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, (currentChatIndex - 1).toString());
 			} catch (error) {
 				console.error('Error saving current chat index to localStorage:', error);
 			}
