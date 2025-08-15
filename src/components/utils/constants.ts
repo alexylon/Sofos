@@ -82,11 +82,8 @@ export const reasoningEfforts: ReasoningEffort[] = [
 	},
 ];
 
-export const getReasoningEfforts = (hasMinimalEffort: boolean) => {
-	if (hasMinimalEffort) {
-		return reasoningEfforts;
-	}
-	return reasoningEfforts.slice(1);
+export const getReasoningEfforts = (hasMinimalEffort: boolean): ReasoningEffort[] => {
+	return hasMinimalEffort ? reasoningEfforts : reasoningEfforts.slice(1);
 }
 
 export const textVerbosities: TextVerbosity[] = [

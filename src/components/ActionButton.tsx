@@ -1,49 +1,50 @@
 import React from 'react';
 import { IconButton } from '@mui/material';
-import { UIMessage } from '@ai-sdk/react'
+import { UIMessage } from '@ai-sdk/react';
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined';
 import ReplayCircleFilledOutlinedIcon from '@mui/icons-material/ReplayCircleFilledOutlined';
 
-interface SelectedImagesContainerProps {
-	messages: UIMessage[],
-	isLoading: boolean,
-	reload: () => void,
-	stop: () => void,
+interface ActionButtonProps {
+	messages: UIMessage[];
+	isLoading: boolean;
+	reload: () => void;
+	stop: () => void;
 }
 
-const ActionButton = ({ messages, isLoading, reload, stop }: SelectedImagesContainerProps) => {
-	const isRegenerateButton = messages.length > 0 && messages[messages.length - 1].role !== 'assistant' && !isLoading;
-	const isAbortButton = messages.length > 0 && isLoading;
+const ActionButton: React.FC<ActionButtonProps> = ({ messages, isLoading, reload, stop }) => {
+	const hasMessages = messages.length > 0;
+	const lastMessage = hasMessages ? messages[messages.length - 1] : null;
+	const isRegenerateButton = hasMessages && lastMessage?.role !== 'assistant' && !isLoading;
+	const isAbortButton = hasMessages && isLoading;
 
+	if (!isRegenerateButton && !isAbortButton) {
+		return null;
+	}
 
 	return (
-		<>
-			{
-				(isRegenerateButton || isAbortButton) &&
-					<IconButton
-						edge="end"
-						color="primary"
-						onClick={isRegenerateButton ? reload as () => void : stop as () => void}
-					>
-					{isRegenerateButton
-						? <ReplayCircleFilledOutlinedIcon
-							sx={{
-								height: '30px',
-								width: '30px',
-							}}
-						/>
-						: <StopCircleOutlinedIcon
-							sx={{
-								height: '30px',
-								width: '30px',
-								color: "red",
-							}}
-						/>
-					}
-					</IconButton>
-			}
-		</>
+		<IconButton
+			edge="end"
+			color="primary"
+			onClick={isRegenerateButton ? reload : stop}
+		>
+			{isRegenerateButton ? (
+				<ReplayCircleFilledOutlinedIcon
+					sx={{
+						height: '30px',
+						width: '30px',
+					}}
+				/>
+			) : (
+				<StopCircleOutlinedIcon
+					sx={{
+						height: '30px',
+						width: '30px',
+						color: 'red',
+					}}
+				/>
+			)}
+		</IconButton>
 	);
 };
 
-export default ActionButton
+export default ActionButton;

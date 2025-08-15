@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import { useChat, UIMessage } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai';
-import { useSession } from "next-auth/react"
-import { resizeImage } from '@/components/utils/resizeImage';
-import HeaderAppBar from '@/components/HeaderAppBar';
+import { useSession } from 'next-auth/react';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { Model, Status } from '@/types/types';
-import MessagesContainer from '@/components/MessagesContainer';
-import SendMessageContainer from '@/components/SendMessageContainer';
 import { IconButton } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { resizeImage } from '@/components/utils/resizeImage';
+import HeaderAppBar from '@/components/HeaderAppBar';
+import MessagesContainer from '@/components/MessagesContainer';
+import SendMessageContainer from '@/components/SendMessageContainer';
+import { Model, Status } from '@/types/types';
 import {
 	MAX_IMAGES,
 	MAX_FILES,
@@ -23,32 +23,41 @@ import {
 	textVerbosities,
 } from '@/components/utils/constants';
 
-const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]) => {
-	if (chatHistory) {
-		const filteredChatHistory = chatHistory.filter(chat => chat !== null && chat !== undefined);
+const STORAGE_KEYS = {
+	CHAT_HISTORY: 'sofosChatHistory',
+	MODEL: 'sofosModel',
+	TEMPERATURE: 'sofosTemperature',
+	REASONING_EFFORT: 'sofosReasoningEffort',
+	TEXT_VERBOSITY: 'sofosTextVerbosity',
+	CURRENT_CHAT_INDEX: 'sofosCurrentChatIndex',
+} as const;
 
-		try {
-			localStorage.setItem(
-				'sofosChatHistory',
-				JSON.stringify(filteredChatHistory, (key, value) => {
-					if (key === 'createdAt' && value instanceof Date) {
-						return value.toISOString();
-					}
+const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]): void => {
+	if (!chatHistory) return;
 
-					if (key === 'experimental_attachments' && value) {
-						value = null;
-					}
+	const filteredChatHistory = chatHistory.filter(
+		chat => chat !== null && chat !== undefined
+	);
 
-					return value;
-				})
-			);
-		} catch (error) {
-			console.error('Error saving chat history to localStorage:', error);
-		}
+	try {
+		localStorage.setItem(
+			STORAGE_KEYS.CHAT_HISTORY,
+			JSON.stringify(filteredChatHistory, (key, value) => {
+				if (key === 'createdAt' && value instanceof Date) {
+					return value.toISOString();
+				}
+				if (key === 'experimental_attachments' && value) {
+					return null;
+				}
+				return value;
+			})
+		);
+	} catch (error) {
+		console.error('Error saving chat history to localStorage:', error);
 	}
 };
 
-export default function Chat() {
+const Chat: React.FC = () => {
 	const [model, setModel] = useState<Model>(models[0]);
 	const hasMinimalEffort = !model.value.startsWith('o');
 	const updatedReasoningEfforts = getReasoningEfforts(hasMinimalEffort);
@@ -94,13 +103,12 @@ export default function Chat() {
 	const isDisabled = isLoading || !!error;
 
 	useEffect(() => {
-		// Initialize from localStorage
-		const storedModelValue = localStorage.getItem('sofosModel');
-		const storedTemperature = localStorage.getItem('sofosTemperature');
-		const storedReasoningEffort = localStorage.getItem('sofosReasoningEffort');
-		const storedTextVerbosity = localStorage.getItem('sofosTextVerbosity');
-		const storedChatHistory = localStorage.getItem('sofosChatHistory');
-		const storedCurrentChatIndex = localStorage.getItem('sofosCurrentChatIndex');
+		const storedModelValue = localStorage.getItem(STORAGE_KEYS.MODEL);
+		const storedTemperature = localStorage.getItem(STORAGE_KEYS.TEMPERATURE);
+		const storedReasoningEffort = localStorage.getItem(STORAGE_KEYS.REASONING_EFFORT);
+		const storedTextVerbosity = localStorage.getItem(STORAGE_KEYS.TEXT_VERBOSITY);
+		const storedChatHistory = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY);
+		const storedCurrentChatIndex = localStorage.getItem(STORAGE_KEYS.CURRENT_CHAT_INDEX);
 
 		if (storedModelValue) {
 			const foundModel = models.find(model => model.value === storedModelValue);
@@ -143,25 +151,22 @@ export default function Chat() {
 			}
 		}
 
-		// Capture all scroll events across the entire viewport
-		const autoScroll = (event: WheelEvent) => {
+		const handleAutoScroll = (event: WheelEvent) => {
 			const grid = scrollableGridRef.current as HTMLDivElement | null;
 
-			// Check if the scrollableGridRef is currently in the viewport
-			if (grid) {
-				const bounding = grid.getBoundingClientRect();
+			if (!grid) return;
 
-				// Check if the vertical position of the mouse is within the grid's boundaries
-				if (event.clientY >= bounding.top && event.clientY <= bounding.bottom) {
-					grid.scrollTop += event.deltaY;
-				}
+			const bounding = grid.getBoundingClientRect();
+
+			if (event.clientY >= bounding.top && event.clientY <= bounding.bottom) {
+				grid.scrollTop += event.deltaY;
 			}
 		};
 
-		window.addEventListener('wheel', autoScroll, { passive: false });
+		window.addEventListener('wheel', handleAutoScroll, { passive: false });
 
 		return () => {
-			window.removeEventListener('wheel', autoScroll);
+			window.removeEventListener('wheel', handleAutoScroll);
 		};
 	}, []);
 
@@ -181,138 +186,134 @@ export default function Chat() {
 		setFiles([]);
 	};
 
-	const handleFilesChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-		if (event.target.files) {
-			const newImages: File[] = Array.from(event.target.files).filter(file => file.type.startsWith('image/'));
-			const newFiles: File[] = Array.from(event.target.files).filter(file => !file.type.startsWith('image/'));
-			const resizedImages: File[] = [];
+	const handleFilesChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (!event.target.files) return;
 
-			for (const image of newImages) {
-				try {
-					const resizedImage = await resizeImage(image, 2048);
-					resizedImages.push(resizedImage);
-				} catch (error) {
-					console.error(`Error resizing image ${image.name}:`, error);
-				}
-			}
+		const fileArray = Array.from(event.target.files);
+		const newImages = fileArray.filter(file => file.type.startsWith('image/'));
+		const newFiles = fileArray.filter(file => !file.type.startsWith('image/'));
+		const resizedImages: File[] = [];
 
-			setImages(prevImages => {
-				const updatedImages = [...prevImages, ...resizedImages].slice(0, MAX_IMAGES);
-
-				if (resizedImages.length > MAX_IMAGES) {
-					console.warn(`You can only upload up to ${MAX_IMAGES} images.`);
-				}
-				return updatedImages;
-			});
-
-			setFiles(prevFiles => {
-				const updatedFiles = [...prevFiles, ...newFiles].slice(0, MAX_FILES);
-
-				if (newFiles.length > MAX_FILES) {
-					console.warn(`You can only upload up to ${MAX_FILES} files.`);
-				}
-				return updatedFiles;
-			});
-		}
-	};
-
-	const handleRemoveImage = (index: number) => {
-		setImages(prevImages => prevImages && prevImages.filter((_, i) => i !== index));
-	};
-
-	const handleRemoveFile = (index: number) => {
-		setFiles(prevFiles => prevFiles && prevFiles.filter((_, i) => i !== index));
-	};
-
-	const handleModelChange = (event: SelectChangeEvent) => {
-		const { value } = event.target;
-		const modelValue = models.find(model => model.value === value);
-
-		if (modelValue) {
-			setModel(modelValue);
-
+		for (const image of newImages) {
 			try {
-				localStorage.setItem('sofosModel', value);
+				const resizedImage = await resizeImage(image, 2048);
+				resizedImages.push(resizedImage);
 			} catch (error) {
-				console.error('Error saving model to localStorage:', error);
+				console.error(`Error resizing image ${image.name}:`, error);
 			}
+		}
+
+		setImages(prevImages => {
+			const updatedImages = [...prevImages, ...resizedImages].slice(0, MAX_IMAGES);
+
+			if (resizedImages.length > MAX_IMAGES) {
+				console.warn(`You can only upload up to ${MAX_IMAGES} images.`);
+			}
+			return updatedImages;
+		});
+
+		setFiles(prevFiles => {
+			const updatedFiles = [...prevFiles, ...newFiles].slice(0, MAX_FILES);
+
+			if (newFiles.length > MAX_FILES) {
+				console.warn(`You can only upload up to ${MAX_FILES} files.`);
+			}
+
+			return updatedFiles;
+		});
+	}, []);
+
+	const handleRemoveImage = useCallback((index: number) => {
+		setImages(prevImages => prevImages.filter((_, i) => i !== index));
+	}, []);
+
+	const handleRemoveFile = useCallback((index: number) => {
+		setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+	}, []);
+
+	const handleModelChange = useCallback((event: SelectChangeEvent) => {
+		const { value } = event.target;
+		const selectedModel = models.find(model => model.value === value);
+
+		if (!selectedModel) return;
+
+		setModel(selectedModel);
+
+		try {
+			localStorage.setItem(STORAGE_KEYS.MODEL, value);
+		} catch (error) {
+			console.error('Error saving model to localStorage:', error);
 		}
 
 		if (value.startsWith('o') && reasoningEffort === reasoningEfforts[0].value) {
-			setReasoningEffort(reasoningEfforts[1].value);
+			const newReasoningEffort = reasoningEfforts[1].value;
+			setReasoningEffort(newReasoningEffort);
 
 			try {
-				localStorage.setItem('sofosReasoningEffort', reasoningEfforts[1].value);
+				localStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);
 			} catch (error) {
 				console.error('Error saving reasoning effort to localStorage:', error);
 			}
 		}
-	};
+	}, [reasoningEffort]);
 
-	const handleTemperatureChange = (event: SelectChangeEvent) => {
+	const handleTemperatureChange = useCallback((event: SelectChangeEvent) => {
 		const { value } = event.target;
-
 		setTemperature(Number(value));
 
 		try {
-			localStorage.setItem('sofosTemperature', value);
+			localStorage.setItem(STORAGE_KEYS.TEMPERATURE, value);
 		} catch (error) {
 			console.error('Error saving temperature to localStorage:', error);
 		}
-	};
+	}, []);
 
-	const handleReasoningEffortChange = (event: SelectChangeEvent) => {
-		setReasoningEffort(event.target.value);
+	const handleReasoningEffortChange = useCallback((event: SelectChangeEvent) => {
+		const { value } = event.target;
+		setReasoningEffort(value);
 
 		try {
-			localStorage.setItem('sofosReasoningEffort', event.target.value);
+			localStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, value);
 		} catch (error) {
 			console.error('Error saving reasoning effort to localStorage:', error);
 		}
-	};
+	}, []);
 
-	const handleTextVerbosityChange = (event: SelectChangeEvent) => {
+	const handleTextVerbosityChange = useCallback((event: SelectChangeEvent) => {
 		const { value } = event.target;
-
 		setTextVerbosity(value);
 
 		try {
-			localStorage.setItem('sofosTextVerbosity', value);
+			localStorage.setItem(STORAGE_KEYS.TEXT_VERBOSITY, value);
 		} catch (error) {
 			console.error('Error saving text verbosity to localStorage:', error);
 		}
-	}
+	}, []);
 
-	const handleDrawerOpen = () => {
+	const handleDrawerOpen = useCallback(() => {
 		setOpen(true);
-	};
+	}, []);
 
-	const handleDrawerClose = () => {
+	const handleDrawerClose = useCallback(() => {
 		setOpen(false);
-	};
+	}, []);
 
-	const autoScroll = () => {
+	const autoScroll = useCallback(() => {
 		setIsScrolling(true);
+		setTimeout(() => setIsScrolling(false), 2000);
+	}, []);
 
-		setTimeout(() => {
-			setIsScrolling(false);
-		}, 2000);
-	}
+	const onFinishCallback = useCallback((message: UIMessage) => {
+		if (error) return;
 
-	// Callback to be executed after 'assistant' message is received
-	const onFinishCallback = (message: UIMessage) => {
-		if (!error) {
-			setMessages((prevMessages: UIMessage[]): UIMessage[] => {
-				const isNewChat = prevMessages.length <= 2;
-				// @ts-ignore
-				message.createdAt = new Date();
+		setMessages((prevMessages: UIMessage[]): UIMessage[] => {
+			const isNewChat = prevMessages.length <= 2;
+			(message as any).createdAt = new Date();
 
-				setModel((prevModel) => {
-					console.log('prevModel', prevModel);
-					// @ts-ignore
-					message.modelId = prevModel.label;
-					return prevModel;
-				});
+			setModel((prevModel) => {
+				(message as any).modelId = prevModel.label;
+				return prevModel;
+			});
 
 				const updatedMessages: UIMessage[] = [...prevMessages];
 				// For some reason the last assistant message is incomplete after
@@ -328,7 +329,7 @@ export default function Chat() {
 							// Only update currentChatIndex if it's a new chat
 							if (isNewChat) {
 								try {
-									localStorage.setItem('sofosCurrentChatIndex', index.toString());
+									localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, index.toString());
 								} catch (error) {
 									console.error('Error saving current chat index to localStorage:', error);
 								}
@@ -362,32 +363,24 @@ export default function Chat() {
 					});
 				}
 
-				return updatedMessages || [];
-			});
-		}
-	}
+			return updatedMessages;
+		});
+	}, [error, setMessages]);
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>, fileList: FileList) => {
+	const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>, fileList: FileList) => {
 		e.preventDefault();
 
-		if (fileList?.length > 0) {
-			sendMessage(
-				{ text: input, files: fileList },
-				{
-					body: { model, temperature, reasoningEffort, textVerbosity },
-				},
-			).then();
-		} else {
-			sendMessage(
-				{ text: input },
-				{
-					body: { model, temperature, reasoningEffort, textVerbosity },
-				},
-			).then();
-		}
+		const messageOptions = {
+			body: { model, temperature, reasoningEffort, textVerbosity },
+		};
 
+		const messageData = fileList?.length > 0
+			? { text: input, files: fileList }
+			: { text: input };
+
+		sendMessage(messageData, messageOptions).then();
 		setInput('');
-	};
+	}, [input, model, temperature, reasoningEffort, textVerbosity, sendMessage]);
 
 	return (
 		<div onClick={handleDrawerClose}>
@@ -417,8 +410,8 @@ export default function Chat() {
 				isDisabled={isDisabled}
 				isLoading={isLoading}
 			/>
-			{user &&
-					<Box
+			{user && (
+				<Box
 						className="chatContainer"
 						sx={{
 							maxWidth: 1200,
@@ -489,9 +482,11 @@ export default function Chat() {
 							reload={regenerate}
 							stop={stop}
 							error={error}
-						/>
-					</Box>
-			}
+					/>
+				</Box>
+			)}
 		</div>
 	);
-}
+};
+
+export default Chat;

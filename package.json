@@ -1,12 +1,17 @@
 {
   "name": "sofos",
-  "version": "5.03.20",
+  "version": "5.8.15",
   "private": true,
+  "description": "A GPT/Claude client application",
+  "author": "Alexander Alexandrov",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.1",

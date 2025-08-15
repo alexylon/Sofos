@@ -18,9 +18,9 @@ interface SendMessageContainerProps {
 	handleRemoveImage: (index: number) => void;
 	handleRemoveFile: (index: number) => void;
 	input: string;
-	handleInputChange: any;
+	handleInputChange: (value: string) => void;
 	onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-	handleFilesChange: any;
+	handleFilesChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	isUploadDisabled: boolean;
 	isLoading: boolean;
 	messages: UIMessage[];
@@ -29,24 +29,24 @@ interface SendMessageContainerProps {
 	error?: Error;
 }
 
-const SendMessageContainer = ({
-								  hasImages,
-								  hasFiles,
-								  images,
-								  files,
-								  handleRemoveImage,
-								  handleRemoveFile,
-								  isDisabled,
-								  input,
-								  handleInputChange,
-								  onSubmit,
-								  handleFilesChange,
-								  isUploadDisabled,
-								  isLoading,
-								  messages,
-								  reload,
-								  stop,
-							  }: SendMessageContainerProps) => {
+const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
+	hasImages,
+	hasFiles,
+	images,
+	files,
+	handleRemoveImage,
+	handleRemoveFile,
+	isDisabled,
+	input,
+	handleInputChange,
+	onSubmit,
+	handleFilesChange,
+	isUploadDisabled,
+	isLoading,
+	messages,
+	reload,
+	stop,
+}) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -135,16 +135,10 @@ const SendMessageContainer = ({
 									style: { resize: 'none' },
 									onKeyDown: (event) => {
 										if (event.key === 'Enter' && !event.shiftKey) {
-											// Prevent default action
 											event.preventDefault();
+											if (!input?.trim()) return;
 
-											if (!input?.trim()) {
-												return;
-											}
-
-											// Create synthetic FormEvent for TypeScript compatibility
-											const formEvent: React.FormEvent<HTMLFormElement> = event as unknown as React.FormEvent<HTMLFormElement>;
-
+											const formEvent = event as unknown as React.FormEvent<HTMLFormElement>;
 											onSubmit(formEvent);
 										}
 									},
