@@ -261,7 +261,7 @@ export default function Completion({
 													{messageTextPart?.text
 														?
 														<MarkdownText>
-															{messageTextPart.text || ''}
+															{`${messageTextPart.text}${status !== 'ready' ? '●' : ''}`}
 														</MarkdownText>
 														:
 														status !== 'ready'

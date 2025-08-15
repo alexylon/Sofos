@@ -1,6 +1,6 @@
 {
   "name": "sofos",
-  "version": "5.8.15",
+  "version": "25.08.15",
   "private": true,
   "description": "A GPT/Claude client application",
   "author": "Alexander Alexandrov",
