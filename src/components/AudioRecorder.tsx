@@ -38,7 +38,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 	const [isRecording, setIsRecording] = useState(false);
 	const [isTranscribing, setIsTranscribing] = useState(false);
 	const [recordingError, setRecordingError] = useState<string | null>(null);
-	const [showManualStopHint, setShowManualStopHint] = useState(false);
+	const [hint, setHint] = useState<string | null>(null);
 
 	// Tunables
 	const SILENCE_THRESHOLD = 0.01; // ~-40 dBFS
@@ -272,9 +272,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 						 (window.navigator as any).standalone === true;
 
 			if (isIOSSafari || isPWA) {
-				setShowManualStopHint(true);
-				// Hide the hint after 3 seconds
-				setTimeout(() => setShowManualStopHint(false), 3000);
+				setHint('Tap the microphone to stop recording');
+				setTimeout(() => setHint(null), 5000);
 			}
 
 			// Auto-stop after 30 seconds (simplified recording doesn't have silence detection)
@@ -287,6 +286,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			console.log('Simple recording started successfully');
 		} catch (error) {
 			console.error('Simple recording failed:', error);
+			setHint(`Simple recording failed: ${error}`);
+			setTimeout(() => setHint(null), 5000);
 			setRecordingError(`Recording failed: ${error}`);
 			if (streamRef.current) {
 				streamRef.current.getTracks().forEach((t) => t.stop());
@@ -486,9 +487,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
 			// Show manual stop hint for iOS Safari/PWA users since auto-stop is disabled
 			if (isIOSSafari || isPWA) {
-				setShowManualStopHint(true);
-				// Hide the hint after 3 seconds
-				setTimeout(() => setShowManualStopHint(false), 3000);
+				setHint('Tap the microphone to stop recording');
+				setTimeout(() => setHint(null), 5000);
 			}
 
 			console.log('Recording started successfully, state:', recorder.state);
@@ -530,12 +530,12 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			try {
 				recorder.stop();
 				setIsRecording(false);
-				setShowManualStopHint(false); // Clear the hint when stopping
+				setHint(null); // Clear the hint when stopping
 				mediaRecorderRef.current = null;
 			} catch (e) {
 				console.warn('Simple MediaRecorder stop error:', e);
 				setIsRecording(false);
-				setShowManualStopHint(false);
+				setHint(null);
 			}
 			return;
 		}
@@ -553,7 +553,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			} finally {
 				mediaRecorderRef.current = null;
 				setIsRecording(false);
-				setShowManualStopHint(false); // Clear the hint when stopping
+				setHint(null); // Clear the hint when stopping
 			}
 		};
 
@@ -618,6 +618,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 						if (isIOSSafari || isPWA) {
 							// Show visual feedback that transcription completed on iOS
 							console.log('🎙️ Transcription completed on iOS:', trimmedText);
+							setHint(`trimmedText: ${trimmedText}`);
+							setTimeout(() => setHint(null), 5000);
 
 							setTimeout(() => {
 								console.log('iOS delayed callback execution');
@@ -629,6 +631,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 							console.log('onTranscriptionResult called successfully');
 						}
 					} catch (error) {
+						setHint(`Error in onTranscriptionResult callback:: ${error}`);
+						setTimeout(() => setHint(null), 5000);
 						console.error('Error in onTranscriptionResult callback:', error);
 					}
 				} else {
@@ -745,7 +749,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 	return (
 		<>
 			{/* Manual stop hint for iOS Safari/PWA */}
-			{showManualStopHint && (
+			{hint && (
 				<div style={{
 					position: 'absolute',
 					bottom: '100%',
@@ -760,7 +764,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 					zIndex: 1000,
 					marginBottom: '8px'
 				}}>
-					Tap the microphone to stop recording
+					{hint}
 				</div>
 			)}
 			<IconButton
