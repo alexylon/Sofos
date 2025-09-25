@@ -79,7 +79,67 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 	};
 
 	const handleTranscriptionResult = (text: string) => {
-		handleInputChange(input + (input ? ' ' : '') + text);
+		console.log('SendMessageContainer handleTranscriptionResult called:', {
+			receivedText: text,
+			currentInput: input,
+			textType: typeof text,
+			textLength: text?.length || 0,
+			inputRefCurrent: inputRef.current,
+			inputRefValue: inputRef.current?.value
+		});
+
+		try {
+			const newText = input + (input ? ' ' : '') + text;
+			console.log('Updating input from:', input, 'to:', newText);
+
+			// Primary method: update through React state
+			handleInputChange(newText);
+
+			// iOS fallback: also update the input element directly
+			const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
+			const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+						 (window.navigator as any).standalone === true;
+
+			if ((isIOSSafari || isPWA) && inputRef.current) {
+				console.log('iOS fallback: updating input element directly');
+
+				// Focus the input first to ensure it's active
+				try {
+					inputRef.current.focus();
+				} catch (e) {
+					console.warn('Could not focus input:', e);
+				}
+
+				// Update the value
+				inputRef.current.value = newText;
+
+				// Trigger input event to ensure React picks up the change
+				const inputEvent = new Event('input', { bubbles: true });
+				inputRef.current.dispatchEvent(inputEvent);
+
+				// Also try triggering change event
+				const changeEvent = new Event('change', { bubbles: true });
+				inputRef.current.dispatchEvent(changeEvent);
+
+				// Try to trigger React's onChange handler directly if available
+				const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+					window.HTMLTextAreaElement.prototype,
+					'value'
+				)?.set;
+
+				if (nativeInputValueSetter) {
+					nativeInputValueSetter.call(inputRef.current, newText);
+					const reactEvent = new Event('input', { bubbles: true });
+					inputRef.current.dispatchEvent(reactEvent);
+				}
+
+				console.log('iOS fallback complete, input value is now:', inputRef.current.value);
+			}
+
+			console.log('handleInputChange called successfully');
+		} catch (error) {
+			console.error('Error in handleTranscriptionResult:', error);
+		}
 	};
 
 	const handleTranscriptionError = (error: string) => {

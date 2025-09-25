@@ -594,8 +594,45 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			if (response.ok) {
 				const result = await response.json();
 				console.log('Transcription successful:', result);
+
+				// iOS-specific debugging
+				const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
+				const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+							 (window.navigator as any).standalone === true;
+
+				console.log('iOS Transcription Debug:', {
+					isIOSSafari,
+					isPWA,
+					resultText: result.text,
+					textTrimmed: result.text?.trim(),
+					textLength: result.text?.trim()?.length || 0,
+					onTranscriptionResultType: typeof onTranscriptionResult
+				});
+
 				if (result.text && result.text.trim()) {
-					onTranscriptionResult(result.text.trim());
+					const trimmedText = result.text.trim();
+					console.log('Calling onTranscriptionResult with:', trimmedText);
+
+					try {
+						// For iOS, ensure the callback runs in the next tick
+						if (isIOSSafari || isPWA) {
+							// Show visual feedback that transcription completed on iOS
+							console.log('🎙️ Transcription completed on iOS:', trimmedText);
+
+							setTimeout(() => {
+								console.log('iOS delayed callback execution');
+								onTranscriptionResult(trimmedText);
+								console.log('iOS onTranscriptionResult called successfully');
+							}, 0);
+						} else {
+							onTranscriptionResult(trimmedText);
+							console.log('onTranscriptionResult called successfully');
+						}
+					} catch (error) {
+						console.error('Error in onTranscriptionResult callback:', error);
+					}
+				} else {
+					console.warn('Transcription result was empty or invalid:', result);
 				}
 			} else {
 				const errorText = await response.text();
