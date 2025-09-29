@@ -702,35 +702,25 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			}
 
 			try {
-				// // For PWA with iOS Safari, try simplified approach first
-				// if (isPWA && isIOSSafari) {
-				// 	console.log('Using simplified recording for iOS PWA');
-				// 	await startSimplifiedRecording();
-				// } else {
-				// 	await startRecording();
-				// }
-
-				await startRecording();
+				// For PWA with iOS Safari, try simplified approach first
+				if (isPWA && isIOSSafari) {
+					console.log('Using simplified recording for iOS PWA');
+					await startSimplifiedRecording();
+				} else {
+					await startRecording();
+				}
 			} catch (error) {
 				console.error('Recording failed in handleMicClick:', error);
 
-				// if (!isPWA || !isIOSSafari) {
-				// 	console.log('Main recording failed, trying simplified approach...');
-				// 	try {
-				// 		await startSimplifiedRecording();
-				// 		return;
-				// 	} catch (fallbackError) {
-				// 		console.error('Fallback recording also failed:', fallbackError);
-				// 	}
-				// }
-
 				// Fallback: try simplified recording if main recording fails
-				console.log('Main recording failed, trying simplified approach...');
-				try {
-					await startSimplifiedRecording();
-					return;
-				} catch (fallbackError) {
-					console.error('Fallback recording also failed:', fallbackError);
+				if (!isPWA || !isIOSSafari) {
+					console.log('Main recording failed, trying simplified approach...');
+					try {
+						await startSimplifiedRecording();
+						return;
+					} catch (fallbackError) {
+						console.error('Fallback recording also failed:', fallbackError);
+					}
 				}
 
 				// Show user-friendly error
