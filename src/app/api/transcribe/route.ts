@@ -86,7 +86,8 @@ export async function POST(req: Request) {
 
 		// Convert audio if it's not already in a format that Whisper can handle directly
 		const audioType = audioFile.type.toLowerCase();
-		const needsConversion = audioType.includes('webm') || audioType.includes('mp4') || audioType.includes('ogg');
+		// Whisper supports mp4, wav, flac, m4a, mp3, webm, so we only need conversion for less common formats
+		const needsConversion = audioType.includes('webm') || audioType.includes('ogg');
 
 		if (needsConversion) {
 			console.log(`Converting audio file of type: ${audioType}`);
