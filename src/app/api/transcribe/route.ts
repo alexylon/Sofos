@@ -99,8 +99,6 @@ export async function POST(req: Request) {
 		const { text: transcription } = await transcribe({
 			model: openai.transcription('whisper-1'),
 			audio: buffer,
-			// Optional: language hint if you know it
-			// language: 'en',
 		});
 
 		return new Response(JSON.stringify({ text: transcription }), {

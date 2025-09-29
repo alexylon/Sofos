@@ -76,13 +76,13 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 		return debugInfo;
 	};
 
-	// Make debug function available globally
-	useEffect(() => {
-		(window as any).debugPWARecording = debugPWARecording;
-		return () => {
-			delete (window as any).debugPWARecording;
-		};
-	}, [isRecording]);
+	// // Make debug function available globally
+	// useEffect(() => {
+	// 	(window as any).debugPWARecording = debugPWARecording;
+	// 	return () => {
+	// 		delete (window as any).debugPWARecording;
+	// 	};
+	// }, [isRecording]);
 
 	function pickMimeType(): string {
 		// iOS Safari prefers mp4 format
@@ -286,8 +286,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			console.log('Simple recording started successfully');
 		} catch (error) {
 			console.error('Simple recording failed:', error);
-			setHint(`Simple recording failed: ${error}`);
-			setTimeout(() => setHint(null), 5000);
 			setRecordingError(`Recording failed: ${error}`);
 			if (streamRef.current) {
 				streamRef.current.getTracks().forEach((t) => t.stop());
@@ -618,8 +616,6 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 						if (isIOSSafari || isPWA) {
 							// Show visual feedback that transcription completed on iOS
 							console.log('🎙️ Transcription completed on iOS:', trimmedText);
-							setHint(`trimmedText: ${trimmedText}`);
-							setTimeout(() => setHint(null), 5000);
 
 							setTimeout(() => {
 								console.log('iOS delayed callback execution');
@@ -706,25 +702,35 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			}
 
 			try {
-				// For PWA with iOS Safari, try simplified approach first
-				if (isPWA && isIOSSafari) {
-					console.log('Using simplified recording for iOS PWA');
-					await startSimplifiedRecording();
-				} else {
-					await startRecording();
-				}
+				// // For PWA with iOS Safari, try simplified approach first
+				// if (isPWA && isIOSSafari) {
+				// 	console.log('Using simplified recording for iOS PWA');
+				// 	await startSimplifiedRecording();
+				// } else {
+				// 	await startRecording();
+				// }
+
+				await startRecording();
 			} catch (error) {
 				console.error('Recording failed in handleMicClick:', error);
 
+				// if (!isPWA || !isIOSSafari) {
+				// 	console.log('Main recording failed, trying simplified approach...');
+				// 	try {
+				// 		await startSimplifiedRecording();
+				// 		return;
+				// 	} catch (fallbackError) {
+				// 		console.error('Fallback recording also failed:', fallbackError);
+				// 	}
+				// }
+
 				// Fallback: try simplified recording if main recording fails
-				if (!isPWA || !isIOSSafari) {
-					console.log('Main recording failed, trying simplified approach...');
-					try {
-						await startSimplifiedRecording();
-						return;
-					} catch (fallbackError) {
-						console.error('Fallback recording also failed:', fallbackError);
-					}
+				console.log('Main recording failed, trying simplified approach...');
+				try {
+					await startSimplifiedRecording();
+					return;
+				} catch (fallbackError) {
+					console.error('Fallback recording also failed:', fallbackError);
 				}
 
 				// Show user-friendly error
