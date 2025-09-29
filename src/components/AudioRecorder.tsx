@@ -85,10 +85,10 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 	// }, [isRecording]);
 
 	function pickMimeType(): string {
-		// iOS Safari prefers mp4 format
-		const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
+		// Always use MP4 format for Safari (both iOS and desktop)
+		const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
 
-		if (isIOSSafari) {
+		if (isSafari) {
 			if (MediaRecorder.isTypeSupported('audio/mp4')) {
 				return 'audio/mp4';
 			}
@@ -233,14 +233,11 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			recorder.onstop = async () => {
 				console.log('Simple recording stopped, chunks:', chunks.length);
 				if (chunks.length > 0) {
-					// Try to determine the correct MIME type for PWA
-					const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-								 (window.navigator as any).standalone === true;
-					const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
+					// Use MP4 for Safari, webm for others
+					const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
 
 					let mimeType = 'audio/webm';
-					if (isPWA && isIOSSafari) {
-						// PWA on iOS often records in MP4 format
+					if (isSafari) {
 						mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
 					}
 
@@ -462,8 +459,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
 					// If we fell back to no options, try to determine type from the recorded data
 					if (!mimeType && finalChunks.length > 0) {
-						const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
-						finalType = isIOSSafari ? 'audio/mp4' : 'audio/webm';
+						const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+						finalType = isSafari ? 'audio/mp4' : 'audio/webm';
 					}
 
 					const audioBlob = new Blob(finalChunks, { type: finalType });
