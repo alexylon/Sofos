@@ -85,25 +85,12 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 	// }, [isRecording]);
 
 	function pickMimeType(): string {
-		// Always use MP4 format for Safari (both iOS and desktop)
-		const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+		let mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
 
-		if (isSafari) {
-			if (MediaRecorder.isTypeSupported('audio/mp4')) {
-				return 'audio/mp4';
-			}
-		}
-
-		let mimeType = 'audio/webm;codecs=opus';
 		if (!MediaRecorder.isTypeSupported(mimeType)) {
-			mimeType = 'audio/webm';
-			if (!MediaRecorder.isTypeSupported(mimeType)) {
-				mimeType = 'audio/mp4';
-				if (!MediaRecorder.isTypeSupported(mimeType)) {
-					mimeType = ''; // let browser choose
-				}
-			}
+			mimeType = ''; // let browser choose
 		}
+
 		return mimeType;
 	}
 
@@ -212,7 +199,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
 	const startSimplifiedRecording = async () => {
 		try {
-			console.log('Starting simplified recording for PWA...');
+			console.log('startSimplifiedRecording...');
 			setRecordingError(null);
 
 			const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -234,12 +221,12 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 				console.log('Simple recording stopped, chunks:', chunks.length);
 				if (chunks.length > 0) {
 					// Use MP4 for Safari, webm for others
-					const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+					// const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
 
-					let mimeType = 'audio/webm';
-					if (isSafari) {
-						mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
-					}
+					let mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
+					// if (isSafari) {
+					// 	mimeType = MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm';
+					// }
 
 					console.log('Using MIME type for simple recording:', mimeType);
 					const audioBlob = new Blob(chunks, { type: mimeType });
@@ -699,25 +686,35 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 			}
 
 			try {
-				// For PWA with iOS Safari, try simplified approach first
-				if (isPWA && isIOSSafari) {
-					console.log('Using simplified recording for iOS PWA');
-					await startSimplifiedRecording();
-				} else {
-					await startRecording();
-				}
+				// // For PWA with iOS Safari, try simplified approach first
+				// if (isPWA && isIOSSafari) {
+				// 	console.log('Using simplified recording for iOS PWA');
+				// 	await startSimplifiedRecording();
+				// } else {
+				// 	await startRecording();
+				// }
+
+				await startRecording();
 			} catch (error) {
 				console.error('Recording failed in handleMicClick:', error);
 
-				// Fallback: try simplified recording if main recording fails
-				if (!isPWA || !isIOSSafari) {
-					console.log('Main recording failed, trying simplified approach...');
-					try {
-						await startSimplifiedRecording();
-						return;
-					} catch (fallbackError) {
-						console.error('Fallback recording also failed:', fallbackError);
-					}
+				// // Fallback: try simplified recording if main recording fails
+				// if (!isPWA || !isIOSSafari) {
+				// 	console.log('Main recording failed, trying simplified approach...');
+				// 	try {
+				// 		await startSimplifiedRecording();
+				// 		return;
+				// 	} catch (fallbackError) {
+				// 		console.error('Fallback recording also failed:', fallbackError);
+				// 	}
+				// }
+
+				console.log('Main recording failed, trying simplified approach...');
+				try {
+					await startSimplifiedRecording();
+					return;
+				} catch (fallbackError) {
+					console.error('Fallback recording also failed:', fallbackError);
 				}
 
 				// Show user-friendly error

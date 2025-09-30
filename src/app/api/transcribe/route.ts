@@ -2,7 +2,6 @@
 import { experimental_transcribe as transcribe } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { spawn } from 'child_process';
-import ffmpegPath from 'ffmpeg-static';
 
 
 export const runtime = 'nodejs';
@@ -38,7 +37,7 @@ function convertAudioToWav(input: Buffer, inputFormat: string): Promise<Buffer> 
 			'pipe:1'
 		);
 
-		const bin = ffmpegPath || 'ffmpeg';
+		const bin = 'ffmpeg';
 		const ff = spawn(bin, ffmpegArgs);
 
 		const chunks: Buffer[] = [];
