@@ -1,70 +1,8 @@
-// import OpenAI from 'openai';
 import { experimental_transcribe as transcribe } from 'ai';
 import { openai } from '@ai-sdk/openai';
-import { spawn } from 'child_process';
-
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-
-function convertAudioToWav(input: Buffer, inputFormat: string): Promise<Buffer> {
-	return new Promise((resolve, reject) => {
-		let ffmpegInputFormat = 'webm';
-
-		if (inputFormat.includes('mp4') || inputFormat.includes('m4a')) {
-			ffmpegInputFormat = 'mp4';
-		} else if (inputFormat.includes('webm')) {
-			ffmpegInputFormat = 'webm';
-		} else if (inputFormat.includes('wav')) {
-			ffmpegInputFormat = 'wav';
-		} else if (inputFormat.includes('ogg')) {
-			ffmpegInputFormat = 'ogg';
-		} else if (inputFormat.includes('3gp')) {
-			ffmpegInputFormat = '3gp';
-		}
-
-		console.log(`Converting audio from ${inputFormat} (${ffmpegInputFormat || 'auto-detect'}) to WAV`);
-
-		const ffmpegArgs = [];
-		if (ffmpegInputFormat) {
-			ffmpegArgs.push('-f', ffmpegInputFormat);
-		}
-		ffmpegArgs.push(
-			'-i', 'pipe:0',
-			'-ac', '1',           // mono
-			'-ar', '16000',       // 16kHz sample rate
-			'-f', 'wav',
-			'pipe:1'
-		);
-
-		const bin = 'ffmpeg';
-		const ff = spawn(bin, ffmpegArgs);
-
-		const chunks: Buffer[] = [];
-		const errorChunks: Buffer[] = [];
-
-		ff.stdout.on('data', (d) => chunks.push(d as Buffer));
-		ff.stderr.on('data', (d) => errorChunks.push(d as Buffer));
-
-		ff.on('close', (code) => {
-			if (code === 0) {
-				console.log('Audio conversion successful');
-				resolve(Buffer.concat(chunks));
-			} else {
-				const errorOutput = Buffer.concat(errorChunks).toString();
-				console.error('ffmpeg conversion failed:', { code, error: errorOutput });
-				reject(new Error(`ffmpeg exited ${code}: ${errorOutput}`));
-			}
-		});
-
-		ff.on('error', (err) => {
-			console.error('ffmpeg spawn error:', err);
-			reject(err);
-		});
-
-		ff.stdin.end(input);
-	});
-}
 
 export async function POST(req: Request) {
 	try {
@@ -83,22 +21,13 @@ export async function POST(req: Request) {
 		});
 
 		const ab = await audioFile.arrayBuffer();
-		let buffer = Buffer.from(ab);
+		const buffer = Buffer.from(ab);
 
-		// Convert audio if it's not already in a format that Whisper can handle directly
-		const audioType = audioFile.type.toLowerCase();
-		// Whisper supports mp4, wav, flac, m4a, mp3, webm, so we only need conversion for less common formats
-		const needsConversion = audioType.includes('webm') || audioType.includes('ogg');
-
-		if (needsConversion) {
-			console.log(`Converting audio file of type: ${audioType}`);
-			buffer = await convertAudioToWav(buffer, audioType);
-		} else {
-			console.log(`Using audio file directly without conversion: ${audioType}`);
-		}
+		// Audio is already converted to WAV in the browser
+		console.log(`Processing audio file: ${audioFile.type}`);
 
 		const { text: transcription } = await transcribe({
-			model: openai.transcription('whisper-1'),
+			model: openai.transcription('gpt-4o-mini-transcribe'),
 			audio: buffer,
 		});
 

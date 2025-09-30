@@ -237,7 +237,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 					if (chunks.length > 0) {
 						const finalType = mimeType || (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm');
 						const audioBlob = new Blob(chunks, { type: finalType });
-						await transcribeAudio(audioBlob, finalType);
+						await transcribeAudio(audioBlob);
 					}
 
 					// Clean up stream
@@ -299,7 +299,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 					if (finalChunks.length > 0) {
 						const finalType = mimeType || (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : 'audio/webm');
 						const audioBlob = new Blob(finalChunks, { type: finalType });
-						await transcribeAudio(audioBlob, finalType);
+						await transcribeAudio(audioBlob);
 					}
 
 					// Clean up stream
@@ -386,18 +386,94 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 		doStop();
 	};
 
-	const transcribeAudio = async (audioBlob: Blob, mimeType?: string) => {
+	const convertToWav = async (audioBlob: Blob): Promise<Blob> => {
+		// Decode the audio blob to raw PCM data
+		const arrayBuffer = await audioBlob.arrayBuffer();
+		const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+		const audioContext = new AudioContextClass();
+		const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+		// Convert to mono 16kHz WAV
+		const targetSampleRate = 16000;
+		const numberOfChannels = 1;
+
+		// Resample if needed
+		let samples: Float32Array;
+		if (audioBuffer.sampleRate === targetSampleRate) {
+			samples = audioBuffer.getChannelData(0);
+		} else {
+			// Simple linear resampling
+			const ratio = audioBuffer.sampleRate / targetSampleRate;
+			const newLength = Math.round(audioBuffer.length / ratio);
+			samples = new Float32Array(newLength);
+			const channelData = audioBuffer.getChannelData(0);
+
+			for (let i = 0; i < newLength; i++) {
+				const srcIndex = i * ratio;
+				const srcIndexFloor = Math.floor(srcIndex);
+				const srcIndexCeil = Math.min(srcIndexFloor + 1, channelData.length - 1);
+				const fraction = srcIndex - srcIndexFloor;
+				samples[i] = channelData[srcIndexFloor] * (1 - fraction) + channelData[srcIndexCeil] * fraction;
+			}
+		}
+
+		// Convert float32 samples to int16
+		const int16Samples = new Int16Array(samples.length);
+		for (let i = 0; i < samples.length; i++) {
+			const s = Math.max(-1, Math.min(1, samples[i]));
+			int16Samples[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+		}
+
+		// Create WAV file
+		const wavBuffer = createWavFile(int16Samples, targetSampleRate, numberOfChannels);
+		return new Blob([wavBuffer], { type: 'audio/wav' });
+	};
+
+	const createWavFile = (samples: Int16Array, sampleRate: number, numChannels: number): ArrayBuffer => {
+		const bytesPerSample = 2; // 16-bit
+		const dataSize = samples.length * bytesPerSample;
+		const buffer = new ArrayBuffer(44 + dataSize);
+		const view = new DataView(buffer);
+
+		// WAV header
+		const writeString = (offset: number, str: string) => {
+			for (let i = 0; i < str.length; i++) {
+				view.setUint8(offset + i, str.charCodeAt(i));
+			}
+		};
+
+		writeString(0, 'RIFF');
+		view.setUint32(4, 36 + dataSize, true);
+		writeString(8, 'WAVE');
+		writeString(12, 'fmt ');
+		view.setUint32(16, 16, true); // fmt chunk size
+		view.setUint16(20, 1, true); // PCM format
+		view.setUint16(22, numChannels, true);
+		view.setUint32(24, sampleRate, true);
+		view.setUint32(28, sampleRate * numChannels * bytesPerSample, true); // byte rate
+		view.setUint16(32, numChannels * bytesPerSample, true); // block align
+		view.setUint16(34, 16, true); // bits per sample
+		writeString(36, 'data');
+		view.setUint32(40, dataSize, true);
+
+		// Write samples
+		for (let i = 0; i < samples.length; i++) {
+			view.setInt16(44 + i * 2, samples[i], true);
+		}
+
+		return buffer;
+	};
+
+	const transcribeAudio = async (audioBlob: Blob) => {
 		try {
 			setIsTranscribing(true);
 			setRecordingError(null);
 
+			// Convert to WAV in the browser for maximum compatibility
+			const wavBlob = await convertToWav(audioBlob);
+
 			const formData = new FormData();
-			const blobType = mimeType || audioBlob.type;
-			const fileExtension = blobType.includes('mp4') ? 'mp4' : 'webm';
-
-
-			// Create the file with explicit MIME type
-			const audioFile = new File([audioBlob], `recording.${fileExtension}`, { type: blobType });
+			const audioFile = new File([wavBlob], 'recording.wav', { type: 'audio/wav' });
 			formData.append('audio', audioFile);
 
 			const response = await fetch('/api/transcribe', {
