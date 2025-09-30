@@ -10,6 +10,7 @@ import { Model, ReasoningEffort, Temperature, TextVerbosity } from '@/types/type
 import { UIMessage } from '@ai-sdk/react'
 import SideBar from '@/components/SideBar';
 import { STORAGE_KEYS } from '@/components/utils/constants';
+import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
 
 interface HeaderAppBarProps {
 	models: Model[],
@@ -33,7 +34,7 @@ interface HeaderAppBarProps {
 	setModel: any,
 	open: any,
 	handleDrawerOpen: any,
-	saveChatHistoryToLocalStorage: any,
+	saveChatHistory: any,
 	isDisabled: boolean,
 	isLoading: boolean,
 }
@@ -60,7 +61,7 @@ export default function HeaderAppBar({
 										 setModel,
 										 open,
 										 handleDrawerOpen,
-										 saveChatHistoryToLocalStorage,
+										 saveChatHistory,
 										 isDisabled,
 										 isLoading,
 									 }: HeaderAppBarProps) {
@@ -74,14 +75,11 @@ export default function HeaderAppBar({
 		setMessages([]);
 		setCurrentChatIndex(-1);
 
-		try {
-			localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, (-1).toString());
-		} catch (error) {
-			console.error('Error saving current chat index to localStorage:', error);
-		}
+		void indexedDBStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, -1);
 
 		router.push('/new');
 	};
+	console.log('temperature', temperature);
 
 	return (
 		<>
@@ -211,7 +209,7 @@ export default function HeaderAppBar({
 												setModel={setModel}
 												open={open}
 												handleStartNewChat={handleStartNewChat}
-												saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
+												saveChatHistory={saveChatHistory}
 											/>
 					}
 				</Box>

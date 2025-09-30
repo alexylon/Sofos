@@ -15,6 +15,7 @@ import { UIMessage } from '@ai-sdk/react'
 import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 import { STORAGE_KEYS } from '@/components/utils/constants';
+import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
 
 interface SideBarProps {
 	messages: UIMessage[];
@@ -26,7 +27,7 @@ interface SideBarProps {
 	setModel: (model: string) => void;
 	open: boolean;
 	handleStartNewChat: () => void;
-	saveChatHistoryToLocalStorage: (history: UIMessage[][]) => void;
+	saveChatHistory: (history: UIMessage[][]) => void;
 }
 
 const formattedDate = (dateString: Date | undefined): string => {
@@ -75,7 +76,7 @@ const SideBar = ({
 					 setModel,
 					 open,
 					 handleStartNewChat,
-					 saveChatHistoryToLocalStorage,
+					 saveChatHistory,
 				 }: SideBarProps) => {
 	const drawerWidth = 200;
 
@@ -91,11 +92,7 @@ const SideBar = ({
 		setMessages(chatHistory[chatIndex]);
 		setCurrentChatIndex(chatIndex);
 
-		try {
-			localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, chatIndex.toString());
-		} catch (error) {
-			console.error('Error saving current chat index to localStorage:', error);
-		}
+		void indexedDBStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, chatIndex);
 
 		// @ts-ignore
 		const model = chatHistory[chatIndex][chatHistory[chatIndex].length - 1].name;
@@ -103,11 +100,7 @@ const SideBar = ({
 		if (model) {
 			setModel(model);
 
-			try {
-				localStorage.setItem(STORAGE_KEYS.MODEL, model);
-			} catch (error) {
-				console.error('Error saving model to localStorage:', error);
-			}
+			void indexedDBStorage.setItem(STORAGE_KEYS.MODEL, model);
 		}
 	};
 
@@ -115,7 +108,7 @@ const SideBar = ({
 		const updatedChats = chatHistory.filter((_, i) => i !== index);
 
 		setChatHistory(updatedChats);
-		saveChatHistoryToLocalStorage(updatedChats);
+		void saveChatHistory(updatedChats);
 
 		if (index === currentChatIndex) {
 			handleStartNewChat();
@@ -124,11 +117,7 @@ const SideBar = ({
 		if (index < currentChatIndex) {
 			setCurrentChatIndex(currentChatIndex - 1);
 
-			try {
-				localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, (currentChatIndex - 1).toString());
-			} catch (error) {
-				console.error('Error saving current chat index to localStorage:', error);
-			}
+			void indexedDBStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, currentChatIndex - 1);
 		}
 	};
 

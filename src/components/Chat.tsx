@@ -23,31 +23,36 @@ import {
 	getReasoningEfforts,
 	textVerbosities,
 } from '@/components/utils/constants';
+import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
 
-const saveChatHistoryToLocalStorage = (chatHistory: UIMessage[][]): void => {
+type MessageWithOptionalAttachments = UIMessage & { experimental_attachments?: unknown };
+
+const sanitizeChatHistory = (history: UIMessage[][]): UIMessage[][] =>
+	history
+		.filter((chat): chat is UIMessage[] => Array.isArray(chat))
+		.map(chat =>
+			chat
+				.filter((message): message is UIMessage => Boolean(message))
+				.map(message => {
+					const sanitizedMessage = { ...message } as MessageWithOptionalAttachments;
+
+					if (sanitizedMessage.experimental_attachments) {
+						sanitizedMessage.experimental_attachments = undefined;
+					}
+
+					return sanitizedMessage;
+				})
+		);
+
+const saveChatHistory = async (chatHistory: UIMessage[][]): Promise<void> => {
 	if (!chatHistory) return;
 
-	const filteredChatHistory = chatHistory.filter(
-		chat => chat !== null && chat !== undefined
-	);
+	const sanitizedChatHistory = sanitizeChatHistory(chatHistory);
 
 	try {
-		localStorage.setItem(
-			STORAGE_KEYS.CHAT_HISTORY,
-			JSON.stringify(filteredChatHistory, (key, value) => {
-				if (key === 'createdAt' && value instanceof Date) {
-					return value.toISOString();
-				}
-
-				if (key === 'experimental_attachments' && value) {
-					return null;
-				}
-
-				return value;
-			})
-		);
+		await indexedDBStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, sanitizedChatHistory);
 	} catch (error) {
-		console.error('Error saving chat history to localStorage:', error);
+		console.error('Error saving chat history to IndexedDB:', error);
 	}
 };
 
@@ -97,54 +102,74 @@ const Chat: React.FC = () => {
 	const isDisabled = isLoading || !!error;
 
 	useEffect(() => {
-		const storedModelValue = localStorage.getItem(STORAGE_KEYS.MODEL);
-		const storedTemperature = localStorage.getItem(STORAGE_KEYS.TEMPERATURE);
-		const storedReasoningEffort = localStorage.getItem(STORAGE_KEYS.REASONING_EFFORT);
-		const storedTextVerbosity = localStorage.getItem(STORAGE_KEYS.TEXT_VERBOSITY);
-		const storedChatHistory = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY);
-		const storedCurrentChatIndex = localStorage.getItem(STORAGE_KEYS.CURRENT_CHAT_INDEX);
+		let isMounted = true;
 
-		if (storedModelValue) {
-			const foundModel = models.find(model => model.value === storedModelValue);
+		const loadPersistedState = async () => {
+			try {
+				const [
+					storedModelValue,
+					storedTemperature,
+					storedReasoningEffort,
+					storedTextVerbosity,
+					storedChatHistory,
+					storedCurrentChatIndex,
+				] = await Promise.all([
+					indexedDBStorage.getItem<string>(STORAGE_KEYS.MODEL),
+					indexedDBStorage.getItem<number>(STORAGE_KEYS.TEMPERATURE),
+					indexedDBStorage.getItem<string>(STORAGE_KEYS.REASONING_EFFORT),
+					indexedDBStorage.getItem<string>(STORAGE_KEYS.TEXT_VERBOSITY),
+					indexedDBStorage.getItem<UIMessage[][]>(STORAGE_KEYS.CHAT_HISTORY),
+					indexedDBStorage.getItem<number>(STORAGE_KEYS.CURRENT_CHAT_INDEX),
+				]);
 
-			if (foundModel) {
-				setModel(foundModel);
-			}
-		}
-
-		if (storedTemperature) {
-			setTemperature(Number(storedTemperature));
-		}
-
-		if (storedReasoningEffort) {
-			setReasoningEffort(storedReasoningEffort);
-		}
-
-		if (storedTextVerbosity) {
-			setTextVerbosity(storedTextVerbosity);
-		}
-
-		if (storedChatHistory && storedCurrentChatIndex) {
-			setCurrentChatIndex(Number(storedCurrentChatIndex));
-
-			const parsedChatHistory: UIMessage[][] = JSON.parse(storedChatHistory, (key, value) => {
-				if (key === 'createdAt' && typeof value === 'string') {
-					return new Date(value);
+				if (!isMounted) {
+					return;
 				}
 
-				return value;
-			});
+				if (storedModelValue) {
+					const foundModel = models.find(modelItem => modelItem.value === storedModelValue);
 
-			if (parsedChatHistory?.length > 0) {
-				setChatHistory(parsedChatHistory);
-
-				const parsedMessages = parsedChatHistory[Number(storedCurrentChatIndex)];
-
-				if (parsedMessages?.length > 0) {
-					setMessages(parsedMessages);
+					if (foundModel) {
+						setModel(foundModel);
+					}
 				}
+
+				if (storedTemperature != null && !Number.isNaN(storedTemperature)) {
+					setTemperature(storedTemperature);
+				}
+
+				if (storedReasoningEffort) {
+					setReasoningEffort(storedReasoningEffort);
+				}
+
+				if (storedTextVerbosity) {
+					setTextVerbosity(storedTextVerbosity);
+				}
+
+				const persistedChatHistory = Array.isArray(storedChatHistory) ? storedChatHistory : null;
+				const persistedCurrentChatIndex = !Number.isNaN(storedCurrentChatIndex) ? storedCurrentChatIndex : null;
+
+				if (persistedChatHistory && persistedChatHistory.length > 0 && persistedCurrentChatIndex !== null) {
+					const normalizedChatHistory = sanitizeChatHistory(persistedChatHistory);
+					setCurrentChatIndex(persistedCurrentChatIndex);
+					setChatHistory(normalizedChatHistory);
+
+					if (persistedCurrentChatIndex >= 0 && persistedCurrentChatIndex < normalizedChatHistory.length) {
+						const persistedMessages = normalizedChatHistory[persistedCurrentChatIndex];
+
+						if (persistedMessages?.length > 0) {
+							setMessages(persistedMessages);
+						}
+					}
+				}
+			} catch (error) {
+				console.error('Error loading data from IndexedDB:', error);
 			}
-		}
+		};
+
+		loadPersistedState().catch(error => {
+			console.error('Unexpected error loading persisted state:', error);
+		});
 
 		const handleAutoScroll = (event: WheelEvent) => {
 			const grid = scrollableGridRef.current as HTMLDivElement | null;
@@ -161,9 +186,10 @@ const Chat: React.FC = () => {
 		window.addEventListener('wheel', handleAutoScroll, { passive: false });
 
 		return () => {
+			isMounted = false;
 			window.removeEventListener('wheel', handleAutoScroll);
 		};
-	}, []);
+	}, [setMessages]);
 
 	const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -235,55 +261,43 @@ const Chat: React.FC = () => {
 
 		setModel(selectedModel);
 
-		try {
-			localStorage.setItem(STORAGE_KEYS.MODEL, value);
-		} catch (error) {
-			console.error('Error saving model to localStorage:', error);
-		}
+		void indexedDBStorage.setItem(STORAGE_KEYS.MODEL, value);
 
 		if (value.startsWith('o') && reasoningEffort === reasoningEfforts[0].value) {
 			const newReasoningEffort = reasoningEfforts[1].value;
 			setReasoningEffort(newReasoningEffort);
 
-			try {
-				localStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);
-			} catch (error) {
-				console.error('Error saving reasoning effort to localStorage:', error);
-			}
+			void indexedDBStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);
+		}
+
+		if (value.startsWith('claude') && reasoningEffort === reasoningEfforts[0].value) {
+			const newReasoningEffort = reasoningEfforts[1].value;
+			setReasoningEffort(newReasoningEffort);
+
+			void indexedDBStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);
 		}
 	}, [reasoningEffort]);
 
 	const handleTemperatureChange = useCallback((event: SelectChangeEvent) => {
 		const { value } = event.target;
-		setTemperature(Number(value));
+		const numericValue = Number(value);
+		setTemperature(numericValue);
 
-		try {
-			localStorage.setItem(STORAGE_KEYS.TEMPERATURE, value);
-		} catch (error) {
-			console.error('Error saving temperature to localStorage:', error);
-		}
+		void indexedDBStorage.setItem(STORAGE_KEYS.TEMPERATURE, numericValue);
 	}, []);
 
 	const handleReasoningEffortChange = useCallback((event: SelectChangeEvent) => {
 		const { value } = event.target;
 		setReasoningEffort(value);
 
-		try {
-			localStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, value);
-		} catch (error) {
-			console.error('Error saving reasoning effort to localStorage:', error);
-		}
+		void indexedDBStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, value);
 	}, []);
 
 	const handleTextVerbosityChange = useCallback((event: SelectChangeEvent) => {
 		const { value } = event.target;
 		setTextVerbosity(value);
 
-		try {
-			localStorage.setItem(STORAGE_KEYS.TEXT_VERBOSITY, value);
-		} catch (error) {
-			console.error('Error saving text verbosity to localStorage:', error);
-		}
+		void indexedDBStorage.setItem(STORAGE_KEYS.TEXT_VERBOSITY, value);
 	}, []);
 
 	const handleDrawerOpen = useCallback(() => {
@@ -324,11 +338,7 @@ const Chat: React.FC = () => {
 
 							// Only update currentChatIndex if it's a new chat
 							if (isNewChat) {
-								try {
-									localStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, index.toString());
-								} catch (error) {
-									console.error('Error saving current chat index to localStorage:', error);
-								}
+								void indexedDBStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, index);
 								return index;
 							}
 
@@ -353,7 +363,7 @@ const Chat: React.FC = () => {
 
 						// Keep only the last 20 conversations
 						const finalChatHistory = updatedChatHistory.slice(-20);
-						saveChatHistoryToLocalStorage(finalChatHistory);
+						void saveChatHistory(finalChatHistory);
 
 						return finalChatHistory;
 					});
@@ -402,7 +412,7 @@ const Chat: React.FC = () => {
 				setModel={setModel}
 				open={open}
 				handleDrawerOpen={handleDrawerOpen}
-				saveChatHistoryToLocalStorage={saveChatHistoryToLocalStorage}
+				saveChatHistory={saveChatHistory}
 				isDisabled={isDisabled}
 				isLoading={isLoading}
 			/>
