@@ -215,6 +215,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 				console.error('MediaRecorder error:', event);
 				setIsRecording(false);
 				setRecordingError('Recording failed');
+				setHint('Recording failed');
+				setTimeout(() => setHint(null), 5000);
 
 				if (!useSimplified) {
 					cleanupAudio(true);
@@ -314,12 +316,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
 			recordingStartTimeRef.current = Date.now();
 			setIsRecording(true);
-
-			// Show hint for iOS Safari/PWA users
-			if (isIOSSafari || isPWA) {
-				setHint('Tap the microphone to stop recording');
-				setTimeout(() => setHint(null), 5000);
-			}
+			setHint('Recording now... Tap the microphone to stop');
 
 		} catch (error) {
 			console.error('Error starting recording:', error);
@@ -357,6 +354,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
 		if (!recorder || recorder.state === 'inactive') {
 			setIsRecording(false);
+			setHint(null);
 			return;
 		}
 
@@ -534,6 +532,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 	const handleMicClick = async () => {
 		if (isRecording) {
 			stopRecording();
+			setHint(null);
 		} else {
 			// Establish user gesture for PWA
 			const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
