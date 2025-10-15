@@ -110,7 +110,7 @@ u(x,t)=(G_t * u_0)(x),\\quad
 G_t(x)=\\frac{1}{\\sqrt{4\\pi \\kappa t}}\\,e^{-x^2/(4\\kappa t)}.
 $$`,
 			temperature,
-			topP: 0.8,
+			// topP: 0.8,
 			providerOptions,
 			tools,
 			async onStepFinish({ response }) {
