@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton } from '@mui/material';
+import { IconButton, useTheme } from '@mui/material';
 import { UIMessage } from '@ai-sdk/react';
 import StopCircleOutlinedIcon from '@mui/icons-material/StopCircleOutlined';
 import ReplayCircleFilledOutlinedIcon from '@mui/icons-material/ReplayCircleFilledOutlined';
@@ -12,6 +12,7 @@ interface ActionButtonProps {
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({ messages, isLoading, reload, stop }) => {
+	const theme = useTheme();
 	const hasMessages = messages.length > 0;
 	const lastMessage = hasMessages ? messages[messages.length - 1] : null;
 	const isRegenerateButton = hasMessages && lastMessage?.role !== 'assistant' && !isLoading;
@@ -24,7 +25,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({ messages, isLoading, reload
 	return (
 		<IconButton
 			edge="end"
-			color="primary"
 			onClick={isRegenerateButton ? reload : stop}
 		>
 			{isRegenerateButton ? (
@@ -32,6 +32,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ messages, isLoading, reload
 					sx={{
 						height: '30px',
 						width: '30px',
+						color: theme.palette.text.primary,
 					}}
 				/>
 			) : (

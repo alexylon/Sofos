@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react';
-import { Drawer, IconButton, Typography } from '@mui/material';
+import { Drawer, IconButton, Typography, useTheme } from '@mui/material';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -78,6 +78,7 @@ const SideBar = ({
 					 handleStartNewChat,
 					 saveChatHistory,
 				 }: SideBarProps) => {
+	const theme = useTheme();
 	const drawerWidth = 200;
 
 	const DrawerHeader = styled('div')(({ theme }) => ({
@@ -139,7 +140,7 @@ const SideBar = ({
 				<Typography
 					align="center"
 					fontWeight="bold"
-					color="#7d7d7d"
+					color={theme.palette.text.secondary}
 				>
 					Last 20 Chats
 				</Typography>
@@ -169,20 +170,19 @@ const SideBar = ({
 											// @ts-ignore
 											formattedDate(chat[chat.length - 1]?.createdAt)
 											: 'No Messages'}
-										sx={{ color: '#7d7d7d' }}
+										sx={{ color: theme.palette.text.secondary }}
 									/>
 								</ListItemButton>
 								<IconButton
 									sx={{
 										position: 'absolute',
 										right: 4,
-										backgroundColor: 'rgba(255, 255, 255, 0.5)',
 										height: '26px',
 										width: '26px',
 									}}
 									onClick={() => handleRemoveChat(chatIndex)}
 								>
-									<ClearIcon />
+									<ClearIcon sx={{ height: '26px', width: '26px', color: theme.palette.text.secondary, backgroundColor: theme.palette.background.paper }}/>
 								</IconButton>
 							</ListItem>
 						</div>
@@ -200,9 +200,11 @@ const SideBar = ({
 						}}
 					>
 						<ListItemIcon>
-							<LogoutOutlinedIcon />
+							<LogoutOutlinedIcon
+								sx={{ height: '26px', width: '26px', color: theme.palette.text.secondary, backgroundColor: theme.palette.background.paper }}
+							/>
 						</ListItemIcon>
-						<ListItemText primary='Log Out' sx={{ color: '#7d7d7d' }}/>
+						<ListItemText primary='Log Out' sx={{ color: theme.palette.text.secondary }}/>
 					</ListItemButton>
 				</ListItem>
 			</List>

@@ -4,6 +4,7 @@ import React from 'react';
 import { NextAuthProvider } from './providers';
 import { Box } from '@mui/material';
 import { Metadata } from 'next';
+import { ThemeProvider } from '@/theme/ThemeProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,9 +28,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
 			</head>
 		<body className={inter.className}>
 		<NextAuthProvider>
-			<Box className="layoutContainer" sx={{ overflow: 'hidden', maxHeight: '97vh' }}>
-				{children}
-			</Box>
+			<ThemeProvider>
+				<Box className="layoutContainer" sx={{ overflow: 'hidden', maxHeight: '97vh' }}>
+					{children}
+				</Box>
+			</ThemeProvider>
 		</NextAuthProvider>
 		</body>
 		</html>

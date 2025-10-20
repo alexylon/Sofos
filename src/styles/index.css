@@ -5,9 +5,22 @@ body {
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #F0F0F0; /* light gray */
     line-height: 150%;
     /*overflow: hidden;*/
+}
+
+/* Light theme (default) */
+body {
+    background-color: #F0F0F0;
+    color: #000000;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #181818;
+        color: #D9D9D9;
+    }
 }
 
 code {

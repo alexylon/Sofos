@@ -1,8 +1,8 @@
 import React, { memo, useMemo, useCallback } from "react";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { AppBar, Box, Toolbar } from "@mui/material";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { AppBar, Box, Toolbar, useTheme } from "@mui/material";
 import { CopyToClipboardButton } from "@/components/CopyToClipboardButton";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
@@ -13,6 +13,7 @@ const MemoizedMarkdown = memo(Markdown);
 const MarkdownText = ({ children }: any) => {
 	const remarkPlugins = useMemo(() => [remarkMath], []);
 	const rehypePlugins = useMemo(() => [rehypeKatex], []);
+	const theme = useTheme();
 
 	const CodeBlock = useCallback(
 		function CodeBlock({ node, className, children, ...rest }: any) {
@@ -37,14 +38,14 @@ const MarkdownText = ({ children }: any) => {
 								<Box sx={{ display: "flex", mr: -1 }}>
 									<CopyToClipboardButton
 										value={String(children).replace(/\n$/, "")}
-										color="white"
+										color={theme.palette.text.primary}
 									/>
 								</Box>
 							</Toolbar>
 						</AppBar>
 					</Box>
 					<SyntaxHighlighter
-						style={dracula}
+						style={vscDarkPlus}
 						customStyle={{ borderRadius: "0 0 13px 13px" }}
 						language={match[1]}
 						PreTag="div"

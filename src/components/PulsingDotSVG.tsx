@@ -1,6 +1,8 @@
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material';
 
 export default function PulsingDotSVG() {
+	const theme = useTheme();
 	const minR = 4;  // radius in px
 	const maxR = 7;
 
@@ -14,6 +16,7 @@ export default function PulsingDotSVG() {
 				display: 'inline-block',
 				'& .dot': {
 					animation: 'pulseR 1.2s ease-in-out infinite',
+					fill: theme.palette.text.primary,
 				},
 				'@keyframes pulseR': {
 					'0%': { r: `${minR}px`, opacity: 1 },

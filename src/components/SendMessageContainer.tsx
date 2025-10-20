@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Grid, IconButton, InputAdornment, TextField } from '@mui/material';
+import { Box, Grid, IconButton, InputAdornment, TextField, useTheme } from '@mui/material';
 import { TextareaAutosize } from '@mui/base';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import ArrowCircleUpOutlinedIcon from '@mui/icons-material/ArrowCircleUpOutlined';
@@ -9,6 +9,8 @@ import AudioRecorder from '@/components/AudioRecorder';
 import { UIMessage } from '@ai-sdk/react';
 import ActionButton from '@/components/ActionButton';
 import { useMediaQuery } from 'react-responsive';
+import { useThemeMode } from '@/theme/ThemeProvider';
+import { messageColors } from '@/theme/theme';
 
 interface SendMessageContainerProps {
 	hasImages: boolean;
@@ -50,6 +52,9 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 }) => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const isMobile = useMediaQuery({ maxWidth: 767 });
+	const { mode } = useThemeMode();
+	const theme = useTheme();
+	const colors = messageColors[mode];
 
 	useEffect(() => {
 		if (isLoading || !inputRef.current || isMobile) return;
@@ -147,8 +152,8 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 	};
 
 	return (
-		<Grid className="send-message-container" container sx={{ width: '100%' }}>
-			<Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0 }}>
+		<Grid className="send-message-container" container sx={{ width: '100%', backgroundColor: 'transparent' }}>
+			<Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'transparent' }}>
 				<Grid item xs={12}>
 					<Box sx={{ p: 1 }}>
 						<AttachmentsContainer
@@ -198,7 +203,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 								},
 								startAdornment: !isDisabled && (
 									<IconButton edge="start" onClick={handleButtonClick} disabled={isUploadDisabled}>
-										<AddCircleOutlineOutlinedIcon sx={{ height: '26px', width: '26px' }} />
+										<AddCircleOutlineOutlinedIcon sx={{ height: '26px', width: '26px', color: theme.palette.text.secondary }} />
 										<VisuallyHiddenInput
 											id="file-input"
 											type="file"
@@ -234,7 +239,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 							sx={{
 								borderRadius: '13px',
 								minHeight: '59px',
-								backgroundColor: isDisabled ? '#F0F0F0' : '#FAFAFA',
+								backgroundColor: isDisabled ? colors.inputDisabled : colors.inputBackground,
 								'& .MuiOutlinedInput-root': {
 									borderRadius: '13px',
 									minHeight: '59px',

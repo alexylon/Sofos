@@ -7,6 +7,8 @@ import { UIMessage } from '@ai-sdk/react'
 import { useMediaQuery } from 'react-responsive';
 import PulsingDotSVG from '@/components/PulsingDotSVG';
 import { ChatStatus } from 'ai';
+import { useThemeMode } from '@/theme/ThemeProvider';
+import { messageColors } from '@/theme/theme';
 
 
 interface CompletionProps {
@@ -30,6 +32,8 @@ export default function Completion({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [containerHeight, setContainerHeight] = useState<number | 'auto'>('auto');
 	const isMobile = useMediaQuery({ maxWidth: 767 });
+	const { mode } = useThemeMode();
+	const colors = messageColors[mode];
 
 	useEffect(() => {
 		const calculateDistance = () => {
@@ -119,7 +123,7 @@ export default function Completion({
 												pl: 2,
 												pr: 2,
 												mb: 1,
-												backgroundColor: '#a9d3ea',
+												backgroundColor: colors.userMessage,
 											}}
 											>
 												<Box sx={{
@@ -131,10 +135,9 @@ export default function Completion({
 												}}
 												>
 													{messageTextPart &&
-														<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1, mt: '-14px' }}>
+														<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1, mt: '5px' }}>
 															<CopyToClipboardButton
 																value={messageTextPart.text || ''}
-																color="#000000"
 															/>
 														</Box>
 													}
@@ -198,7 +201,7 @@ export default function Completion({
 																				paddingRight: '10px',
 																				mr: 1,
 																				mb: 1,
-																				backgroundColor: '#a9eae0',
+																				backgroundColor: colors.attachmentBackground,
 																				borderRadius: '13px',
 																			}}
 																		>
@@ -230,7 +233,7 @@ export default function Completion({
 												pr: 2,
 												mt: 1,
 												mb: 1,
-												backgroundColor: '#d5d5d5',
+												backgroundColor: colors.assistantMessage,
 											}}>
 												<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', height: '10px', pt: 2 }}>
 													<Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -248,7 +251,7 @@ export default function Completion({
 													{// @ts-ignore
 														messageTextPart && message?.modelId &&
 														<Box sx={{ display: 'flex', justifyContent: 'flex-end', mr: -1, mt: '5px' }}>
-															<CopyToClipboardButton value={messageTextPart.text || ''} color="#000000" />
+															<CopyToClipboardButton value={messageTextPart.text || ''} />
 														</Box>
 													}
 												</Box>
@@ -300,7 +303,7 @@ export default function Completion({
 								pr: 2,
 								mt: 1,
 								mb: 1,
-								backgroundColor: '#eaa9a9',
+								backgroundColor: colors.errorMessage,
 							}}>
 								<Box sx={{
 									pt: 2,

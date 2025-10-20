@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { IconButton } from '@mui/material';
+import { IconButton, useTheme } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 
@@ -14,6 +14,8 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 	onTranscriptionResult,
 	onError
 }) => {
+	const theme = useTheme();
+
 	// Media recorder and stream refs
 	const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
@@ -616,7 +618,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
 						height: '24px',
 						width: '24px',
 						opacity: isTranscribing ? 0.5 : 1,
-						color: recordingError ? 'orange' : 'inherit'
+						color: recordingError ? 'orange' : theme.palette.text.secondary
 					}} />
 				)}
 			</IconButton>
