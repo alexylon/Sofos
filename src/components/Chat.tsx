@@ -453,16 +453,17 @@ const Chat: React.FC = () => {
 							>
 								<ArrowDownwardIcon
 									sx={{
-										height: '20px',
-										width: '20px',
+										height: '40px',
+										width: '40px',
 										left: '50%',
 										transform: 'translateX(-50%)',
 										position: 'absolute',
-										bottom: 30,
+										bottom: 35,
 										color: 'white',
 										backgroundColor: 'rgba(82, 82, 82, 0.7)',
 										borderRadius: '50%',
 										padding: '10px',
+										border: '1px solid #7d7d7d',
 										'&:hover': {
 											backgroundColor: 'rgba(64, 64, 64, 0.7)',
 										}

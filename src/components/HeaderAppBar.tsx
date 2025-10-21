@@ -79,7 +79,6 @@ export default function HeaderAppBar({
 
 		router.push('/new');
 	};
-	console.log('temperature', temperature);
 
 	return (
 		<>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef} from 'react';
 import { Box, Grid, IconButton, InputAdornment, TextField, useTheme } from '@mui/material';
 import { TextareaAutosize } from '@mui/base';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
@@ -153,7 +153,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 
 	return (
 		<Grid className="send-message-container" container sx={{ width: '100%', backgroundColor: 'transparent' }}>
-			<Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'transparent' }}>
+			<Box sx={{ position: 'absolute', bottom: -8, left: 0, right: 0, backgroundColor: 'transparent' }}>
 				<Grid item xs={12}>
 					<Box sx={{ p: 1 }}>
 						<AttachmentsContainer
