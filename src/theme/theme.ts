@@ -14,7 +14,7 @@ const lightThemeOptions: ThemeOptions = {
       secondary: '#7d7d7d',
     },
     primary: {
-      main: '#999999',
+      main: '#1976d2',
     },
   },
   components: {
@@ -40,7 +40,7 @@ const darkThemeOptions: ThemeOptions = {
       secondary: '#B0B0B0',
     },
     primary: {
-      main: '#1976d2',
+      main: '#999999',
     },
   },
   components: {
