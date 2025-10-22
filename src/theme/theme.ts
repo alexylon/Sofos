@@ -40,7 +40,7 @@ const darkThemeOptions: ThemeOptions = {
       secondary: '#B0B0B0',
     },
     primary: {
-      main: '#999999',
+      main: '#aaaaaa',
     },
   },
   components: {
@@ -76,8 +76,8 @@ export const messageColors = {
     inputDisabled: '#F0F0F0',
   },
   dark: {
-    userMessage: '#0F2740', // user background color
-    assistantMessage: '#171C24', // assistant bg color
+    userMessage: '#282828', // user background color
+    assistantMessage: '#141414', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color
