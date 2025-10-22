@@ -161,7 +161,7 @@ const SideBar = ({
 									}}
 									sx={{
 										height: '34px',
-										backgroundColor: isSelected ? 'rgba(0, 0, 0, 0.08)' : 'inherit',
+										backgroundColor: isSelected ? '#444444' : 'inherit',
 									}}
 								>
 									<ListItemText

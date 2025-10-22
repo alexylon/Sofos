@@ -40,7 +40,7 @@ const darkThemeOptions: ThemeOptions = {
       secondary: '#B0B0B0',
     },
     primary: {
-      main: '#4090ff',
+      main: '#1976d2',
     },
   },
   components: {
@@ -48,6 +48,13 @@ const darkThemeOptions: ThemeOptions = {
       styleOverrides: {
         root: {
           backgroundColor: '#111111',
+        },
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#2B2B2B', // Fallback for options list (dark)
         },
       },
     },
