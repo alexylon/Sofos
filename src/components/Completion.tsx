@@ -143,7 +143,7 @@ export default function Completion({
 													}
 												</Box>
 												<Box sx={{
-													mt: -4,
+													mt: -2,
 												}}
 												>
 													<>

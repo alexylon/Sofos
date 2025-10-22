@@ -21,7 +21,7 @@ const lightThemeOptions: ThemeOptions = {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1976d2', // Keep top bar the same for both themes
+          backgroundColor: '#1976d2',
         },
       },
     },
@@ -32,7 +32,7 @@ const darkThemeOptions: ThemeOptions = {
   palette: {
     mode: 'dark',
     background: {
-      default: '#181818', // general background
+      default: '#080808', // general background
       paper: '#2B2B2B', // assistant bg color
     },
     text: {
@@ -40,14 +40,14 @@ const darkThemeOptions: ThemeOptions = {
       secondary: '#B0B0B0',
     },
     primary: {
-      main: '#1976d2',
+      main: '#4090ff',
     },
   },
   components: {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#1976d2', // Keep top bar the same for both themes
+          backgroundColor: '#111111',
         },
       },
     },
@@ -69,8 +69,8 @@ export const messageColors = {
     inputDisabled: '#F0F0F0',
   },
   dark: {
-    userMessage: '#153C52', // user background color
-    assistantMessage: '#2B2B2B', // assistant bg color
+    userMessage: '#0F2740', // user background color
+    assistantMessage: '#171C24', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color

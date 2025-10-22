@@ -137,6 +137,7 @@ export default function HeaderAppBar({
 												: { marginRight: '7px' }
 											}
 											disabled={isDisabled}
+
 										/>
 										{ model.provider === 'anthropic' &&
 											<SelectSmall
