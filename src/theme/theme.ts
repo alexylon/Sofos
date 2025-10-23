@@ -2,11 +2,24 @@
 
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 
+const grey = {
+  50: '#fafafa',
+  100: '#f5f5f5',
+  200: '#eeeeee',
+  300: '#e0e0e0',
+  400: '#bdbdbd',
+  500: '#9e9e9e',
+  600: '#757575',
+  700: '#616161',
+  800: '#424242',
+  900: '#212121',
+};
+
 const lightThemeOptions: ThemeOptions = {
   palette: {
     mode: 'light',
     background: {
-      default: '#F0F0F0',
+      default: '#ffffff',
       paper: '#FFFFFF',
     },
     text: {
@@ -26,11 +39,13 @@ const lightThemeOptions: ThemeOptions = {
       },
     },
   },
+  shape: { borderRadius: 4 },
 };
 
 const darkThemeOptions: ThemeOptions = {
   palette: {
     mode: 'dark',
+    grey,
     background: {
       default: '#080808', // general background
       paper: '#2B2B2B', // assistant bg color
@@ -54,11 +69,12 @@ const darkThemeOptions: ThemeOptions = {
     MuiList: {
       styleOverrides: {
         root: {
-          backgroundColor: '#2B2B2B', // Fallback for options list (dark)
+          backgroundColor: '#444444',
         },
       },
     },
   },
+  shape: { borderRadius: 4 },
 };
 
 export const lightTheme = createTheme(lightThemeOptions);
@@ -68,7 +84,7 @@ export const darkTheme = createTheme(darkThemeOptions);
 export const messageColors = {
   light: {
     userMessage: '#a9d3ea',
-    assistantMessage: '#d5d5d5',
+    assistantMessage: '#f0f0f0',
     errorMessage: '#eaa9a9',
     attachmentBackground: '#a9eae0',
     sendMessageContainer: '#FFFFFF',

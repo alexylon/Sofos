@@ -1,7 +1,7 @@
 import React, { memo, useMemo, useCallback } from "react";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { AppBar, Box, Toolbar, useTheme } from "@mui/material";
 import { CopyToClipboardButton } from "@/components/CopyToClipboardButton";
 import rehypeKatex from "rehype-katex";
@@ -19,13 +19,13 @@ const MarkdownText = ({ children }: any) => {
 		function CodeBlock({ node, className, children, ...rest }: any) {
 			const match = /language-(\w+)/.exec(className || "");
 			return match ? (
-				<Box>
+				<Box sx={{ mt: 3 }}>
 					<Box sx={{ flexGrow: 1 }}>
 						<AppBar
 							position="static"
 							color="primary"
 							sx={{
-								backgroundColor: "#777777",
+								backgroundColor: "#505050",
 								borderRadius: "13px 13px 0 0",
 								zIndex: "modal",
 								mb: "-10px",
@@ -38,14 +38,17 @@ const MarkdownText = ({ children }: any) => {
 								<Box sx={{ display: "flex", mr: -1 }}>
 									<CopyToClipboardButton
 										value={String(children).replace(/\n$/, "")}
-										color={theme.palette.text.primary}
+										color={
+											theme.palette.mode === 'dark'
+												? theme.palette.grey[400] : theme.palette.grey[300]
+										}
 									/>
 								</Box>
 							</Toolbar>
 						</AppBar>
 					</Box>
 					<SyntaxHighlighter
-						style={vscDarkPlus}
+						style={dracula}
 						customStyle={{ borderRadius: "0 0 13px 13px" }}
 						language={match[1]}
 						PreTag="div"

@@ -1,13 +1,15 @@
-import { Box, Card } from '@mui/material';
+import { Box, Card, useTheme } from '@mui/material';
 import React from 'react';
 
 const ImageBox = ({ file, index, fileURL }: any) => {
+	const theme = useTheme();
+
 	return (
 		<Card
 			sx={{
 				height: 50,
 				width: 50,
-				borderRadius: '13px',
+				borderRadius: theme.shape.borderRadius,
 				mr: '4px',
 				mb: '-6px',
 				display: 'inline-block',

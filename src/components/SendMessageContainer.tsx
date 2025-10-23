@@ -237,14 +237,14 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 								),
 							}}
 							sx={{
-								borderRadius: '13px',
+								borderRadius: theme.shape.borderRadius,
 								minHeight: '59px',
 								backgroundColor: isDisabled ? colors.inputDisabled : colors.inputBackground,
 								'& .MuiOutlinedInput-root': {
-									borderRadius: '13px',
+									borderRadius: theme.shape.borderRadius,
 									minHeight: '59px',
-									'&:hover fieldset': { borderRadius: '13px', minHeight: '53px' },
-									'&.Mui-focused fieldset': { borderRadius: '13px', minHeight: '59px' },
+									'&:hover fieldset': { borderRadius: theme.shape.borderRadius, minHeight: '53px' },
+									'&.Mui-focused fieldset': { borderRadius: theme.shape.borderRadius, minHeight: '59px' },
 								},
 							}}
 						/>

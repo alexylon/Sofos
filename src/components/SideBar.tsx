@@ -161,7 +161,10 @@ const SideBar = ({
 									}}
 									sx={{
 										height: '34px',
-										backgroundColor: isSelected ? '#444444' : 'inherit',
+										backgroundColor: isSelected
+											? theme.palette.mode === 'dark'
+											? theme.palette.grey[700] : theme.palette.grey[300]
+											: 'inherit',
 									}}
 								>
 									<ListItemText

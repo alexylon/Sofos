@@ -1,10 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Grid, Box, Chip, Card } from "@mui/material";
+import React from "react";
+import { Grid, Box, Chip, Card, useTheme } from "@mui/material";
 import MarkdownText from "@/components/MarkdownText";
-import AutoScrollingWindow from "@/components/AutoScrollingWindow";
 import { CopyToClipboardButton } from '@/components/CopyToClipboardButton';
 import { UIMessage } from '@ai-sdk/react'
-import { useMediaQuery } from 'react-responsive';
 import PulsingDotSVG from '@/components/PulsingDotSVG';
 import { ChatStatus } from 'ai';
 import { useThemeMode } from '@/theme/ThemeProvider';
@@ -13,120 +11,73 @@ import { messageColors } from '@/theme/theme';
 
 interface CompletionProps {
 	messages?: UIMessage[],
-	isScrolling: boolean,
-	autoScroll: () => void,
-	setDistanceFromBottom: (n: number) => void,
+	messagesEndRef: React.RefObject<HTMLDivElement>,
+	scrollContainerRef: React.RefObject<HTMLDivElement>,
 	status:  ChatStatus,
 	error?: Error,
 }
 
 export default function Completion({
 									   messages,
-									   isScrolling,
-									   autoScroll,
-									   setDistanceFromBottom,
+									   messagesEndRef,
+									   scrollContainerRef,
 									   status,
 									   error
 								   }: CompletionProps) {
-	const isLastMessageFromUser = messages && messages.length > 0 && messages[messages.length - 1].role === 'user';
-	const containerRef = useRef<HTMLDivElement>(null);
-	const [containerHeight, setContainerHeight] = useState<number | 'auto'>('auto');
-	const isMobile = useMediaQuery({ maxWidth: 767 });
 	const { mode } = useThemeMode();
+	const theme = useTheme();
 	const colors = messageColors[mode];
+	const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
 
-	useEffect(() => {
-		const calculateDistance = () => {
-			if (!containerRef.current) return;
-			const windowHeight = window.innerHeight;
-			const userMessages = containerRef.current.querySelectorAll('[data-role="user"]');
-			const assistantMessages = containerRef.current.querySelectorAll('[data-role="assistant"]');
+	// Scroll last user message to top when user sends a message
+	React.useEffect(() => {
+		if (messages && messages.length > 0 && messages[messages.length - 1].role === 'user') {
+			setTimeout(() => {
+				const scrollContainer = scrollContainerRef.current;
+				const lastUserMessage = lastUserMessageRef.current;
 
-			if (userMessages.length > 0 && assistantMessages.length > 0) {
-				const firstUserMessage = userMessages[0];
-				const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
-				const firstUserMessageRect = firstUserMessage.getBoundingClientRect();
-				const lastAssistantMessageRect = lastAssistantMessage.getBoundingClientRect();
-				const firstToLastUserMessageHeight = lastAssistantMessageRect.bottom - firstUserMessageRect.top;
-				const offsetHeight = isMobile ? windowHeight + 163 : windowHeight - 230;
+				if (scrollContainer && lastUserMessage) {
+					// Get the position of the message relative to the scroll container
+					const containerRect = scrollContainer.getBoundingClientRect();
+					const messageRect = lastUserMessage.getBoundingClientRect();
 
-				if (isLastMessageFromUser && messages && messages.length > 1) {
-					setContainerHeight(firstToLastUserMessageHeight + offsetHeight);
-					autoScroll();
+					// Calculate the scroll position to put the message at the top
+					const scrollOffset = scrollContainer.scrollTop + (messageRect.top - containerRect.top);
+
+					scrollContainer.scrollTo({ top: scrollOffset, behavior: 'smooth' });
 				}
-			}
-		};
-
-		calculateDistance();
-	}, [isLastMessageFromUser]);
-
-	// Determine if the autoscroll button should be displayed by calculating the last assistant message distance from the bottom
-	useEffect(() => {
-		const calculateDistanceFromBottom = () => {
-			if (containerRef.current) {
-				const assistantMessages = containerRef.current.querySelectorAll('[data-role="assistant"]');
-				const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
-
-				if (lastAssistantMessage) {
-					const rect = lastAssistantMessage.getBoundingClientRect();
-					const windowHeight = window.innerHeight;
-					const distanceFromBottom = windowHeight - rect.bottom;
-
-					setDistanceFromBottom(distanceFromBottom);
-				}
-			}
-		};
-
-		calculateDistanceFromBottom();
-
-		const handleScroll = () => {
-			calculateDistanceFromBottom();
-		};
-
-		window.addEventListener('scroll', handleScroll, true); // true for capture phase
-
-		return () => {
-			window.removeEventListener('scroll', handleScroll, true);
-		};
-	}, [messages]);
+			}, 100);
+		}
+	}, [messages, scrollContainerRef]);
 
 
 	return (
-		<>
-			<div
-				ref={containerRef}
-				style={{
-					minHeight: typeof containerHeight === 'number' ? `${containerHeight}px` : containerHeight,
-					height: 'auto',
-				}}
-			>
-				{messages?.map((message: UIMessage) => {
-					const isUserMessage = message.role === 'user';
-					const messageTextPart = message.parts.find((part) => part.type === 'text');
+		<div style={{ minHeight: '100%', paddingBottom: '70vh' }}>
+			{messages?.map((message: UIMessage, index: number) => {
+				const isUserMessage = message.role === 'user';
+				const messageTextPart = message.parts.find((part) => part.type === 'text');
+				const isLastUserMessage = isUserMessage && index === messages.length - 1;
 
-						return (
-							<AutoScrollingWindow
-								key={message.id}
-								style={{ flexGrow: 1 }}
-								isScrolling={isScrolling}
-							>
-								<div
-									data-role={message.role}
-								>
-									{isUserMessage
-										?
-										<Grid item xs={12}>
-											<Box sx={{
-												borderRadius: '13px',
-												mt: 1,
-												pb: 1,
-												pl: 2,
-												pr: 2,
-												mb: 1,
-												backgroundColor: colors.userMessage,
-											}}
-											>
-												<Box sx={{
+				return (
+					<div
+						key={message.id}
+						data-role={message.role}
+						ref={isLastUserMessage ? lastUserMessageRef : null}
+					>
+							{isUserMessage
+								?
+								<Grid item xs={12} sx={{paddingLeft: 15}}>
+									<Box sx={{
+										borderRadius: theme.shape.borderRadius,
+										mt: 1,
+										pb: 1,
+										pl: 2,
+										pr: 2,
+										mb: 1,
+										backgroundColor: colors.userMessage,
+									}}
+									>
+										<Box sx={{
 													display: 'flex',
 													justifyContent: 'flex-end',
 													height: '40px',
@@ -161,7 +112,7 @@ export default function Completion({
 																	key={`${message.id}-image-${index}`}
 																	sx={{
 																		maxHeight: 200,
-																		borderRadius: '13px',
+																		borderRadius: theme.shape.borderRadius,
 																		mr: 2,
 																		mb: 1,
 																		display: 'inline-block',
@@ -202,7 +153,7 @@ export default function Completion({
 																				mr: 1,
 																				mb: 1,
 																				backgroundColor: colors.attachmentBackground,
-																				borderRadius: '13px',
+																				borderRadius: theme.shape.borderRadius,
 																			}}
 																		>
 																			<Box
@@ -227,7 +178,7 @@ export default function Completion({
 										:
 										<Grid item xs={12}>
 											<Box sx={{
-												borderRadius: '13px',
+												borderRadius: theme.shape.borderRadius,
 												pb: 1,
 												pl: 2,
 												pr: 2,
@@ -288,16 +239,14 @@ export default function Completion({
 											</Box>
 										</Grid>
 									}
-								</div>
-							</AutoScrollingWindow>
-						)
-					}
-				)}
-				{
-					error && (
+					</div>
+				)
+			})}
+			{
+				error && (
 						<Grid item xs={12}>
 							<Box sx={{
-								borderRadius: '13px',
+								borderRadius: theme.shape.borderRadius,
 								pb: 1,
 								pl: 2,
 								pr: 2,
@@ -316,7 +265,7 @@ export default function Completion({
 						</Grid>
 					)
 				}
-			</div>
-		</>
+			<div ref={messagesEndRef} />
+		</div>
 	)
 }

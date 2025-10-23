@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
 import { UIMessage } from '@ai-sdk/react'
@@ -7,9 +7,8 @@ import { ChatStatus } from 'ai';
 interface MessagesContainerProps {
 	hasAttachments: boolean,
 	messages: UIMessage[],
-	isScrolling: boolean,
-	autoScroll: () => void,
-	setDistanceFromBottom: (n: number) => void,
+	messagesEndRef: React.RefObject<HTMLDivElement>,
+	scrollContainerRef: React.RefObject<HTMLDivElement>,
 	status:  ChatStatus,
 	error?: Error,
 }
@@ -17,13 +16,12 @@ interface MessagesContainerProps {
 const MessagesContainer = ({
 							   hasAttachments,
 							   messages,
-							   isScrolling,
-							   autoScroll,
-							   setDistanceFromBottom,
+							   messagesEndRef,
+							   scrollContainerRef,
 							   status,
-							   error
+							   error,
 						   }: MessagesContainerProps) => {
-	const scrollableGridRef = useRef(null);
+	const scrollableGridRef = scrollContainerRef;
 
 	return (
 		<Grid
@@ -35,6 +33,7 @@ const MessagesContainer = ({
 		>
 			<Grid
 				ref={scrollableGridRef}
+				id="messages-scroll-container"
 				item xs={12}
 				sx={{
 					height: hasAttachments
@@ -60,13 +59,11 @@ const MessagesContainer = ({
 					<Box sx={{
 						p: 1,
 						flex: 1,
-						overflow: 'auto',
 					}}>
 						<Completion
 							messages={messages}
-							isScrolling={isScrolling}
-							autoScroll={autoScroll}
-							setDistanceFromBottom={setDistanceFromBottom}
+							messagesEndRef={messagesEndRef}
+							scrollContainerRef={scrollableGridRef}
 							status={status}
 							error={error}
 						/>

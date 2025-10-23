@@ -24,6 +24,7 @@ import {
 	textVerbosities,
 } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
+import { useMediaQuery } from 'react-responsive';
 
 type MessageWithOptionalAttachments = UIMessage & { experimental_attachments?: unknown };
 
@@ -63,14 +64,14 @@ const Chat: React.FC = () => {
 	const [temperature, setTemperature] = useState<number>(temperatures[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(updatedReasoningEfforts[0].value);
 	const [textVerbosity, setTextVerbosity] = useState<string>(textVerbosities[1].value);
-	const [isScrolling, setIsScrolling] = useState<boolean>(false);
 	const [images, setImages] = useState<File[]>([]);
 	const [files, setFiles] = useState<File[]>([]);
 	const [chatHistory, setChatHistory] = useState<UIMessage[][]>([]);
 	const [currentChatIndex, setCurrentChatIndex] = useState<number>(-1);
 	const [open, setOpen] = useState(false);
-	const [distanceFromBottom, setDistanceFromBottom] = useState<number | null>(null);
 	const [input, setInput] = useState('');
+	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	const {
 		status, // submitted, streaming, ready, error
@@ -93,13 +94,13 @@ const Chat: React.FC = () => {
 		}
 	);
 
-	const scrollableGridRef = useRef(null);
 	const { data: session } = useSession();
 	const user = session?.user;
 	const hasImages = images.length > 0;
 	const hasFiles = files.length > 0;
 	const isLoading = status === Status.SUBMITTED || status === Status.STREAMING;
 	const isDisabled = isLoading || !!error;
+	const isMobile = useMediaQuery({ maxWidth: 767 });
 
 	useEffect(() => {
 		let isMounted = true;
@@ -171,23 +172,8 @@ const Chat: React.FC = () => {
 			console.error('Unexpected error loading persisted state:', error);
 		});
 
-		const handleAutoScroll = (event: WheelEvent) => {
-			const grid = scrollableGridRef.current as HTMLDivElement | null;
-
-			if (!grid) return;
-
-			const bounding = grid.getBoundingClientRect();
-
-			if (event.clientY >= bounding.top && event.clientY <= bounding.bottom) {
-				grid.scrollTop += event.deltaY;
-			}
-		};
-
-		window.addEventListener('wheel', handleAutoScroll, { passive: false });
-
 		return () => {
 			isMounted = false;
-			window.removeEventListener('wheel', handleAutoScroll);
 		};
 	}, [setMessages]);
 
@@ -308,9 +294,18 @@ const Chat: React.FC = () => {
 		setOpen(false);
 	}, []);
 
-	const autoScroll = useCallback(() => {
-		setIsScrolling(true);
-		setTimeout(() => setIsScrolling(false), 2000);
+	const scrollToBottom = useCallback(() => {
+		const container = scrollContainerRef.current;
+
+		if (container) {
+			const innerWindowHeight =  window ? window.innerHeight : 0;
+			const offsetHeight = innerWindowHeight * 0.6;
+
+			container.scrollTo({
+				top: container.scrollHeight - container.clientHeight - offsetHeight,
+				behavior: 'smooth'
+			});
+		}
 	}, []);
 
 	const onFinishCallback = useCallback((message: UIMessage) => {
@@ -325,49 +320,49 @@ const Chat: React.FC = () => {
 				return prevModel;
 			});
 
-				const updatedMessages: UIMessage[] = [...prevMessages];
-				// For some reason the last assistant message is incomplete after
-				// importing 'useChat' from '@ai-sdk/react' instead of 'ai'
-				updatedMessages[updatedMessages.length - 1] = message;
+			const updatedMessages: UIMessage[] = [...prevMessages];
+			// For some reason the last assistant message is incomplete after
+			// importing 'useChat' from '@ai-sdk/react' instead of 'ai'
+			updatedMessages[updatedMessages.length - 1] = message;
 
-				if (updatedMessages && updatedMessages.length > 0) {
-					// Update chat history in the state and local storage
-					setChatHistory((prevChatHistory: UIMessage[][]) => {
-						setCurrentChatIndex((prevCurrentChatIndex) => {
-							const index = isNewChat ? prevChatHistory.length : prevCurrentChatIndex;
+			if (updatedMessages && updatedMessages.length > 0) {
+				// Update chat history in the state and local storage
+				setChatHistory((prevChatHistory: UIMessage[][]) => {
+					setCurrentChatIndex((prevCurrentChatIndex) => {
+						const index = isNewChat ? prevChatHistory.length : prevCurrentChatIndex;
 
-							// Only update currentChatIndex if it's a new chat
-							if (isNewChat) {
-								void indexedDBStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, index);
-								return index;
-							}
-
-							return prevCurrentChatIndex;
-						});
-
-						const updatedChatHistory = [...prevChatHistory];
-
+						// Only update currentChatIndex if it's a new chat
 						if (isNewChat) {
-							updatedChatHistory.push(updatedMessages);
-						} else {
-							// For existing chats, update at the current index
-							// Note: we need to get the current index again since we can't access it directly
-							// We'll use the length check to determine if we should push or update
-							if (prevChatHistory.length === 0) {
-								updatedChatHistory.push(updatedMessages);
-							} else {
-								// Update the last chat in history for existing chats
-								updatedChatHistory[updatedChatHistory.length - 1] = updatedMessages;
-							}
+							void indexedDBStorage.setItem(STORAGE_KEYS.CURRENT_CHAT_INDEX, index);
+							return index;
 						}
 
-						// Keep only the last 20 conversations
-						const finalChatHistory = updatedChatHistory.slice(-20);
-						void saveChatHistory(finalChatHistory);
-
-						return finalChatHistory;
+						return prevCurrentChatIndex;
 					});
-				}
+
+					const updatedChatHistory = [...prevChatHistory];
+
+					if (isNewChat) {
+						updatedChatHistory.push(updatedMessages);
+					} else {
+						// For existing chats, update at the current index
+						// Note: we need to get the current index again since we can't access it directly
+						// We'll use the length check to determine if we should push or update
+						if (prevChatHistory.length === 0) {
+							updatedChatHistory.push(updatedMessages);
+						} else {
+							// Update the last chat in history for existing chats
+							updatedChatHistory[updatedChatHistory.length - 1] = updatedMessages;
+						}
+					}
+
+					// Keep only the last 20 conversations
+					const finalChatHistory = updatedChatHistory.slice(-20);
+					void saveChatHistory(finalChatHistory);
+
+					return finalChatHistory;
+				});
+			}
 
 			return updatedMessages;
 		});
@@ -418,77 +413,74 @@ const Chat: React.FC = () => {
 			/>
 			{user && (
 				<Box
-						className="chatContainer"
-						sx={{
-							maxWidth: 1200,
-							marginLeft: "auto",
-							marginRight: "auto",
-							display: 'flex',
-							flexDirection: 'column',
-							justifyContent: 'space-between',
-							overflow: 'hidden',
-							mt: '40px',
-							pb: 5,
-							height: {
-								xs: 'calc(91vh - 60px)', // On extra-small devices
-								sm: 'calc(94vh - 60px)', // On small devices and up
-							},
-							position: 'relative',
-							}}
+					className="chatContainer"
+					sx={{
+						maxWidth: 1200,
+						marginLeft: "auto",
+						marginRight: "auto",
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'space-between',
+						overflow: 'hidden',
+						mt: '40px',
+						pb: 5,
+						height: {
+							xs: 'calc(91vh - 60px)', // On extra-small devices
+							sm: 'calc(94vh - 60px)', // On small devices and up
+						},
+						position: 'relative',
+					}}
+				>
+					<MessagesContainer
+						hasAttachments={hasFiles || hasImages}
+						messages={messages}
+						messagesEndRef={messagesEndRef}
+						scrollContainerRef={scrollContainerRef}
+						status={status}
+						error={error}
+					/>
+					<IconButton
+						edge="end"
+						color="primary"
+						onClick={scrollToBottom}
+						sx={{mr: 2}}
 					>
-						<MessagesContainer
-							hasAttachments={hasFiles || hasImages}
-							messages={messages}
-							isScrolling={isScrolling}
-							autoScroll={autoScroll}
-							setDistanceFromBottom={setDistanceFromBottom}
-							status={status}
-							error={error}
+						<ArrowDownwardIcon
+							sx={{
+								height: '40px',
+								width: '40px',
+								right: '0',
+								position: 'absolute',
+								bottom: 35,
+								color: 'white',
+								backgroundColor: 'rgba(82, 82, 82, 0.7)',
+								borderRadius: '50%',
+								padding: '10px',
+								border: '1px solid #7d7d7d',
+								'&:hover': {
+									backgroundColor: 'rgba(64, 64, 64, 0.7)',
+								}
+							}}
 						/>
-						{distanceFromBottom && distanceFromBottom < 80 &&
-							<IconButton
-								edge="end"
-								color="primary"
-								onClick={() => autoScroll()}
-							>
-								<ArrowDownwardIcon
-									sx={{
-										height: '40px',
-										width: '40px',
-										left: '50%',
-										transform: 'translateX(-50%)',
-										position: 'absolute',
-										bottom: 35,
-										color: 'white',
-										backgroundColor: 'rgba(82, 82, 82, 0.7)',
-										borderRadius: '50%',
-										padding: '10px',
-										border: '1px solid #7d7d7d',
-										'&:hover': {
-											backgroundColor: 'rgba(64, 64, 64, 0.7)',
-										}
-									}}
-								/>
-							</IconButton>
-						}
-						<SendMessageContainer
-							hasImages={hasImages}
-							hasFiles={hasFiles}
-							images={images}
-							files={files}
-							isDisabled={isDisabled}
-							handleRemoveImage={handleRemoveImage}
-							handleRemoveFile={handleRemoveFile}
-							input={input}
-							handleInputChange={setInput}
-							onSubmit={onSubmit}
-							handleFilesChange={handleFilesChange}
-							isUploadDisabled={false}
-							isLoading={isLoading}
-							messages={messages}
-							reload={regenerate}
-							stop={stop}
-							error={error}
+					</IconButton>
+					<SendMessageContainer
+						hasImages={hasImages}
+						hasFiles={hasFiles}
+						images={images}
+						files={files}
+						isDisabled={isDisabled}
+						handleRemoveImage={handleRemoveImage}
+						handleRemoveFile={handleRemoveFile}
+						input={input}
+						handleInputChange={setInput}
+						onSubmit={onSubmit}
+						handleFilesChange={handleFilesChange}
+						isUploadDisabled={false}
+						isLoading={isLoading}
+						messages={messages}
+						reload={regenerate}
+						stop={stop}
+						error={error}
 					/>
 				</Box>
 			)}
