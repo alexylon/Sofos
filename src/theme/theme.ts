@@ -93,7 +93,7 @@ export const messageColors = {
   },
   dark: {
     userMessage: '#2E2E2E', // user background color
-    assistantMessage: '#242424', // assistant bg color
+    assistantMessage: '#202020', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color
