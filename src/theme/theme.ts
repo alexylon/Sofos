@@ -98,7 +98,7 @@ const darkThemeOptions: ThemeOptions = {
     MuiList: {
       styleOverrides: {
         root: {
-          backgroundColor: '#444444',
+          backgroundColor: '#2B2B2B',
         },
       },
     },
