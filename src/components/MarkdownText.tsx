@@ -6,7 +6,8 @@ import { AppBar, Box, Toolbar, useTheme } from "@mui/material";
 import { CopyToClipboardButton } from "@/components/CopyToClipboardButton";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
-import "katex/dist/katex.min.css"; // `rehype-katex` does not import the CSS for you
+import "katex/dist/katex.min.css";
+import { themeColors } from '@/theme/theme'; // `rehype-katex` does not import the CSS for you
 
 const MemoizedMarkdown = memo(Markdown);
 
@@ -40,7 +41,7 @@ const MarkdownText = ({ children }: any) => {
 										value={String(children).replace(/\n$/, "")}
 										color={
 											theme.palette.mode === 'dark'
-												? theme.palette.grey[400] : theme.palette.grey[300]
+												? themeColors.grey[400] : themeColors.grey[350]
 										}
 									/>
 								</Box>

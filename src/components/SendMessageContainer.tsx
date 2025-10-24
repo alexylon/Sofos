@@ -10,7 +10,7 @@ import { UIMessage } from '@ai-sdk/react';
 import ActionButton from '@/components/ActionButton';
 import { useMediaQuery } from 'react-responsive';
 import { useThemeMode } from '@/theme/ThemeProvider';
-import { messageColors } from '@/theme/theme';
+import { themeColors } from '@/theme/theme';
 
 interface SendMessageContainerProps {
 	hasImages: boolean;
@@ -54,7 +54,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 	const isMobile = useMediaQuery({ maxWidth: 767 });
 	const { mode } = useThemeMode();
 	const theme = useTheme();
-	const colors = messageColors[mode];
+	const colors = themeColors[mode];
 
 	useEffect(() => {
 		if (isLoading || !inputRef.current || isMobile) return;
@@ -221,17 +221,21 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 												onError={handleTranscriptionError}
 											/>
 										)}
-										{!isDisabled && input && (
-											<IconButton
-												edge="end"
-												color="primary"
-												onClick={(event: any) => {
-													if (!!input?.trim()) onSubmit(event);
-												}}
-											>
-												<ArrowCircleUpOutlinedIcon sx={{ height: '30px', width: '30px' }} />
-											</IconButton>
-										)}
+										<IconButton
+											edge="end"
+											color="primary"
+											disabled={isDisabled || !input}
+											onClick={(event: any) => {
+												if (!!input?.trim()) onSubmit(event);
+											}}
+										>
+											<ArrowCircleUpOutlinedIcon
+												sx={{
+													height: '30px',
+													width: '30px',
+											}}
+											/>
+										</IconButton>
 										<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
 									</InputAdornment>
 								),

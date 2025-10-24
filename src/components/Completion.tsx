@@ -6,7 +6,7 @@ import { UIMessage } from '@ai-sdk/react'
 import PulsingDotSVG from '@/components/PulsingDotSVG';
 import { ChatStatus } from 'ai';
 import { useThemeMode } from '@/theme/ThemeProvider';
-import { messageColors } from '@/theme/theme';
+import { themeColors } from '@/theme/theme';
 
 
 interface CompletionProps {
@@ -26,7 +26,7 @@ export default function Completion({
 								   }: CompletionProps) {
 	const { mode } = useThemeMode();
 	const theme = useTheme();
-	const colors = messageColors[mode];
+	const colors = themeColors[mode];
 	const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
 
 	// Scroll last user message to top when user sends a message
@@ -66,7 +66,7 @@ export default function Completion({
 					>
 							{isUserMessage
 								?
-								<Grid item xs={12} sx={{paddingLeft: 15}}>
+								<Grid item xs={12} sx={{paddingLeft: '25%'}}>
 									<Box sx={{
 										borderRadius: theme.shape.borderRadius,
 										mt: 1,

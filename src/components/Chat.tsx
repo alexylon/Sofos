@@ -6,7 +6,7 @@ import { useChat, UIMessage } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai';
 import { useSession } from 'next-auth/react';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { IconButton } from '@mui/material';
+import { IconButton, useTheme } from '@mui/material';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { resizeImage } from '@/components/utils/resizeImage';
 import HeaderAppBar from '@/components/HeaderAppBar';
@@ -25,6 +25,7 @@ import {
 } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
 import { useMediaQuery } from 'react-responsive';
+import { themeColors } from '@/theme/theme';
 
 type MessageWithOptionalAttachments = UIMessage & { experimental_attachments?: unknown };
 
@@ -72,6 +73,7 @@ const Chat: React.FC = () => {
 	const [input, setInput] = useState('');
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const theme = useTheme();
 
 	const {
 		status, // submitted, streaming, ready, error
@@ -441,25 +443,29 @@ const Chat: React.FC = () => {
 					/>
 					<IconButton
 						edge="end"
-						color="primary"
 						onClick={scrollToBottom}
-						sx={{mr: 2}}
+						sx={{
+							height: '45px',
+							width: '45px',
+							mr: 2,
+							bottom: 70,
+							position: 'absolute',
+							left: '50%',
+							transform: 'translateX(-50%)',
+							color: theme.palette.mode === 'dark' ? themeColors.grey[250] : themeColors.grey[100],
+					}}
 					>
 						<ArrowDownwardIcon
 							sx={{
-								height: '40px',
-								width: '40px',
-								right: '0',
-								position: 'absolute',
-								bottom: 35,
-								color: 'white',
+								height: '45px',
+								width: '45px',
 								backgroundColor: 'rgba(82, 82, 82, 0.7)',
 								borderRadius: '50%',
 								padding: '10px',
 								border: '1px solid #7d7d7d',
 								'&:hover': {
 									backgroundColor: 'rgba(64, 64, 64, 0.7)',
-								}
+								},
 							}}
 						/>
 					</IconButton>

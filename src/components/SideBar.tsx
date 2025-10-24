@@ -16,6 +16,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 import { STORAGE_KEYS } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
+import { themeColors } from '@/theme/theme';
 
 interface SideBarProps {
 	messages: UIMessage[];
@@ -79,7 +80,10 @@ const SideBar = ({
 					 saveChatHistory,
 				 }: SideBarProps) => {
 	const theme = useTheme();
+	const isDarkMode = theme.palette.mode === 'dark';
 	const drawerWidth = 200;
+	// @ts-ignore
+	let chatListBackground = theme.palette.background.paper;
 
 	const DrawerHeader = styled('div')(({ theme }) => ({
 		display: 'flex',
@@ -130,6 +134,8 @@ const SideBar = ({
 				'& .MuiDrawer-paper': {
 					width: drawerWidth,
 					boxSizing: 'border-box',
+					// @ts-ignore
+					backgroundColor: theme.palette.background.paper,
 				},
 			}}
 			variant="persistent"
@@ -162,9 +168,9 @@ const SideBar = ({
 									sx={{
 										height: '34px',
 										backgroundColor: isSelected
-											? theme.palette.mode === 'dark'
-											? theme.palette.grey[700] : theme.palette.grey[300]
-											: 'inherit',
+											? isDarkMode
+											? themeColors.grey[850] : themeColors.grey[200]
+											: chatListBackground,
 									}}
 								>
 									<ListItemText
@@ -185,7 +191,7 @@ const SideBar = ({
 									}}
 									onClick={() => handleRemoveChat(chatIndex)}
 								>
-									<ClearIcon sx={{ height: '26px', width: '26px', color: theme.palette.text.secondary, backgroundColor: theme.palette.background.paper }}/>
+									<ClearIcon sx={{ height: '26px', width: '26px', color: theme.palette.text.secondary, backgroundColor: 'transparent' }}/>
 								</IconButton>
 							</ListItem>
 						</div>
