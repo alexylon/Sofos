@@ -80,7 +80,7 @@ const darkThemeOptions: ThemeOptions = {
       paper: '#2B2B2B',
     },
     text: {
-      primary: '#D9D9D9', // general text color
+      primary: '#E6E6E6', // general text color
       secondary: '#B0B0B0',
     },
     primary: {
@@ -122,7 +122,7 @@ export const themeColors: ThemeColors = {
   },
   dark: {
     userMessage: '#2E2E2E', // user background color
-    assistantMessage: '#181818', // assistant bg color
+    assistantMessage: '#1C1C1C', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color
