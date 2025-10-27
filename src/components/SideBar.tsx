@@ -16,7 +16,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 import { STORAGE_KEYS } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
-import { themeColors } from '@/theme/theme';
+import { grey } from '@/theme/theme';
 
 interface SideBarProps {
 	messages: UIMessage[];
@@ -169,7 +169,7 @@ const SideBar = ({
 										height: '34px',
 										backgroundColor: isSelected
 											? isDarkMode
-											? themeColors.grey[850] : themeColors.grey[200]
+											? grey[850] : grey[200]
 											: chatListBackground,
 									}}
 								>

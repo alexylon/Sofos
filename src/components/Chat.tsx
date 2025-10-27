@@ -25,7 +25,7 @@ import {
 } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
 import { useMediaQuery } from 'react-responsive';
-import { themeColors } from '@/theme/theme';
+import { grey } from '@/theme/theme';
 
 type MessageWithOptionalAttachments = UIMessage & { experimental_attachments?: unknown };
 
@@ -452,7 +452,7 @@ const Chat: React.FC = () => {
 							position: 'absolute',
 							left: '50%',
 							transform: 'translateX(-50%)',
-							color: theme.palette.mode === 'dark' ? themeColors.grey[250] : themeColors.grey[100],
+							color: theme.palette.mode === 'dark' ? grey[250] : grey[100],
 					}}
 					>
 						<ArrowDownwardIcon

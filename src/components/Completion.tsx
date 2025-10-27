@@ -74,6 +74,7 @@ export default function Completion({
 										pl: 2,
 										pr: 2,
 										mb: 1,
+										color: colors.userText,
 										backgroundColor: colors.userMessage,
 									}}
 									>

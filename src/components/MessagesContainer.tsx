@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
 import { UIMessage } from '@ai-sdk/react'

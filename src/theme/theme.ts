@@ -2,9 +2,10 @@
 
 import { createTheme, ThemeOptions } from '@mui/material/styles';
 
-type ThemeColors = {
+export type ThemeColors = {
   light: {
     userMessage: string;
+    userText?: string;
     assistantMessage: string;
     errorMessage: string;
     attachmentBackground: string;
@@ -14,6 +15,7 @@ type ThemeColors = {
   };
   dark: {
     userMessage: string;
+    userText?: string;
     assistantMessage: string;
     errorMessage: string;
     attachmentBackground: string;
@@ -21,28 +23,29 @@ type ThemeColors = {
     inputBackground: string;
     inputDisabled: string;
   };
-  grey: {
-    50: string;
-    100: string;
-    150: string;
-    200: string;
-    250: string;
-    300: string;
-    350: string;
-    400: string;
-    450: string;
-    500: string;
-    550: string;
-    600: string;
-    650: string;
-    700: string;
-    750: string;
-    800: string;
-    850: string;
-    900: string;
-    950: string;
-  };
 };
+
+export type Grey = {
+  50: string;
+  100: string;
+  150: string;
+  200: string;
+  250: string;
+  300: string;
+  350: string;
+  400: string;
+  450: string;
+  500: string;
+  550: string;
+  600: string;
+  650: string;
+  700: string;
+  750: string;
+  800: string;
+  850: string;
+  900: string;
+  950: string;
+}
 
 const lightThemeOptions: ThemeOptions = {
   palette: {
@@ -91,7 +94,7 @@ const darkThemeOptions: ThemeOptions = {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: '#111111',
+          backgroundColor: '#161B22',
         },
       },
     },
@@ -112,8 +115,9 @@ export const darkTheme = createTheme(darkThemeOptions);
 // Custom colors for messages that aren't part of MUI theme
 export const themeColors: ThemeColors = {
   light: {
-    userMessage: '#a9d3ea',
-    assistantMessage: '#f0f0f0',
+    userMessage: '#D7E9FF',
+    userText: lightThemeOptions.palette?.text?.primary,
+    assistantMessage: '#F2F2F6',
     errorMessage: '#eaa9a9',
     attachmentBackground: '#a9eae0',
     sendMessageContainer: '#FFFFFF',
@@ -121,33 +125,35 @@ export const themeColors: ThemeColors = {
     inputDisabled: '#F0F0F0',
   },
   dark: {
-    userMessage: '#2E2E2E', // user background color
-    assistantMessage: '#1C1C1C', // assistant bg color
+    userMessage: '#1B2530', // user background color
+    userText: darkThemeOptions.palette?.text?.primary,
+    assistantMessage: '#1C1C1E', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color
     inputBackground: '#1E1E1E',
     inputDisabled: '#181818',
   },
-  grey: {
-    50:  '#FAFAFA',
-    100: '#EDEDED',
-    150: '#E1E1E1',
-    200: '#D5D5D5',
-    250: '#C9C9C9',
-    300: '#BEBEBE',
-    350: '#B3B3B3',
-    400: '#A8A8A8',
-    450: '#9E9E9E',
-    500: '#939393',
-    550: '#8A8A8A',
-    600: '#808080',
-    650: '#777777',
-    700: '#6E6E6E',
-    750: '#666666',
-    800: '#5D5D5D',
-    850: '#555555',
-    900: '#4D4D4D',
-    950: '#3F3F3F',
-  },
+};
+
+export const grey: Grey = {
+  50: '#FAFAFA',
+  100: '#EDEDED',
+  150: '#E1E1E1',
+  200: '#D5D5D5',
+  250: '#C9C9C9',
+  300: '#BEBEBE',
+  350: '#B3B3B3',
+  400: '#A8A8A8',
+  450: '#9E9E9E',
+  500: '#939393',
+  550: '#8A8A8A',
+  600: '#808080',
+  650: '#777777',
+  700: '#6E6E6E',
+  750: '#666666',
+  800: '#5D5D5D',
+  850: '#555555',
+  900: '#4D4D4D',
+  950: '#3F3F3F',
 };

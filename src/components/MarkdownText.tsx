@@ -7,7 +7,7 @@ import { CopyToClipboardButton } from "@/components/CopyToClipboardButton";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import "katex/dist/katex.min.css";
-import { themeColors } from '@/theme/theme'; // `rehype-katex` does not import the CSS for you
+import { grey } from '@/theme/theme'; // `rehype-katex` does not import the CSS for you
 
 const MemoizedMarkdown = memo(Markdown);
 
@@ -41,7 +41,7 @@ const MarkdownText = ({ children }: any) => {
 										value={String(children).replace(/\n$/, "")}
 										color={
 											theme.palette.mode === 'dark'
-												? themeColors.grey[400] : themeColors.grey[350]
+												? grey[400] : grey[350]
 										}
 									/>
 								</Box>
