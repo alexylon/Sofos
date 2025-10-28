@@ -52,7 +52,7 @@ const lightThemeOptions: ThemeOptions = {
     mode: 'light',
     background: {
       default: '#FFFFFF', // general background
-      paper: '#F0F0F0F0',
+      paper: '#F0F0F0',
     },
     text: {
       primary: '#000000', // general text color
@@ -83,11 +83,12 @@ const darkThemeOptions: ThemeOptions = {
       paper: '#2B2B2B',
     },
     text: {
-      primary: '#E6E6E6', // general text color
-      secondary: '#B0B0B0',
+      primary: '#E6E6E6',// general text color
+      secondary: '#C0C0C0',
     },
     primary: {
-      main: '#aaaaaa',
+      main: '#4DA3FF',
+      contrastText: '#000000',
     },
   },
   components: {
@@ -115,9 +116,9 @@ export const darkTheme = createTheme(darkThemeOptions);
 // Custom colors for messages that aren't part of MUI theme
 export const themeColors: ThemeColors = {
   light: {
-    userMessage: '#D7E9FF',
+    userMessage: '#D2E4FA', // user background color
     userText: lightThemeOptions.palette?.text?.primary,
-    assistantMessage: '#F2F2F6',
+    assistantMessage: '#ECECF1', // assistant bg color
     errorMessage: '#eaa9a9',
     attachmentBackground: '#a9eae0',
     sendMessageContainer: '#FFFFFF',
@@ -125,9 +126,9 @@ export const themeColors: ThemeColors = {
     inputDisabled: '#F0F0F0',
   },
   dark: {
-    userMessage: '#1B2530', // user background color
+    userMessage: '#243240', // user background color
     userText: darkThemeOptions.palette?.text?.primary,
-    assistantMessage: '#1C1C1E', // assistant bg color
+    assistantMessage: '#262629', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color

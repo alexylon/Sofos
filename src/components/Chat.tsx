@@ -415,7 +415,7 @@ const Chat: React.FC = () => {
 			/>
 			{user && (
 				<Box
-					className="chatContainer"
+					className="chatContainer chat-area"
 					sx={{
 						maxWidth: 1200,
 						marginLeft: "auto",

@@ -190,7 +190,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 								inputProps: {
 									minRows: 1,
 									maxRows: 10,
-									style: { resize: 'none' },
+									style: { resize: 'none', fontFamily: "'SF Pro Text BG', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" },
 									onKeyDown: (event) => {
 										if (event.key === 'Enter' && !event.shiftKey) {
 											event.preventDefault();
