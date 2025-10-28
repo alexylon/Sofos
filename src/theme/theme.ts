@@ -116,9 +116,9 @@ export const darkTheme = createTheme(darkThemeOptions);
 // Custom colors for messages that aren't part of MUI theme
 export const themeColors: ThemeColors = {
   light: {
-    userMessage: '#D2E4FA', // user background color
+    userMessage: '#D4E2FA', // user background color
     userText: lightThemeOptions.palette?.text?.primary,
-    assistantMessage: '#ECECF1', // assistant bg color
+    assistantMessage: '#F0F0F4', // assistant bg color
     errorMessage: '#eaa9a9',
     attachmentBackground: '#a9eae0',
     sendMessageContainer: '#FFFFFF',
@@ -128,7 +128,7 @@ export const themeColors: ThemeColors = {
   dark: {
     userMessage: '#243240', // user background color
     userText: darkThemeOptions.palette?.text?.primary,
-    assistantMessage: '#262629', // assistant bg color
+    assistantMessage: '#1D1D1F', // assistant bg color
     errorMessage: '#5C2626',
     attachmentBackground: '#1A4D45',
     sendMessageContainer: '#121212', // send message container bg color
