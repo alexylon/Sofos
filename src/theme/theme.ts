@@ -61,6 +61,10 @@ const lightThemeOptions: ThemeOptions = {
     primary: {
       main: '#1976d2',
     },
+    secondary: {
+      main: '#B4C2DF',
+      light: '#C4D2EF',
+    }
   },
   components: {
     MuiAppBar: {
@@ -90,6 +94,10 @@ const darkThemeOptions: ThemeOptions = {
       main: '#4DA3FF',
       contrastText: '#000000',
     },
+    secondary: {
+      main: '#546270',
+      light: '#647280',
+    }
   },
   components: {
     MuiAppBar: {

@@ -4,6 +4,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Model, ReasoningEffort, Temperature } from '@/types/types';
 import { ReactNode } from 'react';
+import { useTheme } from '@mui/material';
 
 interface SelectSmallProps {
 	options: Model[] | Temperature[] | ReasoningEffort[];
@@ -14,6 +15,7 @@ interface SelectSmallProps {
 }
 
 export default function SelectSmall({ options, handleChange, value, style, disabled }: SelectSmallProps) {
+	const theme = useTheme();
 
 	return (
 		<FormControl size="small">
@@ -55,6 +57,21 @@ export default function SelectSmall({ options, handleChange, value, style, disab
 						},
 						'&:before': {
 							borderBottom: 'none',
+						},
+					},
+					'&.MuiInputBase-root.MuiSelect-root': {
+						'&:after': {
+							borderBottom: 'none',
+						},
+					},
+				}}
+				MenuProps={{
+					sx: {
+						'& .MuiMenuItem-root.Mui-selected': {
+							backgroundColor: `${theme.palette.secondary.main} !important`,
+						},
+						'& .MuiMenuItem-root.Mui-selected:hover': {
+							backgroundColor: `${theme.palette.secondary.light} !important`,
 						},
 					},
 				}}

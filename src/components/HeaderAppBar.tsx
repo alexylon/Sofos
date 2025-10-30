@@ -90,7 +90,8 @@ export default function HeaderAppBar({
 								? (
 									<>
 										<IconButton
-											color={isLoading ? "primary" : "inherit"}
+											color="inherit"
+											disabled={isLoading}
 											aria-label="open drawer"
 											onClick={(e) => {
 												e.stopPropagation();

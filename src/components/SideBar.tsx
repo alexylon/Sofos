@@ -16,7 +16,6 @@ import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 import { STORAGE_KEYS } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
-import { grey } from '@/theme/theme';
 
 interface SideBarProps {
 	messages: UIMessage[];
@@ -80,7 +79,6 @@ const SideBar = ({
 					 saveChatHistory,
 				 }: SideBarProps) => {
 	const theme = useTheme();
-	const isDarkMode = theme.palette.mode === 'dark';
 	const drawerWidth = 200;
 	// @ts-ignore
 	let chatListBackground = theme.palette.background.paper;
@@ -168,8 +166,7 @@ const SideBar = ({
 									sx={{
 										height: '34px',
 										backgroundColor: isSelected
-											? isDarkMode
-											? grey[850] : grey[200]
+											? theme.palette.secondary.main
 											: chatListBackground,
 									}}
 								>

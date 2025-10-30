@@ -40,7 +40,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ messages, isLoading, reload
 					sx={{
 						height: '30px',
 						width: '30px',
-						color: 'red',
+						color: '#dd5555',
 					}}
 				/>
 			)}
