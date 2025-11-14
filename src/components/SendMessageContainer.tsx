@@ -215,27 +215,29 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 								endAdornment: (
 									<InputAdornment position="end">
 										{!isDisabled && (
-											<AudioRecorder
-												disabled={isDisabled}
-												onTranscriptionResult={handleTranscriptionResult}
-												onError={handleTranscriptionError}
-											/>
+											<>
+												<AudioRecorder
+													disabled={isDisabled}
+													onTranscriptionResult={handleTranscriptionResult}
+													onError={handleTranscriptionError}
+												/>
+												<IconButton
+													edge="end"
+													color="primary"
+													disabled={isDisabled || !input}
+													onClick={(event: any) => {
+														if (!!input?.trim()) onSubmit(event);
+													}}
+												>
+													<ArrowCircleUpOutlinedIcon
+														sx={{
+															height: '30px',
+															width: '30px',
+														}}
+													/>
+												</IconButton>
+											</>
 										)}
-										<IconButton
-											edge="end"
-											color="primary"
-											disabled={isDisabled || !input}
-											onClick={(event: any) => {
-												if (!!input?.trim()) onSubmit(event);
-											}}
-										>
-											<ArrowCircleUpOutlinedIcon
-												sx={{
-													height: '30px',
-													width: '30px',
-											}}
-											/>
-										</IconButton>
 										<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
 									</InputAdornment>
 								),
