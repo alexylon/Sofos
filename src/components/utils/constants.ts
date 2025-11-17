@@ -14,7 +14,7 @@ export const STORAGE_KEYS = {
 
 export const models: Model[] = [
 	{
-		value: 'gpt-5',
+		value: 'gpt-5.1',
 		label: 'GPT-5',
 		provider: 'openAI',
 		type: ModelType.REASONING,
@@ -74,8 +74,8 @@ export const temperatures: Temperature[] = [
 
 export const reasoningEfforts: ReasoningEffort[] = [
 	{
-		value: 'minimal',
-		label: 'Minimal',
+		value: 'none',
+		label: 'None',
 	},
 	{
 		value: 'low',

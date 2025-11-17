@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 	} else if (model.provider === 'openAI') {
 		modelName = openai.responses(model.value);
 
-		if (reasoningEffort !== 'minimal') {
+		if (!(reasoningEffort === 'none' && model.value === 'gpt-5-mini')) {
 			tools = {
 				web_search_preview: openai.tools.webSearchPreview({
 					// optional configuration:
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 	let providerOptions: SharedV2ProviderOptions;
 
 	if (model.provider === 'anthropic') {
-		if (reasoningEffort === 'minimal') {
+		if (reasoningEffort === 'none') {
 			providerOptions = {
 				anthropic: {
 					thinking: { type: 'disabled' },
@@ -47,15 +47,15 @@ export async function POST(req: Request) {
 			let budgetTokens = 0;
 
 			if (reasoningEffort === 'low') {
-				budgetTokens = 12000;
+				budgetTokens = 6000;
 			}
 
 			if (reasoningEffort === 'medium') {
-				budgetTokens = 24000;
+				budgetTokens = 12000;
 			}
 
 			if (reasoningEffort === 'high') {
-				budgetTokens = 36000;
+				budgetTokens = 24000;
 			}
 
 			providerOptions = {
@@ -67,7 +67,9 @@ export async function POST(req: Request) {
 	} else {
 		providerOptions = {
 			openai: {
-				reasoningEffort,
+				reasoningEffort: reasoningEffort === 'none' && model.value === 'gpt-5-mini'
+					? 'minimal'
+					: reasoningEffort,
 				textVerbosity,
 				include: ['reasoning.encrypted_content'],
 			}
