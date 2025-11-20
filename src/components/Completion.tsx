@@ -7,6 +7,7 @@ import PulsingDotSVG from '@/components/PulsingDotSVG';
 import { ChatStatus } from 'ai';
 import { useThemeMode } from '@/theme/ThemeProvider';
 import { themeColors } from '@/theme/theme';
+import { Status } from '@/types/types';
 
 
 interface CompletionProps {
@@ -15,6 +16,12 @@ interface CompletionProps {
 	scrollContainerRef: React.RefObject<HTMLDivElement>,
 	status:  ChatStatus,
 	error?: Error,
+}
+
+const getMessageReasoningPartTextTitle = (messageReasoningPartText: string) => {
+	const firstLine = messageReasoningPartText && messageReasoningPartText?.split("\n")[0];
+	const match = firstLine?.match(/\*\*(.*?)\*\*/);
+	return match ? `${match[1]}...` : "";
 }
 
 export default function Completion({
@@ -50,14 +57,18 @@ export default function Completion({
 		}
 	}, [messages, scrollContainerRef]);
 
-
 	return (
 		<div style={{ minHeight: '100%', paddingBottom: '70vh' }}>
 			{messages?.map((message: UIMessage, index: number) => {
 				const isUserMessage = message.role === 'user';
 				const messageTextPart = message.parts.find((part) => part.type === 'text');
-				const messageReasoningPart = [...message.parts].reverse().find((part) => part.type === 'reasoning' && part.text);
+				const messageReasoningPart = [...message.parts].reverse().find((part) =>
+					part.type === 'reasoning' && part.text && getMessageReasoningPartTextTitle(part.text)
+				);
+				// @ts-ignore
+				const messageReasoningPartTextTitle = getMessageReasoningPartTextTitle(messageReasoningPart?.text);
 				const isLastUserMessage = isUserMessage && index === messages.length - 1;
+				const isLoading = status === Status.SUBMITTED || status === Status.STREAMING;
 
 				return (
 					<div
@@ -200,6 +211,18 @@ export default function Completion({
 																sx={{ fontSize: '0.70rem' }}
 															/>
 														}
+														{messageReasoningPartTextTitle && isLoading && (
+															<Box sx={{
+																fontSize: '0.85em',
+																color: colors.userText,
+																fontStyle: 'italic',
+																opacity: 0.6,
+																marginLeft: '10px',
+																marginTop: '1px',
+															}}>
+																{messageReasoningPartTextTitle}
+															</Box>
+														)}
 													</Box>
 													{// @ts-ignore
 														messageTextPart && message?.modelId &&
@@ -214,21 +237,6 @@ export default function Completion({
 													minHeight: '50px',
 												}}
 												>
-													{messageReasoningPart && (
-														<Box sx={{
-															fontSize: '0.85em',
-															color: colors.userText,
-															borderLeft: `3px solid '#888'`,
-															padding: '8px 12px',
-															marginBottom: '12px',
-															borderRadius: '4px',
-															fontStyle: 'italic',
-															opacity: 0.6,
-														}}>
-															{/*@ts-ignore*/}
-															{messageReasoningPart.text || ''}
-														</Box>
-													)}
 													{messageTextPart?.text
 														?
 														<MarkdownText>
