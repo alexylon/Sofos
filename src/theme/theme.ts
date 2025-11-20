@@ -12,6 +12,7 @@ export type ThemeColors = {
     sendMessageContainer: string;
     inputBackground: string;
     inputDisabled: string;
+    reasoningColor: string;
   };
   dark: {
     userMessage: string;
@@ -22,6 +23,7 @@ export type ThemeColors = {
     sendMessageContainer: string;
     inputBackground: string;
     inputDisabled: string;
+    reasoningColor: string;
   };
 };
 
@@ -132,6 +134,7 @@ export const themeColors: ThemeColors = {
     sendMessageContainer: '#FFFFFF',
     inputBackground: '#FAFAFA',
     inputDisabled: '#F0F0F0',
+    reasoningColor: '',
   },
   dark: {
     userMessage: '#243240', // user background color
@@ -142,6 +145,7 @@ export const themeColors: ThemeColors = {
     sendMessageContainer: '#121212', // send message container bg color
     inputBackground: '#1E1E1E',
     inputDisabled: '#181818',
+    reasoningColor: '',
   },
 };
 

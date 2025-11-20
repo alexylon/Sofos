@@ -7,6 +7,7 @@ import PulsingDotSVG from '@/components/PulsingDotSVG';
 import { ChatStatus } from 'ai';
 import { useThemeMode } from '@/theme/ThemeProvider';
 import { themeColors } from '@/theme/theme';
+import { Status } from '@/types/types';
 
 
 interface CompletionProps {
@@ -28,6 +29,7 @@ export default function Completion({
 	const theme = useTheme();
 	const colors = themeColors[mode];
 	const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
+	const isLoading = status === Status.SUBMITTED || status === Status.STREAMING;
 
 	// Scroll last user message to top when user sends a message
 	React.useEffect(() => {
@@ -56,6 +58,7 @@ export default function Completion({
 			{messages?.map((message: UIMessage, index: number) => {
 				const isUserMessage = message.role === 'user';
 				const messageTextPart = message.parts.find((part) => part.type === 'text');
+				const messageReasoningPart = [...message.parts].reverse().find((part) => part.type === 'reasoning' && part.text);
 				const isLastUserMessage = isUserMessage && index === messages.length - 1;
 
 				return (
@@ -208,11 +211,26 @@ export default function Completion({
 													}
 												</Box>
 												<Box sx={{
-													pt: 1,
+													pt: 3,
 													pb: 0,
 													minHeight: '50px',
 												}}
 												>
+													{messageReasoningPart && isLoading && (
+														<Box sx={{
+															fontSize: '0.85em',
+															color: colors.userText,
+															borderLeft: `3px solid '#888'`,
+															padding: '8px 12px',
+															marginBottom: '12px',
+															borderRadius: '4px',
+															fontStyle: 'italic',
+															opacity: 0.6,
+														}}>
+															{/*@ts-ignore*/}
+															{messageReasoningPart.text || ''}
+														</Box>
+													)}
 													{messageTextPart?.text
 														?
 														<MarkdownText>

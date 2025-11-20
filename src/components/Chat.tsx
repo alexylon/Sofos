@@ -95,6 +95,7 @@ const Chat: React.FC = () => {
 			experimental_throttle: 100,
 		}
 	);
+	console.log('messages', messages);
 
 	const { data: session } = useSession();
 	const user = session?.user;

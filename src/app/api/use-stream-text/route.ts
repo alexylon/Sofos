@@ -71,7 +71,9 @@ export async function POST(req: Request) {
 					? 'minimal'
 					: reasoningEffort,
 				textVerbosity,
-				include: ['reasoning.encrypted_content'],
+				include: ['reasoning.encrypted_content'], // Hence, we need to retrieve the model's encrypted reasoning to be able to pass it to follow-up requests
+				store: false, // No data retention - makes interaction stateless
+				reasoningSummary: 'auto', // output reasoning
 			}
 		};
 	}
