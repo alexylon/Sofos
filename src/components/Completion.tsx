@@ -7,7 +7,6 @@ import PulsingDotSVG from '@/components/PulsingDotSVG';
 import { ChatStatus } from 'ai';
 import { useThemeMode } from '@/theme/ThemeProvider';
 import { themeColors } from '@/theme/theme';
-import { Status } from '@/types/types';
 
 
 interface CompletionProps {
@@ -29,7 +28,6 @@ export default function Completion({
 	const theme = useTheme();
 	const colors = themeColors[mode];
 	const lastUserMessageRef = React.useRef<HTMLDivElement>(null);
-	const isLoading = status === Status.SUBMITTED || status === Status.STREAMING;
 
 	// Scroll last user message to top when user sends a message
 	React.useEffect(() => {
@@ -216,7 +214,7 @@ export default function Completion({
 													minHeight: '50px',
 												}}
 												>
-													{messageReasoningPart && isLoading && (
+													{messageReasoningPart && (
 														<Box sx={{
 															fontSize: '0.85em',
 															color: colors.userText,
