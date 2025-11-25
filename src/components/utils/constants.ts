@@ -38,6 +38,12 @@ export const models: Model[] = [
 		type: ModelType.REASONING,
 	},
 	{
+		value: 'gemini-3-pro-preview',
+		label: 'Gemini 3 Pro',
+		provider: 'google',
+		type: ModelType.REASONING,
+	},
+	{
 		value: 'o3',
 		label: 'o3',
 		provider: 'openAI',

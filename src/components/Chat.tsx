@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import { useChat, UIMessage } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai';
@@ -19,7 +19,6 @@ import {
 	MAX_FILES,
 	models,
 	temperatures,
-	reasoningEfforts,
 	getReasoningEfforts,
 	textVerbosities,
 } from '@/components/utils/constants';
@@ -60,8 +59,14 @@ const saveChatHistory = async (chatHistory: UIMessage[][]): Promise<void> => {
 
 const Chat: React.FC = () => {
 	const [model, setModel] = useState<Model>(models[0]);
-	const hasMinimalEffort = !model.value.startsWith('o');
-	const updatedReasoningEfforts = getReasoningEfforts(hasMinimalEffort);
+	const hasNoneEffort = useMemo(() => {
+		return !model.value.startsWith('o') && !model.value.startsWith('gemini');
+	}, [model.value]);
+
+	const updatedReasoningEfforts = useMemo(() => {
+		return getReasoningEfforts(hasNoneEffort);
+	}, [hasNoneEffort]);
+
 	const [temperature, setTemperature] = useState<number>(temperatures[0].value);
 	const [reasoningEffort, setReasoningEffort] = useState<string>(updatedReasoningEfforts[0].value);
 	const [textVerbosity, setTextVerbosity] = useState<string>(textVerbosities[1].value);
@@ -103,6 +108,17 @@ const Chat: React.FC = () => {
 	const isLoading = status === Status.SUBMITTED || status === Status.STREAMING;
 	const isDisabled = isLoading || !!error;
 	const isMobile = useMediaQuery({ maxWidth: 767 });
+
+	// Update reasoning effort if current value is not available for the selected model
+	useEffect(() => {
+		const availableEffortValues = updatedReasoningEfforts.map(effort => effort.value);
+
+		if (!availableEffortValues.includes(reasoningEffort)) {
+			const newReasoningEffort = updatedReasoningEfforts[0].value;
+			setReasoningEffort(newReasoningEffort);
+			void indexedDBStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);
+		}
+	}, [updatedReasoningEfforts, reasoningEffort]);
 
 	useEffect(() => {
 		let isMounted = true;
@@ -251,15 +267,9 @@ const Chat: React.FC = () => {
 
 		void indexedDBStorage.setItem(STORAGE_KEYS.MODEL, value);
 
-		if (value.startsWith('o') && reasoningEffort === reasoningEfforts[0].value) {
-			const newReasoningEffort = reasoningEfforts[1].value;
-			setReasoningEffort(newReasoningEffort);
-
-			void indexedDBStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);
-		}
-
-		if (value.startsWith('claude') && reasoningEffort === reasoningEfforts[0].value) {
-			const newReasoningEffort = reasoningEfforts[1].value;
+		// If switching to o-series or gemini models with "none" effort, change to "low"
+		if ((value.startsWith('o') || value.startsWith('gemini')) && reasoningEffort === 'none') {
+			const newReasoningEffort = 'low';
 			setReasoningEffort(newReasoningEffort);
 
 			void indexedDBStorage.setItem(STORAGE_KEYS.REASONING_EFFORT, newReasoningEffort);

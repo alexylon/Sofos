@@ -1,5 +1,6 @@
-import { openai } from '@ai-sdk/openai';
-import { anthropic } from '@ai-sdk/anthropic';
+import { openai, OpenAIResponsesProviderOptions } from '@ai-sdk/openai';
+import { anthropic, AnthropicProviderOptions } from '@ai-sdk/anthropic';
+import { google, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google';
 import { convertToModelMessages, streamText, StreamTextResult } from 'ai';
 import { SharedV2ProviderOptions } from '@ai-sdk/provider';
 
@@ -30,6 +31,8 @@ export async function POST(req: Request) {
 				}),
 			};
 		}
+	} else if (model.provider === 'google') {
+		modelName = google(model.value);
 	} else {
 		modelName = openai(model.value);
 	}
@@ -41,7 +44,7 @@ export async function POST(req: Request) {
 			providerOptions = {
 				anthropic: {
 					thinking: { type: 'disabled' },
-				},
+				} satisfies AnthropicProviderOptions,
 			};
 		} else {
 			let budgetTokens = 0;
@@ -61,9 +64,18 @@ export async function POST(req: Request) {
 			providerOptions = {
 				anthropic: {
 					thinking: { type: 'enabled', budgetTokens },
-				},
+				} satisfies AnthropicProviderOptions,
 			};
 		}
+	} else if (model.provider === 'google') {
+		providerOptions = {
+			google: {
+				thinkingConfig: {
+					thinkingLevel: reasoningEffort,
+						includeThoughts: true,
+				},
+			} satisfies GoogleGenerativeAIProviderOptions,
+		};
 	} else {
 		providerOptions = {
 			openai: {
@@ -74,7 +86,7 @@ export async function POST(req: Request) {
 				include: ['reasoning.encrypted_content'], // Hence, we need to retrieve the model's encrypted reasoning to be able to pass it to follow-up requests
 				store: false, // No data retention - makes interaction stateless
 				reasoningSummary: 'auto', // output reasoning
-			}
+			} satisfies OpenAIResponsesProviderOptions
 		};
 	}
 
