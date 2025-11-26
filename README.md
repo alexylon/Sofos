@@ -1,13 +1,15 @@
 # sofos
 
-A multimodal web chatbot developed using Vercel AI SDK, React (TypeScript), Next.js, NextAuth.js and Material UI. It can read messages and analyze multiple images simultaneously. Currently, it responds only with text. 
+A multimodal AI chatbot built with the Vercel AI SDK, React (TypeScript), Next.js, NextAuth.js, and Material UI. 
 
-Supports OpenAI and Anthropic API keys
+It can read incoming messages, convert speech to text, and analyze multiple images at the same time.
+
+Supports OpenAI, Anthropic, and Google models and their API keys.
 
 
 <br/>
 
-## RUN the React/Next.js App in a browser
+## RUN the App in a browser
 
 ### Install Node v.22
 
@@ -16,6 +18,8 @@ Supports OpenAI and Anthropic API keys
 `OPENAI_API_KEY` - go to https://platform.openai.com/account/api-keys
 
 `ANTHROPIC_API_KEY` - go to https://docs.anthropic.com/en/api/getting-started
+
+`GOOGLE_GENERATIVE_AI_API_KEY` - go to https://aistudio.google.com/apikey`
 
 `GITHUB_ID` - go to GitHub -> Settings -> Developer Settings -> OAuth Apps -> New OAuth App
 
@@ -33,7 +37,7 @@ Currently, there is no database support.
 
 Then navigate to http://localhost:3000 in your browser
 
-## Build the app as a Docker image, run it as a Docker container and push it to your Docker Hub repository
+## BUILD the app as a Docker image, run it as a Docker container and push it to your Docker Hub repository
 
 1. Navigate to the project's root directory (where the `dockerfile` and `.env.local` reside).
 
