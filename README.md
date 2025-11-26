@@ -19,7 +19,7 @@ Supports OpenAI, Anthropic, and Google models and their API keys.
 
 `ANTHROPIC_API_KEY` - go to https://docs.anthropic.com/en/api/getting-started
 
-`GOOGLE_GENERATIVE_AI_API_KEY` - go to https://aistudio.google.com/apikey`
+`GOOGLE_GENERATIVE_AI_API_KEY` - go to https://aistudio.google.com/apikey
 
 `GITHUB_ID` - go to GitHub -> Settings -> Developer Settings -> OAuth Apps -> New OAuth App
 
