@@ -11,11 +11,6 @@ export enum ModelType {
 	HYBRID = "HYBRID",
 }
 
-export interface Temperature {
-	value: number;
-	label: string;
-}
-
 export interface ReasoningEffort {
 	value: string;
 	label: string;

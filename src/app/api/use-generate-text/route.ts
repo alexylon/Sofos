@@ -6,13 +6,12 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
 	// Extract the data from the body of the request
-	const { messages, model, temperature } = await req.json();
+	const { messages, model } = await req.json();
 
 	try {
 		const result: GenerateTextResult<any, any> = await generateText({
 			model: openai(model.value),
 			messages: convertToModelMessages(messages),
-			temperature: temperature,
 			topP: 0.8,
 		});
 

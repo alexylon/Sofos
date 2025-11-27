@@ -1,27 +1,21 @@
 import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import Completion from '@/components/Completion';
-import { UIMessage } from '@ai-sdk/react'
+import { useChatContext } from '@/context/ChatContext';
 import { ChatStatus } from 'ai';
 
-interface MessagesContainerProps {
-	hasAttachments: boolean,
-	messages: UIMessage[],
-	messagesEndRef: React.RefObject<HTMLDivElement>,
-	scrollContainerRef: React.RefObject<HTMLDivElement>,
-	status:  ChatStatus,
-	error?: Error,
-}
+const MessagesContainer = () => {
+	const {
+		messages,
+		messagesEndRef,
+		scrollContainerRef,
+		status,
+		error,
+		hasFiles,
+		hasImages,
+	} = useChatContext();
 
-const MessagesContainer = ({
-							   hasAttachments,
-							   messages,
-							   messagesEndRef,
-							   scrollContainerRef,
-							   status,
-							   error,
-						   }: MessagesContainerProps) => {
-	const scrollableGridRef = scrollContainerRef;
+	const hasAttachments = hasFiles || hasImages;
 
 	return (
 		<Grid
@@ -32,26 +26,26 @@ const MessagesContainer = ({
 			}}
 		>
 			<Grid
-				ref={scrollableGridRef}
+				ref={scrollContainerRef}
 				id="messages-scroll-container"
 				item xs={12}
 				sx={{
 					height: hasAttachments
 						? {
-							xs: 'calc(85vh - 138px)', // On extra-small devices
-							sm: 'calc(90vh - 142px)', // On small devices and up
+							xs: 'calc(85vh - 138px)',
+							sm: 'calc(90vh - 142px)',
 						}
 						: {
-							xs: 'calc(85vh - 62px)', // On extra-small devices
-							sm: 'calc(90vh - 65px)', // On small devices and up
+							xs: 'calc(85vh - 62px)',
+							sm: 'calc(90vh - 65px)',
 						},
 					overflow: 'auto',
 					width: '100%',
 					'&::-webkit-scrollbar': {
-						display: 'none', // Hide scrollbar for WebKit browsers
+						display: 'none',
 					},
-					scrollbarWidth: 'none', // Hide scrollbar for Firefox
-					msOverflowStyle: 'none', // Hide scrollbar for IE 10+
+					scrollbarWidth: 'none',
+					msOverflowStyle: 'none',
 				}}
 			>
 				{messages.length
@@ -63,8 +57,8 @@ const MessagesContainer = ({
 						<Completion
 							messages={messages}
 							messagesEndRef={messagesEndRef}
-							scrollContainerRef={scrollableGridRef}
-							status={status}
+							scrollContainerRef={scrollContainerRef}
+							status={status as ChatStatus}
 							error={error}
 						/>
 					</Box>

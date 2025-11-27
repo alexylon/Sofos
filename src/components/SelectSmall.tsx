@@ -2,12 +2,12 @@ import * as React from 'react';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Model, ReasoningEffort, Temperature } from '@/types/types';
+import { Model, ReasoningEffort } from '@/types/types';
 import { ReactNode } from 'react';
 import { useTheme } from '@mui/material';
 
 interface SelectSmallProps {
-	options: Model[] | Temperature[] | ReasoningEffort[];
+	options: Model[] | ReasoningEffort[];
 	handleChange: (event: SelectChangeEvent<string | number>, child: ReactNode) => void;
 	value: string | number;
 	style?: React.CSSProperties;

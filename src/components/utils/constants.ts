@@ -1,4 +1,4 @@
-import { Model, ModelType, ReasoningEffort, Temperature, TextVerbosity } from '@/types/types';
+import { Model, ModelType, ReasoningEffort, TextVerbosity } from '@/types/types';
 
 export const MAX_IMAGES = 5;
 export const MAX_FILES = 5;
@@ -6,7 +6,6 @@ export const MAX_FILES = 5;
 export const STORAGE_KEYS = {
 	CHAT_HISTORY: 'sofosChatHistory',
 	MODEL: 'sofosModel',
-	TEMPERATURE: 'sofosTemperature',
 	REASONING_EFFORT: 'sofosReasoningEffort',
 	TEXT_VERBOSITY: 'sofosTextVerbosity',
 	CURRENT_CHAT_INDEX: 'sofosCurrentChatIndex',
@@ -60,21 +59,6 @@ export const models: Model[] = [
 		label: 'o4-mini',
 		provider: 'openAI',
 		type: ModelType.REASONING,
-	},
-];
-
-export const temperatures: Temperature[] = [
-	{
-		value: 0.2,
-		label: 'Focused',
-	},
-	{
-		value: 0.6,
-		label: 'Balanced',
-	},
-	{
-		value: 1,
-		label: 'Creative',
 	},
 ];
 

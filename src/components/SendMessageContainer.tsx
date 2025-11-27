@@ -6,55 +6,36 @@ import ArrowCircleUpOutlinedIcon from '@mui/icons-material/ArrowCircleUpOutlined
 import { styled } from '@mui/material/styles';
 import AttachmentsContainer from '@/components/AttachmentsContainer';
 import AudioRecorder from '@/components/AudioRecorder';
-import { UIMessage } from '@ai-sdk/react';
 import ActionButton from '@/components/ActionButton';
 import { useMediaQuery } from 'react-responsive';
 import { useThemeMode } from '@/theme/ThemeProvider';
 import { themeColors } from '@/theme/theme';
+import { useChatContext } from '@/context/ChatContext';
 
-interface SendMessageContainerProps {
-	hasImages: boolean;
-	hasFiles: boolean;
-	images: File[];
-	files: File[];
-	isDisabled: boolean;
-	handleRemoveImage: (index: number) => void;
-	handleRemoveFile: (index: number) => void;
-	input: string;
-	handleInputChange: (value: string) => void;
-	onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-	handleFilesChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	isUploadDisabled: boolean;
-	isLoading: boolean;
-	messages: UIMessage[];
-	reload: () => void;
-	stop: () => void;
-	error?: Error;
-}
-
-const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
-	hasImages,
-	hasFiles,
-	images,
-	files,
-	handleRemoveImage,
-	handleRemoveFile,
-	isDisabled,
-	input,
-	handleInputChange,
-	onSubmit,
-	handleFilesChange,
-	isUploadDisabled,
-	isLoading,
-	messages,
-	reload,
-	stop,
-}) => {
+const SendMessageContainer: React.FC = () => {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const isMobile = useMediaQuery({ maxWidth: 767 });
 	const { mode } = useThemeMode();
 	const theme = useTheme();
 	const colors = themeColors[mode];
+
+	const {
+		hasImages,
+		hasFiles,
+		images,
+		files,
+		isDisabled,
+		input,
+		isLoading,
+		messages,
+		setInput,
+		handleRemoveImage,
+		handleRemoveFile,
+		onSubmit,
+		handleFilesChange,
+		regenerate,
+		stop,
+	} = useChatContext();
 
 	useEffect(() => {
 		if (isLoading || !inputRef.current || isMobile) return;
@@ -98,7 +79,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 			console.log('Updating input from:', input, 'to:', newText);
 
 			// Primary method: update through React state
-			handleInputChange(newText);
+			setInput(newText);
 
 			// iOS fallback: also update the input element directly
 			const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent);
@@ -173,7 +154,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 							disabled={isDisabled}
 							size="small"
 							value={input}
-							onChange={(e) => handleInputChange(e.target.value)}
+							onChange={(e) => setInput(e.target.value)}
 							variant="outlined"
 							InputLabelProps={{
 								shrink: false,
@@ -202,7 +183,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 									onWheel: (event) => event.stopPropagation(),
 								},
 								startAdornment: !isDisabled && (
-									<IconButton edge="start" onClick={handleButtonClick} disabled={isUploadDisabled}>
+									<IconButton edge="start" onClick={handleButtonClick} disabled={false}>
 										<AddCircleOutlineOutlinedIcon sx={{ height: '26px', width: '26px', color: theme.palette.text.secondary }} />
 										<VisuallyHiddenInput
 											id="file-input"
@@ -238,7 +219,7 @@ const SendMessageContainer: React.FC<SendMessageContainerProps> = ({
 												</IconButton>
 											</>
 										)}
-										<ActionButton messages={messages} isLoading={isLoading} reload={reload} stop={stop} />
+										<ActionButton messages={messages} isLoading={isLoading} reload={regenerate} stop={stop} />
 									</InputAdornment>
 								),
 							}}

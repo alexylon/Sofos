@@ -11,24 +11,11 @@ import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
 import { signOut } from "next-auth/react"
-import { UIMessage } from '@ai-sdk/react'
 import ClearIcon from '@mui/icons-material/Clear';
 import Box from '@mui/material/Box';
 import { STORAGE_KEYS } from '@/components/utils/constants';
 import { indexedDBStorage } from '@/components/utils/indexedDBStorage';
-
-interface SideBarProps {
-	messages: UIMessage[];
-	setMessages: (messages: UIMessage[]) => void;
-	chatHistory: UIMessage[][];
-	setChatHistory: (history: UIMessage[][]) => void;
-	currentChatIndex: number;
-	setCurrentChatIndex: (index: number) => void;
-	setModel: (model: string) => void;
-	open: boolean;
-	handleStartNewChat: () => void;
-	saveChatHistory: (history: UIMessage[][]) => void;
-}
+import { useChatContext } from '@/context/ChatContext';
 
 const formattedDate = (dateString: Date | undefined): string => {
 	if (!dateString) {
@@ -67,26 +54,26 @@ const formattedDate = (dateString: Date | undefined): string => {
 	}).replace(/\//g, '.');
 };
 
-const SideBar = ({
-					 setMessages,
-					 chatHistory,
-					 setChatHistory,
-					 currentChatIndex,
-					 setCurrentChatIndex,
-					 setModel,
-					 open,
-					 handleStartNewChat,
-					 saveChatHistory,
-				 }: SideBarProps) => {
+const SideBar = () => {
 	const theme = useTheme();
 	const drawerWidth = 200;
-	// @ts-ignore
-	let chatListBackground = theme.palette.background.paper;
+	const chatListBackground = theme.palette.background.paper;
+
+	const {
+		chatHistory,
+		currentChatIndex,
+		open,
+		setMessages,
+		setChatHistory,
+		setCurrentChatIndex,
+		setModel,
+		handleStartNewChat,
+		saveChatHistory,
+	} = useChatContext();
 
 	const DrawerHeader = styled('div')(({ theme }) => ({
 		display: 'flex',
 		alignItems: 'center',
-		// necessary for content to be below app bar
 		...theme.mixins.toolbar,
 		justifyContent: 'center',
 	}));
