@@ -6,6 +6,9 @@ It can read incoming messages, convert speech to text, and analyze multiple imag
 
 Supports OpenAI, Anthropic, and Google models and their API keys.
 
+<br/>
+
+<div align="center"><img align="center" src="/public/images/sofos_screenshot.png" width="400" alt="Sofos"></div>
 
 <br/>
 
