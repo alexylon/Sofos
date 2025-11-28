@@ -142,7 +142,10 @@ $$
 \\frac{\\partial u}{\\partial t}=\\kappa \\frac{\\partial^2 u}{\\partial x^2},\\quad
 u(x,t)=(G_t * u_0)(x),\\quad
 G_t(x)=\\frac{1}{\\sqrt{4\\pi \\kappa t}}\\,e^{-x^2/(4\\kappa t)}.
-$$`,
+$$
+
+Do not add follow-up questions, invitations for the user to provide more details, or suggestions like "If you tell me X, I can do Y" unless the user explicitly asks for that.
+Do not propose next steps or additional topics unless they are strictly required to answer the question.`,
 			providerOptions,
 			tools,
 			async onStepFinish({ response }) {
