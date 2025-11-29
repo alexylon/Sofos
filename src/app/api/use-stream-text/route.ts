@@ -16,28 +16,6 @@ export async function POST(req: Request) {
 	let tools;
 	let providerOptions: SharedV2ProviderOptions;
 
-	// if (model.provider === 'anthropic') {
-	// 	modelName = anthropic(model.value);
-	// } else if (model.provider === 'openAI') {
-	// 	modelName = openai.responses(model.value);
-	//
-	// 	if (!(reasoningEffort === 'none' && model.value === 'gpt-5-mini')) {
-	// 		tools = {
-	// 			web_search_preview: openai.tools.webSearchPreview({
-	// 				// optional configuration:
-	// 				searchContextSize: 'high',
-	// 				userLocation: {
-	// 					type: 'approximate',
-	// 				},
-	// 			}),
-	// 		};
-	// 	}
-	// } else if (model.provider === 'google') {
-	// 	modelName = google(model.value);
-	// } else {
-	// 	modelName = openai(model.value);
-	// }
-
 
 	if (model.provider === 'anthropic') {
 		modelName = anthropic(model.value);
