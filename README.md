@@ -1,5 +1,7 @@
 # sofos
 
+![](https://github.com/alexylon/Sofos/actions/workflows/node.js.yml/badge.svg)
+
 A multimodal AI chatbot built with the Vercel AI SDK, React (TypeScript), Next.js, NextAuth.js, and Material UI. 
 
 It can read incoming messages, convert speech to text, and analyze multiple images at the same time.
