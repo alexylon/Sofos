@@ -110,7 +110,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const router = useRouter();
 	const [model, setModel] = useState<Model>(models[0]);
 	const hasNoneEffort = useMemo(() => {
-		return !model.value.startsWith('o') && !model.value.startsWith('gemini');
+		return !model.value.includes('codex') && !model.value.startsWith('gemini');
 	}, [model.value]);
 
 	const updatedReasoningEfforts = useMemo(() => {

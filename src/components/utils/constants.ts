@@ -19,8 +19,14 @@ export const models: Model[] = [
 		type: ModelType.REASONING,
 	},
 	{
+		value: 'gpt-5.1-codex-max',
+		label: 'GPT-5.1 Codex Max',
+		provider: 'openAI',
+		type: ModelType.REASONING,
+	},
+	{
 		value: 'gpt-5-mini',
-		label: 'GPT-5-mini',
+		label: 'GPT-5 mini',
 		provider: 'openAI',
 		type: ModelType.REASONING,
 	},
