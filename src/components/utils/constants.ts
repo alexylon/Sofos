@@ -13,8 +13,8 @@ export const STORAGE_KEYS = {
 
 export const models: Model[] = [
 	{
-		value: 'gpt-5.1',
-		label: 'GPT-5',
+		value: 'gpt-5.2',
+		label: 'GPT-5.2',
 		provider: 'openAI',
 		type: ModelType.REASONING,
 	},
@@ -26,13 +26,13 @@ export const models: Model[] = [
 	},
 	{
 		value: 'claude-sonnet-4-5',
-		label: 'Claude Sonnet 4',
+		label: 'Claude Sonnet 4.5',
 		provider: 'anthropic',
 		type: ModelType.REASONING,
 	},
 	{
-		value: 'claude-opus-4-1',
-		label: 'Claude Opus 4',
+		value: 'claude-opus-4-5',
+		label: 'Claude Opus 4.5',
 		provider: 'anthropic',
 		type: ModelType.REASONING,
 	},
@@ -40,24 +40,6 @@ export const models: Model[] = [
 		value: 'gemini-3-pro-preview',
 		label: 'Gemini 3 Pro',
 		provider: 'google',
-		type: ModelType.REASONING,
-	},
-	{
-		value: 'o3',
-		label: 'o3',
-		provider: 'openAI',
-		type: ModelType.REASONING,
-	},
-	{
-		value: 'o3-pro',
-		label: 'o3-pro',
-		provider: 'openAI',
-		type: ModelType.REASONING,
-	},
-	{
-		value: 'o4-mini',
-		label: 'o4-mini',
-		provider: 'openAI',
 		type: ModelType.REASONING,
 	},
 ];

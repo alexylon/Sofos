@@ -122,6 +122,13 @@ u(x,t)=(G_t * u_0)(x),\\quad
 G_t(x)=\\frac{1}{\\sqrt{4\\pi \\kappa t}}\\,e^{-x^2/(4\\kappa t)}.
 $$
 
+Always use the metric system for all measurements. If the user uses other units, convert them and answer in metric.
+Show imperial units only when the user explicitly asks for them.
+
+Use only English or Bulgarian in your replies, choosing the one that best matches the current conversation context. 
+If any other language appears, still respond exclusively in English or Bulgarian, prioritizing whichever of these two is already present in the context, 
+unless you are explicitly asked to use a different language.
+
 Do not add follow-up questions, invitations for the user to provide more details, or suggestions like "If you tell me X, I can do Y" unless the user explicitly asks for that.
 Do not propose next steps or additional topics unless they are strictly required to answer the question.`,
 			providerOptions,
