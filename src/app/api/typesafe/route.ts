@@ -1,16 +1,17 @@
+import { APIConnectionError, APIError, APITimeoutError, TypeSafeClient, TypeSafeError } from '@typesafe-ai/sdk';
 import type { NextRequest } from 'next/server';
 import { requireAllowedUser } from '@/app/api/auth/allowedUser';
 import type { JevAnswer } from '@/types/types';
 
-const SYSTEM_ONE_URL = 'https://api.typesafe.ai/v1/systemone';
-// TypeSafe's docs say to wait and retry these: 429 rate limited, 529 overloaded.
-const RETRY_STATUSES = [429, 529];
-const RETRY_DELAYS_MS = [300, 1000];
-const MAX_RETRY_AFTER_MS = 5000;
 // Jev answers in under a second, so this only catches a stalled connection.
 const ATTEMPT_TIMEOUT_MS = 15000;
+// The SDK ignores Retry-After waits longer than this and retries after its usual
+// short delay, so a long wait can't hold up the reply.
+const MAX_RETRY_AFTER_MS = 5000;
 
 export const maxDuration = 60;
+
+let client: TypeSafeClient | undefined;
 
 export async function POST(req: NextRequest) {
 	const denied = await requireAllowedUser(req);
@@ -29,82 +30,65 @@ export async function POST(req: NextRequest) {
 		return Response.json({ error: 'TYPESAFE_API_KEY is not set on the server' }, { status: 500 });
 	}
 
-	let response: Response;
+	// Without a question, the SDK throws an unclear error.
+	if (typeof question !== 'object' || question === null) {
+		return Response.json({ error: 'The request has no question' }, { status: 400 });
+	}
+
+	// Outside the try, so a setup mistake shows as a server error, not a bad question.
+	// The SDK retries failures itself; asking again has no side effects.
+	client ??= new TypeSafeClient({
+		apiKey,
+		timeout: ATTEMPT_TIMEOUT_MS,
+		retry: { maxRetryAfterMs: MAX_RETRY_AFTER_MS },
+	});
+
+	let answer: JevAnswer | undefined;
 
 	try {
-		response = await askSystemOne(apiKey, JSON.stringify({ model, state, questions: { answer: question } }));
+		const result = await client.systemOne({ model, state, questions: { answer: question } });
+
+		answer = result?.answers?.answer as JevAnswer | undefined;
 	} catch (error) {
 		console.error('TypeSafe error:', error);
-		return Response.json({ error: `TypeSafe is unreachable: ${describeFailure(error)}` }, { status: 502 });
+		return failure(error);
 	}
 
-	if (!response.ok) {
-		const body = await response.text().catch(() => '');
-		console.error('TypeSafe error:', response.status, body);
-		return Response.json(
-			{ error: describeError(body) || `TypeSafe answered HTTP ${response.status}` },
-			{ status: response.status },
-		);
-	}
-
-	const body = await response.json().catch(() => null);
-	const answer: JevAnswer | undefined = body?.answers?.answer;
-
-	if (!isDrawable(answer, question?.type)) {
-		console.error('TypeSafe sent an unexpected response:', body);
+	if (!isDrawable(answer, question.type)) {
+		console.error('TypeSafe sent an unexpected response:', answer);
 		return Response.json({ error: 'TypeSafe sent an unexpected response' }, { status: 502 });
 	}
 
 	return Response.json({ answer });
 }
 
-// Asking twice has no side effects, so dropped connections and busy responses
-// are retried.
-async function askSystemOne(apiKey: string, body: string): Promise<Response> {
-	for (let attempt = 0; ; attempt++) {
-		const isLastAttempt = attempt === RETRY_DELAYS_MS.length;
-
-		try {
-			const response = await fetch(SYSTEM_ONE_URL, {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${apiKey}`,
-					'Content-Type': 'application/json',
-				},
-				body,
-				signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
-			});
-
-			if (isLastAttempt || !RETRY_STATUSES.includes(response.status)) return response;
-
-			await response.body?.cancel();
-			await sleep(retryAfterMs(response) ?? RETRY_DELAYS_MS[attempt]);
-		} catch (error) {
-			if (isLastAttempt) throw error;
-
-			console.warn('TypeSafe request failed, retrying:', error);
-			await sleep(RETRY_DELAYS_MS[attempt]);
-		}
+function failure(error: unknown): Response {
+	// The SDK's message starts with the status, such as "400 Unknown model: x".
+	if (error instanceof APIError) {
+		const message = hasReadableMessage(error.body) ? error.message : String(error.status);
+		return Response.json({ error: `TypeSafe answered HTTP ${message}` }, { status: error.status });
 	}
+
+	if (error instanceof APIConnectionError) {
+		return Response.json({ error: `TypeSafe is unreachable: ${describeFailure(error)}` }, { status: 502 });
+	}
+
+	// The SDK rejects some invalid questions before sending them.
+	if (error instanceof TypeSafeError) return Response.json({ error: error.message }, { status: 400 });
+
+	return Response.json({ error: 'Unexpected error while asking TypeSafe' }, { status: 500 });
 }
 
-// Capped so a long Retry-After can't hold up the answer.
-function retryAfterMs(response: Response): number | undefined {
-	const seconds = Number(response.headers.get('retry-after'));
-	return seconds > 0 ? Math.min(seconds * 1000, MAX_RETRY_AFTER_MS) : undefined;
-}
+// The fetch error only says "fetch failed"; the real network error is its cause.
+function describeFailure(error: APIConnectionError): string {
+	if (error instanceof APITimeoutError) return `no answer within ${error.timeoutMs / 1000} seconds`;
 
-function sleep(ms: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, ms));
-}
+	const fetchError = error.cause;
 
-// fetch only says "fetch failed"; the real network error is in its cause.
-function describeFailure(error: unknown): string {
-	if (!(error instanceof Error)) return 'unknown error';
-	if (error.name === 'TimeoutError') return `no answer within ${ATTEMPT_TIMEOUT_MS / 1000} seconds`;
+	if (!(fetchError instanceof Error)) return error.message;
 
-	const cause = error.cause instanceof Error ? error.cause.message : undefined;
-	return cause ? `${error.message} (${cause})` : error.message;
+	const cause = fetchError.cause instanceof Error ? fetchError.cause.message : undefined;
+	return cause ? `${fetchError.message} (${cause})` : fetchError.message;
 }
 
 // The screen reads these fields directly; a reply without them would crash it.
@@ -123,27 +107,12 @@ function isDrawable(answer: JevAnswer | undefined, type: string | undefined): an
 	}
 }
 
-function isRecord(value: unknown): boolean {
-	return typeof value === 'object' && value !== null;
+// The SDK builds its message from one of these fields. Without them it falls back
+// to the raw body, such as a proxy's HTML page, which isn't worth showing.
+function hasReadableMessage(body: unknown): boolean {
+	return isRecord(body) && ['detail', 'message', 'error'].some(field => field in body);
 }
 
-// TypeSafe's error detail is a message, a list of invalid fields, or an object
-// with a message. Anything else returns '' so the caller shows the HTTP status.
-function describeError(body: string): string {
-	try {
-		const { detail } = JSON.parse(body);
-
-		if (typeof detail === 'string') return detail;
-
-		if (Array.isArray(detail)) {
-			return (detail as { loc: string[]; msg: string }[])
-				.map(({ loc, msg }) => `${loc.slice(1).join('.')}: ${msg}`)
-				.join('; ');
-		}
-
-		return typeof detail?.message === 'string' ? detail.message : '';
-	} catch {
-		// Not JSON, such as an HTML error page from the proxy in front of TypeSafe.
-		return '';
-	}
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null;
 }
